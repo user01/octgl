@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "./node_modules/.bin/webpack -p",
+    "watch": "node_modules/.bin/webpack-dev-server -d --colors --content-base build/ --hot --inline --port 9105",
     "serve-example": "./node_modules/.bin/ws -d ./example/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,9 +16,12 @@
     "css-loader": "^0.23.1",
     "file-loader": "^0.8.5",
     "json-loader": "^0.5.4",
+    "less": "^2.6.1",
     "less-loader": "^2.2.3",
     "local-web-server": "^1.2.2",
+    "style-loader": "^0.13.1",
     "ts-loader": "^0.8.2",
+    "typescript": "^1.8.10",
     "webpack": "^1.13.0",
     "webpack-dev-server": "^1.14.1"
   }
