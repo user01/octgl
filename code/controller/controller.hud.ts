@@ -25,7 +25,7 @@ export class ControllerHUD {
       honkOverlay,
       mainOverlay,
     ];
-    this.switchTo(ControllerState.Default);
+    this.SwitchTo(ControllerState.Default);
     this.hackElm = defaultOverlay.getElementsByClassName("screen-header")[0];
   }
 
@@ -38,7 +38,7 @@ export class ControllerHUD {
       elm.style.zIndex = '0';
     })
   }
-  private switchTo = (state: ControllerState) => {
+  public SwitchTo = (state: ControllerState) => {
     this.hideAll();
     switch (state) {
       case ControllerState.Default:

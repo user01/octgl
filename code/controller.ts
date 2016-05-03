@@ -2,6 +2,8 @@
 /// <reference path="../typings/references.d.ts" />
 declare var AirConsole;
 import ControllerHUD from './controller/controller.hud';
+import ToController from './interfaces/to.controller';
+
 
 const initController = () => {
   require('../less/controller.less');
@@ -25,9 +27,12 @@ const initController = () => {
       airconsole.convertPlayerNumberToDeviceId(player));
     controllerHud.setPlayerIdAndNick(player, nick);
   };
-  airconsole.onMessage = (from, data) => {
+  airconsole.onMessage = (from: number, data: ToController) => {
     // console.log(airconsole);
-    console.log('Heard message ' + from, data);
+    console.log('Heard message from ' + from, data);
+    if (data.state) {
+      controllerHud.SwitchTo(data.state.state);
+    }
   }
 
   setTimeout(() => {
