@@ -1,7 +1,7 @@
 
 /// <reference path="../../typings/references.d.ts" />
 
-import {MenuCommand, MenuCommands} from '../interfaces/leadercommand';
+import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
 import * as TrackList from '../data/track.list';
 
 /** Controls selection of next track
