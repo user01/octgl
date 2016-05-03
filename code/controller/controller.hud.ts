@@ -1,19 +1,15 @@
 
 /// <reference path="../../typings/references.d.ts" />
 
-import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
-// import * as TrackList from '../data/track.list';
+import {MenuCommand} from '../interfaces/menucommand';
+import {ControllerCommand, ControllerState} from '../interfaces/controllercommand';
 
 /** Handles rendering of HUDs and catching of events
 */
 export class ControllerHUD {
   private trackName: HTMLHeadingElement;
   private huds: HTMLElement[];
-  private static defaultIndex = 0;
-  private static leaderIndex = 1;
-  private static honkIndex = 2;
-  private static mainIndex = 3;
-  
+
   private hackElm;
 
   constructor(
@@ -29,11 +25,11 @@ export class ControllerHUD {
       honkOverlay,
       mainOverlay,
     ];
-    this.switchTo(ControllerHUD.defaultIndex);
+    this.switchTo(ControllerState.Default);
     this.hackElm = defaultOverlay.getElementsByClassName("screen-header")[0];
   }
-  
-  public setPlayerIdAndNick = (id:number,nick:string) => {
+
+  public setPlayerIdAndNick = (id: number, nick: string) => {
     this.hackElm.innerText = `Heard: ${id} - ${nick}`;
   }
 
@@ -42,9 +38,23 @@ export class ControllerHUD {
       elm.style.zIndex = '0';
     })
   }
-  private switchTo = (index: number) => {
+  private switchTo = (state: ControllerState) => {
     this.hideAll();
-    this.huds[index].style.zIndex = '1';
+    switch (state) {
+      case ControllerState.Default:
+        this.defaultOverlay.style.zIndex = '1';
+        break;
+      case ControllerState.Honk:
+        this.honkOverlay.style.zIndex = '1';
+        break;
+      case ControllerState.Leader:
+        this.leaderOverlay.style.zIndex = '1';
+        break;
+      case ControllerState.Main:
+        this.mainOverlay.style.zIndex = '1';
+        break;
+      default:
+    }
   }
 }
 

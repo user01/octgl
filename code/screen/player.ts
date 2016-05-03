@@ -5,9 +5,10 @@
 */
 export class Player {
 
-  public get Color() { return this._color; }
+  public get Color() { return this.color; }
+  public get DeviceId() { return this.deviceId }
 
-  constructor(private _color: number) {
+  constructor(private color: number, private deviceId: number) {
   }
 
 }
