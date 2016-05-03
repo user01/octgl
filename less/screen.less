@@ -1,0 +1,46 @@
+@import "common.less";
+
+@border-small-value: 0.4em solid teal;
+@border-big-value: 1.4em solid teal;
+
+.control-box.selected {
+  .flex-center {
+    border-left: @border-big-value;
+    border-right: @border-big-value;
+    background: #DBA;
+  }
+}
+
+.flex-center {
+  border-left: @border-small-value;
+  border-right: @border-small-value;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  resize: vertical;
+  overflow: auto;
+  p {
+    margin: 0;
+    padding: 1.2em;
+  }
+  div {
+    margin: auto;
+    height: 25vw;
+    width: 25vw;
+    background: #CCC;
+    .control-arrows {
+      .left {
+        float: left;
+      }
+      .right {
+        float: right;
+      }
+    }
+  }
+}
+
+#track-name {
+  text-align:  center;
+}
+

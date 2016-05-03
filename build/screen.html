@@ -1,16 +1,62 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Racer Screen</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.4.0.js"></script>
-    <script type="text/javascript" src="vendor/babylon.2.3.js"></script>
-    <script type="text/javascript" src="vendor/oimo.js"></script>
-    <script type="text/javascript" src="generated/screen.bundle.js"></script>
-  </head>
-  <body>
-    <p>Screen</p>
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <title>Racer Screen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="vendor/font-awesome-4.6.1/css/font-awesome.min.css">
+  <link rel="stylesheet" href="vendor/pure-min.css">
+
+  <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.4.0.js"></script>
+  <script type="text/javascript" src="vendor/babylon.2.3.js"></script>
+  <script type="text/javascript" src="vendor/oimo.js"></script>
+  <script type="text/javascript" src="generated/screen.bundle.js"></script>
+</head>
+
+<body>
+  <div id="main" class="controls">
+    <div class="pure-g">
+
+      <div id="controls-left" class="pure-u-1-3 control-box selected">
+        <div class="flex-center">
+
+          <div>
+            <p class="control-arrows">
+              <span class="left">
+                <i class="fa fa-chevron-circle-left fa-2x"></i>
+              </span>
+              <span class="right">
+                <i class="fa fa-chevron-circle-right fa-2x"></i>
+              </span>
+            </p>
+            <h3 id="track-name">Track Name</h3>
+            <p>Image will go here</p>
+
+          </div>
+        </div>
+      </div>
+
+      <div id="controls-middle" class="pure-u-1-3 control-box">
+        <div class="flex-center">
+          <p>More options here</p>
+        </div>
+
+      </div>
+
+      <div id="controls-right" class="pure-u-1-3 control-box">
+        <div class="flex-center">
+
+          <div>
+            <h3>Play</h3>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</body>
+
 </html>

@@ -6,6 +6,7 @@ import Game from './screen/game';
 
 const initScreen = () => {
   console.log('Screen online');
+  require('../less/screen.less');
 
   const game = new Game(new AirConsole());
 
