@@ -2,6 +2,7 @@
 /// <reference path="../../typings/references.d.ts" />
 
 import MainMenu from './mainmenu';
+import ToController from '../interfaces/to.controller';
 import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
 import {ControllerCommand, ControllerState} from '../interfaces/controllercommand';
 import PlayerList from './playerlist';
@@ -41,13 +42,14 @@ export class Game {
   private onConnect = (device_id) => {
     // const player_id = this.airConsole.convertDeviceIdToPlayerNumber(device_id);
     console.log(`Device ${device_id} connected`);
-    this.managePlayerRoster();
     this.playerList.addPlayer(device_id);
-    this.airConsole.message(device_id, { msg: 'hey player! ' + device_id });
+    this.managePlayerRoster();
+    // this.message(device_id, { msg: 'hey player! ' + device_id });
   }
 
   private onDisconnect = (device_id) => {
     console.log(`Device ${device_id} disconnected`);
+    this.playerList.removePlayer(device_id);
     this.managePlayerRoster();
   }
   private onMessage = (device_id, data) => {
@@ -68,17 +70,21 @@ export class Game {
     switch (this.state) {
       case GameState.Game:
         this.playerList.Players.forEach((p) => {
-          this.airConsole.message(p.DeviceId, { state: ControllerState.Main });
+          this.message(p.DeviceId, { state: { state: ControllerState.Main } });
         });
         break;
       default:
       case GameState.Lobby:
-        this.airConsole.message(this.playerList.Leader.DeviceId, { state: ControllerState.Leader });
+        this.message(this.playerList.Leader.DeviceId, { state: { state: ControllerState.Leader } });
         this.playerList.Followers.forEach((p) => {
-          this.airConsole.message(p.DeviceId, { state: ControllerState.Honk });
+          this.message(p.DeviceId, { state: { state: ControllerState.Honk } });
         });
         break;
     }
+  }
+
+  private message = (device_id: number, message: ToController) => {
+    this.airConsole.message(device_id, message);
   }
 
   private requestNewGame = () => {

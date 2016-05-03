@@ -26,7 +26,7 @@ const initController = () => {
     controllerHud.setPlayerIdAndNick(player, nick);
   };
   airconsole.onMessage = (from, data) => {
-    console.log(airconsole);
+    // console.log(airconsole);
     console.log('Heard message ' + from, data);
   }
 

@@ -1,9 +1,10 @@
 import RacerCommand from './racercommand';
 import ControllerCommand from './controllercommand';
+import MenuCommand from './menucommand';
 
 export interface ToScreen {
   racer?: RacerCommand;
-  controller?: ControllerCommand;
+  menu?: MenuCommand;
 }
 
 export default ToScreen;

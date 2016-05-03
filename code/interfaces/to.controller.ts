@@ -1,7 +1,8 @@
-import MenuCommand from './menucommand';
+import RacerCommand from './racercommand';
+import ControllerCommand from './controllercommand';
 
 export interface ToController {
-  menu?: MenuCommand;
+  state?: ControllerCommand;
 }
 
 export default ToController;
