@@ -8,7 +8,10 @@ const initScreen = () => {
   console.log('Screen online');
   require('../less/screen.less');
 
-  const game = new Game(new AirConsole());
+  const game = new Game(
+    new AirConsole(),
+    document.getElementById('main')
+  );
 
 
   // var canvas = <HTMLCanvasElement>document.getElementById('render-canvas');
@@ -52,8 +55,8 @@ const initScreen = () => {
   // window.addEventListener('resize', function () {
   //   engine.resize();
   // });
-  
-  
+
+
 }
 
 
