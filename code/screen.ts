@@ -3,6 +3,7 @@
 declare var AirConsole;
 
 import Game from './screen/game';
+import Utility from './data/utility';
 
 const initScreen = () => {
   console.log('Screen online');
@@ -10,7 +11,9 @@ const initScreen = () => {
 
   const game = new Game(
     new AirConsole(),
-    document.getElementById('main')
+    document.getElementById('main'),
+    <HTMLCanvasElement>document.getElementById('render-canvas'),
+    Utility.NodeListToArray(document.getElementsByClassName('player-hud'))
   );
 
 

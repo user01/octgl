@@ -23,7 +23,12 @@ export class Game {
   private playerList: PlayerList;
   private state: GameState;
 
-  constructor(private airConsole, mainControls: HTMLElement) {
+  constructor(
+    private airConsole,
+    mainControls: HTMLElement,
+    renderCanvas: HTMLCanvasElement,
+    playerHuds: Array<Element>
+  ) {
     this.airConsole.onConnect = this.onConnect;
     this.airConsole.onDisconnect = this.onDisconnect;
     this.airConsole.onMessage = this.onMessage;
@@ -96,6 +101,14 @@ export class Game {
 
   private requestNewGame = () => {
     console.log('Requesting a new game with payload of ', this.mainMenu.CurrentGamePayload);
+
+    //Switch the game state
+    this.state = GameState.Game;
+
+    // collect current device_ids and colors into racers
+
+
+    // pass racers into race object
   }
 }
 
