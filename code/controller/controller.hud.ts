@@ -10,7 +10,6 @@ export class ControllerHUD {
   private trackName: HTMLHeadingElement;
   private huds: HTMLElement[];
 
-  private hackElm;
 
   constructor(
     private defaultOverlay: HTMLElement,
@@ -26,11 +25,36 @@ export class ControllerHUD {
       mainOverlay,
     ];
     this.SwitchTo(ControllerState.Default);
-    this.hackElm = defaultOverlay.getElementsByClassName("screen-header")[0];
+    const x = defaultOverlay.getElementsByClassName("screen-header");
+    this.huds.forEach(this.assignClick);
   }
 
-  public setPlayerIdAndNick = (id: number, nick: string) => {
-    this.hackElm.innerText = `Heard: ${id} - ${nick}`;
+  // public setPlayerIdAndNick = (id: number, nick: string) => {
+  //   this.hackElm.innerText = `Heard: ${id} - ${nick}`;
+  // }
+
+  private assignClick = (elm: HTMLElement) => {
+    const clickableBtns = elm.getElementsByClassName('btn');
+    for (var i = 0; i < clickableBtns.length; i++) {
+      let id = clickableBtns[i].id;
+      let currentHandler = (evt) => {
+        evt.preventDefault();
+        console.log('heard a click start from ', id);
+        this.handleClick(id);
+      };
+      clickableBtns[i].addEventListener('touchstart', currentHandler, true);
+      clickableBtns[i].addEventListener('mousedown', currentHandler, true);
+    }
+  }
+  private handleClick = (id:string) => {
+    // switch (id) {
+    //   case '':
+        
+    //     break;
+    
+    //   default:
+    //     break;
+    // }
   }
 
   private hideAll = () => {
