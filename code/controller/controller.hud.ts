@@ -1,7 +1,8 @@
 
 /// <reference path="../../typings/references.d.ts" />
 
-import {MenuCommand} from '../interfaces/menucommand';
+import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
+import {RacerCommand} from '../interfaces/racercommand';
 import {ControllerCommand, ControllerState} from '../interfaces/controllercommand';
 
 /** Handles rendering of HUDs and catching of events
@@ -10,6 +11,20 @@ export class ControllerHUD {
   private trackName: HTMLHeadingElement;
   private huds: HTMLElement[];
 
+  private currentRacerCommand: RacerCommand = {
+    left: false,
+    right: false,
+    special: false
+  };
+
+  private static IDS_TO_CMDS = {
+    'leader-honk': MenuCommands.Honk,
+    'leader-up': MenuCommands.Up,
+    'leader-left': MenuCommands.Left,
+    'leader-right': MenuCommands.Right,
+    'leader-down': MenuCommands.Down,
+    'leader-choose': MenuCommands.Choose,
+  }
 
   constructor(
     private defaultOverlay: HTMLElement,
@@ -37,24 +52,40 @@ export class ControllerHUD {
     const clickableBtns = elm.getElementsByClassName('btn');
     for (var i = 0; i < clickableBtns.length; i++) {
       let id = clickableBtns[i].id;
-      let currentHandler = (evt) => {
+      let handlerOn = (evt) => {
         evt.preventDefault();
         console.log('heard a click start from ', id);
-        this.handleClick(id);
+        this.handleClickOn(id);
       };
-      clickableBtns[i].addEventListener('touchstart', currentHandler, true);
-      clickableBtns[i].addEventListener('mousedown', currentHandler, true);
+      clickableBtns[i].addEventListener('touchstart', handlerOn, true);
+      clickableBtns[i].addEventListener('mousedown', handlerOn, true);
+      let handlerOff = (evt) => {
+        evt.preventDefault();
+        console.log('heard a click end from ', id);
+        this.handleClickOff(id);
+      };
+      clickableBtns[i].addEventListener('touchend', handlerOff, true);
+      clickableBtns[i].addEventListener('mouseup', handlerOff, true);
     }
   }
-  private handleClick = (id:string) => {
-    // switch (id) {
-    //   case '':
-        
-    //     break;
-    
-    //   default:
-    //     break;
-    // }
+  private handleClickOn = (id: string) => {
+    if (ControllerHUD.IDS_TO_CMDS[id]) {
+      this.handleNewCommand({ cmd: ControllerHUD.IDS_TO_CMDS[id] });
+      return;
+    }
+    this.toggleRacerId(id, true);
+  }
+  private handleClickOff = (id: string) => {
+    this.toggleRacerId(id, false);
+  }
+  private toggleRacerId = (id: string, state: boolean) => {
+    switch (id) {
+      case 'button-upper-left':
+      case 'button-lower-left':
+        break;
+      default:
+        // console.error('bad id of ', id);
+    }
   }
 
   private hideAll = () => {
@@ -66,19 +97,19 @@ export class ControllerHUD {
     this.hideAll();
     switch (state) {
       case ControllerState.Default:
-        console.log('Showing Default');
+        // console.log('Showing Default');
         this.defaultOverlay.style.zIndex = '1';
         break;
       case ControllerState.Honk:
-        console.log('Showing Honk');
+        // console.log('Showing Honk');
         this.honkOverlay.style.zIndex = '1';
         break;
       case ControllerState.Leader:
-        console.log('Showing Leader');
+        // console.log('Showing Leader');
         this.leaderOverlay.style.zIndex = '1';
         break;
       case ControllerState.Main:
-        console.log('Showing Main');
+        // console.log('Showing Main');
         this.mainOverlay.style.zIndex = '1';
         break;
       default:

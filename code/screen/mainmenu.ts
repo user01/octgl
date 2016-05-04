@@ -125,7 +125,7 @@ export class MainMenu {
       }),
       R.join('')
     )(this.players);
-    console.log('HTML', html);
+    // console.log('HTML', html);
     this.playerListElement.innerHTML = html;
   }
 

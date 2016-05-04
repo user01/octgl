@@ -42,19 +42,19 @@ export class Game {
 
   private onConnect = (device_id) => {
     // const player_id = this.airConsole.convertDeviceIdToPlayerNumber(device_id);
-    console.log(`Device ${device_id} connected`);
+    console.log(`SCREEN - Device ${device_id} connected`);
     this.playerList.addPlayer(device_id);
     this.managePlayerRoster();
     // this.message(device_id, { msg: 'hey player! ' + device_id });
   }
 
   private onDisconnect = (device_id) => {
-    console.log(`Device ${device_id} disconnected`);
+    console.log(`SCREEN - Device ${device_id} disconnected`);
     this.playerList.removePlayer(device_id);
     this.managePlayerRoster();
   }
   private onMessage = (device_id, data) => {
-    console.log(`Device ${device_id} sent `, data);
+    console.log(`SCREEN - Device ${device_id} sent `, data);
   }
 
   private managePlayerRoster = () => {
