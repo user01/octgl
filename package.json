@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "./node_modules/.bin/webpack -p",
+    "build": "./node_modules/.bin/webpack",
+    "production": "./node_modules/.bin/webpack -p",
     "watch": "node_modules/.bin/webpack-dev-server -d --colors --content-base build/ --hot --inline --port 9105",
     "serve-example": "./node_modules/.bin/ws -d ./example/",
     "test": "echo \"Error: no test specified\" && exit 1"
