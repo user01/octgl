@@ -31,11 +31,11 @@ export class MainMenu {
   }
 
   private get columnIndex() {
-    return Math.abs(this.currentColumnIndex % this.columns.length);
+    return Math.abs(this.currentColumnIndex) % this.columns.length;
   }
 
   private get trackIndex() {
-    return Math.abs(this.currentTrackIndex % TrackList.default.tracks.length);
+    return Math.abs(this.currentTrackIndex) % TrackList.default.tracks.length;
   }
 
 
@@ -43,12 +43,14 @@ export class MainMenu {
     this.columns = this.mainControls.getElementsByClassName('control-box');
     this.trackName = <HTMLHeadingElement>this.mainControls.getElementsByClassName('track-name')[0];
     this.playerListElement = <HTMLElement>this.mainControls.getElementsByClassName('player-list')[0];
+    this.currentColumnIndex = 10000 * this.columns.length;
+    this.currentTrackIndex = 10000 * TrackList.default.tracks.length;
     this.renderAll();
   }
 
-  public HandleCommandFromLeader = (cmd: MenuCommand) => {
-    console.log('cmd ', cmd);
-    switch (cmd.cmd) {
+  public HandleCommandFromLeader = (cmd: MenuCommands) => {
+    console.log('cmd ', cmd, this.currentColumnIndex);
+    switch (cmd) {
       case MenuCommands.Left:
         this.currentColumnIndex--;
         break;

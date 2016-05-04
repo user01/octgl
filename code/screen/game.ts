@@ -4,8 +4,10 @@
 import MainMenu from './mainmenu';
 import ToController from '../interfaces/to.controller';
 import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
+import ToScreen from '../interfaces/to.screen';
 import {ControllerCommand, ControllerState} from '../interfaces/controllercommand';
 import PlayerList from './playerlist';
+
 
 export enum GameState {
   Lobby,
@@ -53,8 +55,11 @@ export class Game {
     this.playerList.removePlayer(device_id);
     this.managePlayerRoster();
   }
-  private onMessage = (device_id, data) => {
+  private onMessage = (device_id: number, data: ToScreen) => {
     console.log(`SCREEN - Device ${device_id} sent `, data);
+    if (this.playerList.Leader.DeviceId == device_id && data.menu) {
+      this.mainMenu.HandleCommandFromLeader(data.menu.cmd);
+    }
   }
 
   private managePlayerRoster = () => {
