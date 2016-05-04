@@ -14,7 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ramda": "^0.21.0"
+    "ramda": "^0.21.0",
+    "react": "^15.0.2",
+    "react-dom": "^15.0.2"
   },
   "devDependencies": {
     "css-loader": "^0.23.1",
