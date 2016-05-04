@@ -9,6 +9,11 @@ export default {
       "name": "Fake",
       "filename": "test.track.babylon",
       "image": "some.jpg"
+    },
+    {
+      "name": "Faux Track",
+      "filename": "test.track.babylon",
+      "image": "some.jpg"
     }
   ]
 }
