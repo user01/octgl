@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "watch-simple": "./node_modules/.bin/webpack  --progress --colors --watch",
     "build": "./node_modules/.bin/webpack",
     "production": "./node_modules/.bin/webpack -p",
     "watch": "node_modules/.bin/webpack-dev-server -d --colors --content-base build/ --hot --inline --port 9105",
