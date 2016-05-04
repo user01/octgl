@@ -27,6 +27,7 @@ export class Game {
     this.airConsole.onMessage = this.onMessage;
 
     this.mainMenu = new MainMenu(mainControls, this.requestNewGame);
+    // this.playerList = new PlayerList(this.airConsole.getNickname);
     this.playerList = new PlayerList();
     this.state = GameState.Lobby;
 
@@ -81,6 +82,7 @@ export class Game {
         });
         break;
     }
+    this.mainMenu.HandlePlayerList(this.playerList.Players);
   }
 
   private message = (device_id: number, message: ToController) => {

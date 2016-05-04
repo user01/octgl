@@ -18,14 +18,15 @@ export class PlayerList {
   private static MAX_PLAYERS = 4;
   private static COLOR_SET = [0x3366cc, 0xdc3912, 0xff9900, 0x109618, 0x990099, 0x0099c6]
 
-  constructor() {
+  constructor(
+    private getNickname = (device_id: number) => { return 'Unknown'; }) {
   }
 
   public addPlayer = (device_id: number) => {
     if (this.players.length > 4) return;
     const currentColors = R.map(R.prop('Color'), this.players);
     const newColor: number = (<any>R.find)(R.flip(R.contains)(currentColors), PlayerList.COLOR_SET) || 0xFF0000;
-    this.players.push(new Player(newColor, device_id));
+    this.players.push(new Player(newColor, device_id, this.getNickname(device_id)));
     console.log(`Added player ${device_id}`, this.players);
   }
 

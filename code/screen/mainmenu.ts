@@ -3,6 +3,8 @@
 
 import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
 import * as TrackList from '../data/track.list';
+import Player from './player';
+import * as R from 'ramda';
 
 /** Controls selection of next track
  * Lists current player states
@@ -14,6 +16,9 @@ export class MainMenu {
   private columns: NodeListOf<Element>;
   private trackName: HTMLHeadingElement;
   private imageElement: HTMLImageElement;
+  private playerListElement: HTMLElement;
+
+  private players: Player[] = [];
 
   public get CurrentGamePayload() {
     return {
@@ -37,6 +42,7 @@ export class MainMenu {
   constructor(private mainControls: HTMLElement, private onNewGameRequest: () => void) {
     this.columns = this.mainControls.getElementsByClassName('control-box');
     this.trackName = <HTMLHeadingElement>this.mainControls.getElementsByClassName('track-name')[0];
+    this.playerListElement = <HTMLElement>this.mainControls.getElementsByClassName('player-list')[0];
     this.renderAll();
   }
 
@@ -86,9 +92,15 @@ export class MainMenu {
     }
   }
 
+  public HandlePlayerList = (players: Player[]) => {
+    this.players = players;
+    this.renderAll();
+  }
+
   private renderAll = () => {
     this.renderSelectedColumn();
     this.renderTrackToMenu();
+    this.renderPlayerList();
   }
 
   private renderSelectedColumn = () => {
@@ -102,6 +114,19 @@ export class MainMenu {
   }
   private renderTrackToMenu = () => {
     this.trackName.innerText = this.currentTrack.name;
+  }
+  private renderPlayerList = () => {
+    const html = (<any>R.pipe)(
+      R.map((p: Player) => {
+        return `
+        <li style="background: 0x${p.Color.toString(16)}">
+          ${p.DeviceId} - ${p.Nickname}
+        </li>`;
+      }),
+      R.join('')
+    )(this.players);
+    console.log('HTML', html);
+    this.playerListElement.innerHTML = html;
   }
 
 }
