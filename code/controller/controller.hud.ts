@@ -1,6 +1,7 @@
 
 /// <reference path="../../typings/references.d.ts" />
 
+import ToScreen from '../interfaces/to.screen';
 import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
 import {RacerCommand} from '../interfaces/racercommand';
 import {ControllerCommand, ControllerState} from '../interfaces/controllercommand';
@@ -12,11 +13,20 @@ export class ControllerHUD {
   private trackName: HTMLHeadingElement;
   private huds: HTMLElement[];
 
-  private currentRacerCommand: RacerCommand = {
-    left: false,
-    right: false,
-    special: false
+  private get currentRacerCommand(): RacerCommand {
+    return {
+      left: this.left,
+      right: this.right,
+      special: this.special
+    }
   };
+  private leftUpper = false;
+  private leftLower = false;
+  private special = false;
+  private rightUpper = false;
+  private rightLower = false;
+  private get left() { return this.leftUpper || this.leftLower; }
+  private get right() { return this.rightUpper || this.rightLower; }
 
   private static IDS_TO_CMDS = {
     'leader-honk': MenuCommands.Honk,
@@ -32,7 +42,7 @@ export class ControllerHUD {
     private leaderOverlay: HTMLElement,
     private honkOverlay: HTMLElement,
     private mainOverlay: HTMLElement,
-    private handleNewCommand: (cmd: MenuCommand) => void) {
+    private handleNewCommand: (msg: ToScreen) => void) {
 
     this.huds = [
       defaultOverlay,
@@ -72,22 +82,38 @@ export class ControllerHUD {
   private handleClickOn = (id: string) => {
     // console.log(ControllerHUD.IDS_TO_CMDS[id], id, ControllerHUD.IDS_TO_CMDS);
     if (R.is(Number, ControllerHUD.IDS_TO_CMDS[id])) {
-      this.handleNewCommand({ cmd: ControllerHUD.IDS_TO_CMDS[id] });
+      this.handleNewCommand({ menu: { cmd: ControllerHUD.IDS_TO_CMDS[id] } });
       return;
+    } else {
+      this.toggleRacerId(id, true);
     }
-    this.toggleRacerId(id, true);
   }
   private handleClickOff = (id: string) => {
-    this.toggleRacerId(id, false);
+    if (!R.is(Number, ControllerHUD.IDS_TO_CMDS[id])) {
+      this.toggleRacerId(id, false);
+    }
   }
   private toggleRacerId = (id: string, state: boolean) => {
     switch (id) {
       case 'button-upper-left':
+        this.leftUpper = state;
+        break;
       case 'button-lower-left':
+        this.leftLower = state;
+        break;
+      case 'button-upper-right':
+        this.rightUpper = state;
+        break;
+      case 'button-lower-right':
+        this.rightLower = state;
+        break;
+      case 'button-special':
+        this.special = state;
         break;
       default:
-      // console.error('bad id of ', id);
+        console.error('bad id of ', id);
     }
+    this.handleNewCommand({ racer: this.currentRacerCommand });
   }
 
   private hideAll = () => {

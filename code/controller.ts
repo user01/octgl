@@ -19,18 +19,17 @@ const initController = () => {
     document.getElementById('main'),
     (cmd) => {
       console.log('HUD heard ', cmd);
-      // message(AirConsole.SCREEN, { menu: cmd });
-      airconsole.message(AirConsole.SCREEN, { menu: cmd });
+      airconsole.message(AirConsole.SCREEN, cmd);
     }
   );
 
-  /** Called when screen calls setActivePlayers() */
-  airconsole.onActivePlayersChange = (player) => {
-    console.log(`onActivePlayersChange to ${player}`);
-    const nick = airconsole.getNickname(
-      airconsole.convertPlayerNumberToDeviceId(player));
-    // controllerHud.setPlayerIdAndNick(player, nick);
-  };
+  // /** Called when screen calls setActivePlayers() */
+  // airconsole.onActivePlayersChange = (player) => {
+  //   console.log(`onActivePlayersChange to ${player}`);
+  //   const nick = airconsole.getNickname(
+  //     airconsole.convertPlayerNumberToDeviceId(player));
+  //   // controllerHud.setPlayerIdAndNick(player, nick);
+  // };
   airconsole.onMessage = (from: number, data: ToController) => {
     // console.log(airconsole);
     console.log('CONTROLLER Heard message from ' + from, data);
