@@ -65,14 +65,14 @@ export class ControllerHUD {
       let id = clickableBtns[i].id;
       let handlerOn = (evt) => {
         evt.preventDefault();
-        console.log('heard a click start from ', id);
+        // console.log('heard a click start from ', id);
         this.handleClickOn(id);
       };
       clickableBtns[i].addEventListener('touchstart', handlerOn, true);
       clickableBtns[i].addEventListener('mousedown', handlerOn, true);
       let handlerOff = (evt) => {
         evt.preventDefault();
-        console.log('heard a click end from ', id);
+        // console.log('heard a click end from ', id);
         this.handleClickOff(id);
       };
       clickableBtns[i].addEventListener('touchend', handlerOff, true);
