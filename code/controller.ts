@@ -18,7 +18,7 @@ const initController = () => {
     document.getElementById('honk'),
     document.getElementById('main'),
     (cmd) => {
-      console.log('HUD heard ', cmd);
+      // console.log('HUD heard ', cmd);
       airconsole.message(AirConsole.SCREEN, cmd);
     }
   );

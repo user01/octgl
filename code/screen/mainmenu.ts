@@ -49,7 +49,7 @@ export class MainMenu {
   }
 
   public HandleCommandFromLeader = (cmd: MenuCommands) => {
-    console.log('cmd ', cmd, this.currentColumnIndex);
+    // console.log('cmd ', cmd, this.currentColumnIndex);
     switch (cmd) {
       case MenuCommands.Left:
         this.currentColumnIndex--;
@@ -75,14 +75,15 @@ export class MainMenu {
 
   private handleChoose = () => {
     // console.log('column index', this.columnIndex);
-    switch (this.columnIndex) {
-      case 2:
-        this.onNewGameRequest();
-        break;
-      default:
-        this.handleUpDown(false);
-        break;
-    }
+    this.onNewGameRequest();
+    // switch (this.columnIndex) {
+    //   case 2:
+    //     this.onNewGameRequest();
+    //     break;
+    //   default:
+    //     this.handleUpDown(false);
+    //     break;
+    // }
   }
 
   private handleUpDown = (up: boolean) => {
