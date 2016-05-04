@@ -4,6 +4,7 @@
 import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
 import {RacerCommand} from '../interfaces/racercommand';
 import {ControllerCommand, ControllerState} from '../interfaces/controllercommand';
+import * as R from 'ramda';
 
 /** Handles rendering of HUDs and catching of events
 */
@@ -69,7 +70,8 @@ export class ControllerHUD {
     }
   }
   private handleClickOn = (id: string) => {
-    if (ControllerHUD.IDS_TO_CMDS[id]) {
+    // console.log(ControllerHUD.IDS_TO_CMDS[id], id, ControllerHUD.IDS_TO_CMDS);
+    if (R.is(Number, ControllerHUD.IDS_TO_CMDS[id])) {
       this.handleNewCommand({ cmd: ControllerHUD.IDS_TO_CMDS[id] });
       return;
     }
@@ -84,7 +86,7 @@ export class ControllerHUD {
       case 'button-lower-left':
         break;
       default:
-        // console.error('bad id of ', id);
+      // console.error('bad id of ', id);
     }
   }
 
