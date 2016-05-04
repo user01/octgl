@@ -119,7 +119,7 @@ export class MainMenu {
     const html = (<any>R.pipe)(
       R.map((p: Player) => {
         return `
-        <li style="background: 0x${p.Color.toString(16)}">
+        <li style="background: #${p.Color.toString(16)}">
           ${p.DeviceId} - ${p.Nickname}
         </li>`;
       }),
