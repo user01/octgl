@@ -42,15 +42,19 @@ export class ControllerHUD {
     this.hideAll();
     switch (state) {
       case ControllerState.Default:
+        console.log('Showing Default');
         this.defaultOverlay.style.zIndex = '1';
         break;
       case ControllerState.Honk:
+        console.log('Showing Honk');
         this.honkOverlay.style.zIndex = '1';
         break;
       case ControllerState.Leader:
+        console.log('Showing Leader');
         this.leaderOverlay.style.zIndex = '1';
         break;
       case ControllerState.Main:
+        console.log('Showing Main');
         this.mainOverlay.style.zIndex = '1';
         break;
       default:

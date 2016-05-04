@@ -35,9 +35,9 @@ const initController = () => {
     }
   }
 
-  setTimeout(() => {
-    airconsole.message(AirConsole.SCREEN, { move: 50 });
-  }, 1500);
+  // setTimeout(() => {
+  //   airconsole.message(AirConsole.SCREEN, { move: 50 });
+  // }, 1500);
 }
 
 window.onload = initController;

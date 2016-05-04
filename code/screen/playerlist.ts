@@ -4,7 +4,7 @@
 // import MainMenu from './mainmenu';
 // import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
 import Player from './player';
-import R = require('ramda');
+import * as R from 'ramda';
 
 /** Tracks active players, their attribute
 */
@@ -26,12 +26,15 @@ export class PlayerList {
     const currentColors = R.map(R.prop('Color'), this.players);
     const newColor: number = (<any>R.find)(R.flip(R.contains)(currentColors), PlayerList.COLOR_SET) || 0xFF0000;
     this.players.push(new Player(newColor, device_id));
+    console.log(`Added player ${device_id}`, this.players);
   }
 
   public removePlayer = (device_id: number) => {
+    // console.log(R);
     this.players = R.filter(
-      R.pipe(R.prop('DeviceId'), R.eq(device_id)),
+      R.pipe(R.prop('DeviceId'), R.equals(device_id), R.not),
       this.players);
+    console.log(`Removed player ${device_id}`, this.players);
   }
 
 }
