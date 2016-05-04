@@ -4,6 +4,8 @@ declare var AirConsole;
 
 import Game from './screen/game';
 import Utility from './data/utility';
+import RaceHUD from './screen/race/race.hud.tsx';
+import x from './tmp.tsx';
 
 const initScreen = () => {
   console.log('Screen online');
@@ -16,6 +18,9 @@ const initScreen = () => {
     Utility.NodeListToArray(document.getElementsByClassName('player-hud'))
   );
 
+  console.log('GO!');
+  var rh = new RaceHUD(document.getElementById('play-box'));
+  // x(document.getElementById('play-box'));
 
   // var canvas = <HTMLCanvasElement>document.getElementById('render-canvas');
   // var engine = new BABYLON.Engine(canvas, true);
@@ -63,4 +68,5 @@ const initScreen = () => {
 }
 
 
-window.onload = initScreen;
+// window.onload = initScreen;
+document.addEventListener('DOMContentLoaded', initScreen, false);
