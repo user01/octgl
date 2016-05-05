@@ -148,6 +148,12 @@ export class ControllerHUD {
       default:
     }
   }
+  public Colorize = (color: number) => {
+    const colorStr = `#${color.toString(16)}`;
+    this.huds.forEach((elm) => {
+      elm.style.background = colorStr;
+    })
+  }
 }
 
 

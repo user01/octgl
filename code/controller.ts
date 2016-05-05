@@ -40,6 +40,9 @@ const initController = () => {
     if (R.is(Number, data.state)) {
       controllerHud.SwitchTo(data.state);
     }
+    if (R.is(Number, data.color)) {
+      controllerHud.Colorize(data.color);
+    }
   }
 
   setTimeout(() => {

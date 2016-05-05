@@ -89,7 +89,11 @@ export class Game {
   }
 
   private updateDeviceIdControllerState = (device_id: number) => {
-    this.message(device_id, { state: this.getControllerStateFromDeviceId(device_id) });
+    this.message(device_id,
+      {
+        state: this.getControllerStateFromDeviceId(device_id),
+        color: this.getColorFromDeviceId(device_id)
+      });
   }
 
   private getControllerStateFromDeviceId = (device_id: number): ControllerState => {
@@ -106,6 +110,10 @@ export class Game {
           ControllerState.Leader :
           ControllerState.Honk;
     }
+  }
+  private getColorFromDeviceId = (device_id: number): number => {
+    const player = R.find(p => p.DeviceId == device_id, this.playerList.Players);
+    return player ? player.Color : 0x111111;
   }
 
   private message = (device_id: number, message: ToController) => {
