@@ -8,7 +8,7 @@ import {ToScreen, ScreenRequest} from '../interfaces/to.screen';
 import ControllerState from '../interfaces/controllerstate';
 import PlayerList from './playerlist';
 
-import Race from './race/race';
+import Race from './race/race.tsx';
 
 import * as R from 'ramda';
 
@@ -31,34 +31,21 @@ export class Game {
   constructor(
     private airConsole,
     private mainControls: HTMLElement,
-    private renderCanvas: HTMLCanvasElement,
-    private playerHuds: Array<HTMLElement>,
-    private loadingOverlay: HTMLElement
+    private raceElement: HTMLElement
   ) {
     this.airConsole.onConnect = this.onConnect;
     this.airConsole.onDisconnect = this.onDisconnect;
     this.airConsole.onMessage = this.onMessage;
 
     this.mainMenu = new MainMenu(mainControls, this.requestNewGame);
-    // this.playerList = new PlayerList(this.airConsole.getNickname);
     this.playerList = new PlayerList();
     this.state = GameState.Lobby;
-
-    // setInterval(() => {
-    //   this.mainMenu.HandleCommandFromLeader({ cmd: MenuCommands.Right });
-    // }, 3000);
-
-    // setInterval(() => {
-    //   this.mainMenu.HandleCommandFromLeader({ cmd: MenuCommands.Choose });
-    // }, 1000);
   }
 
   private onConnect = (device_id) => {
-    // const player_id = this.airConsole.convertDeviceIdToPlayerNumber(device_id);
     console.log(`SCREEN - Device ${device_id} connected`);
     this.playerList.addPlayer(device_id);
     this.managePlayerRoster();
-    // this.message(device_id, { msg: 'hey player! ' + device_id });
   }
 
   private onDisconnect = (device_id) => {
@@ -131,6 +118,11 @@ export class Game {
     //Switch the game state
     this.state = GameState.Game;
     this.mainMenu.Hide();
+
+    this.race = new Race(
+      this.playerList.Players,
+      this.raceElement,
+      this.mainMenu.CurrentGamePayload.track.filename);
 
     // collect current device_ids and colors into racers
 

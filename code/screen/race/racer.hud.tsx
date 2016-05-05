@@ -17,7 +17,10 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
   render() {
     return (
       <div>
-        <h2>Racer HUD - {this.props.device_id * 10}</h2>
+        <div className="controls">
+          <canvas ref="render-canvas"></canvas>
+        </div>
+
       </div>
     );
   }

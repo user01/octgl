@@ -11,10 +11,13 @@ import RacerHUD from './racer.hud.tsx';
 */
 export class RaceHUD {
 
-  constructor(private playerHuds: Array<HTMLElement>) {
+  // constructor(private playerHuds: Array<HTMLElement>) {
+  constructor(domElm: HTMLElement) {
     // console.log('render!');
-    // ReactDOM.render(<RacerHUD device_id={4} />, domElm);
-
+    var t = 0;
+    setInterval(()=>{
+      ReactDOM.render(<RacerHUD device_id={t++} />, domElm);
+    },2000);
   }
 
   /** Update components like lap/direction */
@@ -23,7 +26,7 @@ export class RaceHUD {
   }
 
   private hideAll = () => {
-    this.playerHuds.forEach(hud => hud.style.display = 'none');
+    // this.playerHuds.forEach(hud => hud.style.display = 'none');
   }
 }
 

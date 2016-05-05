@@ -13,13 +13,11 @@ const initScreen = () => {
   const game = new Game(
     new AirConsole(),
     document.getElementById('main'),
-    <HTMLCanvasElement>document.getElementById('render-canvas'),
-    <HTMLElement[]>Utility.NodeListToArray(document.getElementsByClassName('player-hud')),
-    document.getElementById('loading-view')
+    document.getElementById('race-view')
   );
 
   // console.log('GO!');
-  // var rh = new RaceHUD(document.getElementById('play-box'));
+  var rh = new RaceHUD(document.getElementById('play-box'));
   // x(document.getElementById('play-box'));
 
   // var canvas = <HTMLCanvasElement>document.getElementById('render-canvas');
