@@ -30,9 +30,10 @@ export class Game {
 
   constructor(
     private airConsole,
-    mainControls: HTMLElement,
-    renderCanvas: HTMLCanvasElement,
-    playerHuds: Array<Element>
+    private mainControls: HTMLElement,
+    private renderCanvas: HTMLCanvasElement,
+    private playerHuds: Array<HTMLElement>,
+    private loadingOverlay: HTMLElement
   ) {
     this.airConsole.onConnect = this.onConnect;
     this.airConsole.onDisconnect = this.onDisconnect;
@@ -93,15 +94,6 @@ export class Game {
   }
 
   private managePlayerRoster = () => {
-    // const active_players = <number[]>this.airConsole.getActivePlayerDeviceIds();
-    // const connected_controllers = <number[]>this.airConsole.getControllerDeviceIds();
-
-    // const targetPlayers = Math.min(4, connected_controllers.length);
-    // console.log(`active players ${active_players.length} vs controllers ${connected_controllers.length} and target players of ${targetPlayers}`);
-    // this.airConsole.setActivePlayers(targetPlayers);
-
-    if (this.playerList.Players.length < 1) return;
-
     //now set current player states
     this.playerList.Players.forEach((p) => {
       this.updateDeviceIdControllerState(p.DeviceId);
@@ -138,6 +130,7 @@ export class Game {
 
     //Switch the game state
     this.state = GameState.Game;
+    this.mainMenu.Hide();
 
     // collect current device_ids and colors into racers
 

@@ -48,6 +48,13 @@ export class MainMenu {
     this.renderAll();
   }
 
+  public Hide = () => {
+    this.mainControls.style.display = 'none';
+  }
+  public Show = () => {
+    this.mainControls.style.display = 'display';
+  }
+
   public HandleCommandFromLeader = (cmd: MenuCommands) => {
     // console.log('cmd ', cmd, this.currentColumnIndex);
     switch (cmd) {

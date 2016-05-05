@@ -11,7 +11,14 @@ export class Race {
   public get Racers() { return this.racers; }
   private racers: Racer[] = [];
 
-  constructor(currentPlayers: Player[]) {
+  constructor(
+    currentPlayers: Player[],
+    private loadingElement: HTMLElement,
+    private canvasElement: HTMLCanvasElement,
+    private playerHuds: Array<HTMLElement>
+  ) {
+    //throw up loading screen
+    
   }
 
 }

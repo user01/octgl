@@ -14,7 +14,8 @@ const initScreen = () => {
     new AirConsole(),
     document.getElementById('main'),
     <HTMLCanvasElement>document.getElementById('render-canvas'),
-    Utility.NodeListToArray(document.getElementsByClassName('player-hud'))
+    <HTMLElement[]>Utility.NodeListToArray(document.getElementsByClassName('player-hud')),
+    document.getElementById('loading-view')
   );
 
   // console.log('GO!');
