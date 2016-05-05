@@ -112,13 +112,35 @@ export class Race {
 
   private babylonSceneLoaded = () => {
 
-    var camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 5, -10), this.scene);
+    this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.OimoJSPlugin());
+    // this.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
+    this.scene.workerCollisions = true;
+    this.scene.collisionsEnabled = true;
 
-    // target the camera to scene origin
-    camera.setTarget(BABYLON.Vector3.Zero());
+    this.scene.meshes.filter((m) => {
+      return m.name.indexOf('Cube') > -1;
+    }).map((m) => {
+      console.log(m.name)
+    })
+
+    var camera01 = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 5, -10), this.scene);
+    var camera02 = new BABYLON.FreeCamera('camera2', new BABYLON.Vector3(10, 5, -10), this.scene);
+
+
+    this.scene.activeCameras.push(camera01);
+    this.scene.activeCameras.push(camera02);
+
+    camera01.viewport = new BABYLON.Viewport(0, 0, 0.5, 1);
+    camera02.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 1);
 
     // create a basic light, aiming 0,1,0 - meaning, to the sky
     var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
+
+
+
+    // target the camera to scene origin
+    // camera01.app
+
 
     // create a built-in "sphere" shape; its constructor takes 5 params: name, width, depth, subdivisions, scene
     var sphere = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, this.scene);
@@ -126,8 +148,23 @@ export class Race {
     // move the sphere upward 1/2 of its height
     sphere.position.y = 1;
 
+    camera02.setTarget(sphere.position);
+
+
     // create a built-in "ground" shape; its constructor takes the same 5 params as the sphere's one
     var ground = BABYLON.Mesh.CreateGround('ground1', 6, 6, 2, this.scene);
+    ground.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, friction: 0, restitution: 0.7 });
+    // ground.checkCollisions = true;
+
+    var box = BABYLON.Mesh.CreateBox("crate", 2, this.scene);
+    // box.material = new BABYLON.StandardMaterial("Mat", this.scene);
+    // box.material.diffuseTexture = new BABYLON.Texture("textures/crate.png", this.scene);
+    // box.material.diffuseTexture.hasAlpha = true;
+    box.position = new BABYLON.Vector3(0, 10, 0);
+    box.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 1, friction: 0.5, restitution: 0.5 });
+    camera01.setTarget(box.position);
+
+
 
     this.engine.runRenderLoop(() => {
       sphere.position.y = Math.sin((new Date()).getMilliseconds() / 200);
@@ -140,6 +177,9 @@ export class Race {
   }
   private babylonEngineResize = () => {
     this.engine.resize();
+  }
+  private setupCameras = (count: number) => {
+
   }
 
   private closeLevel = () => {
