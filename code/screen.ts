@@ -17,7 +17,7 @@ const initScreen = () => {
   );
 
   // console.log('GO!');
-  var rh = new RaceHUD(document.getElementById('play-box'));
+  // var rh = new RaceHUD(document.getElementById('play-box'));
   // x(document.getElementById('play-box'));
 
   // var canvas = <HTMLCanvasElement>document.getElementById('render-canvas');
