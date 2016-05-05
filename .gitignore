@@ -1,3 +1,4 @@
 npm-debug.log
 *.blend1
 *.blend2
+build/assets/*.log

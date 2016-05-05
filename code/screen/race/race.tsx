@@ -13,8 +13,10 @@ import TwoPlayer from './huds/twoplayer.tsx';
 
 import LoadingBoard from './loading.board.tsx';
 import LeaderBoard from './leader.board.tsx';
+import UnsupportedBoard from './unsupported.board.tsx';
 
 export enum RaceState {
+  Unsupported, // Cannot run the asset
   Loading, //loading assets
   Pending, // before race starts
   Red, //red flag
@@ -34,6 +36,7 @@ export class Race {
   private state: RaceState = RaceState.Loading;
 
   private engine: BABYLON.Engine;
+  private scene: BABYLON.Scene;
 
   private static id = 0;
   private id = Race.id++;
@@ -61,6 +64,7 @@ export class Race {
 
         {this.state == RaceState.Post ? <LeaderBoard /> : ''}
         {this.state == RaceState.Loading ? <LoadingBoard /> : ''}
+        {this.state == RaceState.Unsupported ? <UnsupportedBoard /> : ''}
       </div>), this.rootElement);
   }
 
@@ -76,41 +80,61 @@ export class Race {
   }
 
   private loadLevel = (filename) => {
-
+    if (!BABYLON.Engine.isSupported()) {
+      this.state = RaceState.Unsupported;
+      this.render();
+      return;
+    }
 
     this.engine = new BABYLON.Engine(this.canvas, true);
-    var sphere;
 
-    // create a basic BJS Scene object
-    var scene = new BABYLON.Scene(this.engine);
+    BABYLON.SceneLoader.Load("assets/", filename, this.engine, (newScene) => {
+      // Wait for textures and shaders to be ready
+      this.scene = newScene;
+      this.scene.executeWhenReady(this.babylonSceneLoaded);
+    }, (progress) => {
+      // To do: give progress feedback to user
+      console.log('progress', progress);
+    });
 
+
+    // // Attach camera to canvas inputs
+    // newScene.activeCamera.attachControl(canvas);
+
+    // // Once the scene is loaded, just register a render loop to render it
+    // engine.runRenderLoop(function () {
+    //   newScene.render();
+    // });
     // create a FreeCamera, and set its position to (x:0, y:5, z:-10)
-    var camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 5, -10), scene);
+    // engine.stopRenderLoop()
+    window.addEventListener(`resize.${this.id}`, this.babylonEngineResize);
+  }
+
+  private babylonSceneLoaded = () => {
+
+    var camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 5, -10), this.scene);
 
     // target the camera to scene origin
     camera.setTarget(BABYLON.Vector3.Zero());
 
     // create a basic light, aiming 0,1,0 - meaning, to the sky
-    var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), scene);
+    var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
 
     // create a built-in "sphere" shape; its constructor takes 5 params: name, width, depth, subdivisions, scene
-    sphere = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, scene);
+    var sphere = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, this.scene);
 
     // move the sphere upward 1/2 of its height
     sphere.position.y = 1;
 
     // create a built-in "ground" shape; its constructor takes the same 5 params as the sphere's one
-    var ground = BABYLON.Mesh.CreateGround('ground1', 6, 6, 2, scene);
+    var ground = BABYLON.Mesh.CreateGround('ground1', 6, 6, 2, this.scene);
 
-    this.engine.runRenderLoop(function () {
+    this.engine.runRenderLoop(() => {
       sphere.position.y = Math.sin((new Date()).getMilliseconds() / 200);
       // sphere.position.y = 1;
-      scene.render();
+      this.scene.render();
     });
-    // engine.stopRenderLoop()
-    window.addEventListener(`resize.${this.id}`, this.babylonEngineResize);
   }
-
   private babylonEngineLoop = () => {
 
   }
