@@ -99,6 +99,7 @@ export class Game {
   private getControllerStateFromDeviceId = (device_id: number): ControllerState => {
     switch (this.state) {
       case GameState.Game:
+        // console.log('Racers', this.race.Racers);
         const isRacing = R.pipe(
           R.map(R.prop('DeviceId')),
           R.contains(device_id)
@@ -130,12 +131,14 @@ export class Game {
     this.race = new Race(
       this.playerList.Players,
       this.raceElement,
-      this.mainMenu.CurrentGamePayload.track.filename);
+      this.mainMenu.CurrentGamePayload.track.filename,
+      () => {
+        console.log('race done');
+        this.mainMenu.Show();
+      });
 
-    // collect current device_ids and colors into racers
-
-
-    // pass racers into race object
+    //Set the controllers
+    this.managePlayerRoster();
   }
 }
 

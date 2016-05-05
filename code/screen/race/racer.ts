@@ -19,7 +19,7 @@ export class Racer extends Player {
   }
 
   public static PlayersToRacers = (players: Player[]): Racer[] => {
-    return [];
+    return players;
   }
 }
 
