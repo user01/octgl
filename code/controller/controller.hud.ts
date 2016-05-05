@@ -4,7 +4,7 @@
 import ToScreen from '../interfaces/to.screen';
 import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
 import {RacerCommand} from '../interfaces/racercommand';
-import {ControllerCommand, ControllerState} from '../interfaces/controllercommand';
+import ControllerState from '../interfaces/controllerstate';
 import * as R from 'ramda';
 
 /** Handles rendering of HUDs and catching of events
@@ -42,6 +42,7 @@ export class ControllerHUD {
     private leaderOverlay: HTMLElement,
     private honkOverlay: HTMLElement,
     private mainOverlay: HTMLElement,
+    private waitingOverlay: HTMLElement,
     private handleNewCommand: (msg: ToScreen) => void) {
 
     this.huds = [
@@ -49,6 +50,7 @@ export class ControllerHUD {
       leaderOverlay,
       honkOverlay,
       mainOverlay,
+      waitingOverlay
     ];
     this.SwitchTo(ControllerState.Default);
     const x = defaultOverlay.getElementsByClassName("screen-header");
@@ -124,6 +126,9 @@ export class ControllerHUD {
   public SwitchTo = (state: ControllerState) => {
     this.hideAll();
     switch (state) {
+      case ControllerState.Waiting:
+        this.waitingOverlay.style.zIndex = '1';
+        break;
       case ControllerState.Default:
         // console.log('Showing Default');
         this.defaultOverlay.style.zIndex = '1';

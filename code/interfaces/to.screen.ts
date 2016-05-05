@@ -1,10 +1,14 @@
 import RacerCommand from './racercommand';
-import ControllerCommand from './controllercommand';
 import MenuCommand from './menucommand';
+
+export enum ScreenRequest {
+  UpdateControllerState
+}
 
 export interface ToScreen {
   racer?: RacerCommand;
   menu?: MenuCommand;
+  request?: ScreenRequest;
 }
 
 export default ToScreen;

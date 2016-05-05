@@ -11,18 +11,19 @@ import RacerHUD from './racer.hud.tsx';
 */
 export class RaceHUD {
 
-  constructor(domElm: HTMLElement) {
-    console.log('render!');
-    ReactDOM.render(<RacerHUD device_id={4} />, domElm);
-  }
-
-  /** Pick the correct  */
-  public InitialPaint = () => {
+  constructor(private playerHuds: Array<HTMLElement>) {
+    // console.log('render!');
+    // ReactDOM.render(<RacerHUD device_id={4} />, domElm);
 
   }
+
   /** Update components like lap/direction */
   public CurrentPaint = () => {
 
+  }
+
+  private hideAll = () => {
+    this.playerHuds.forEach(hud => hud.style.display = 'none');
   }
 }
 

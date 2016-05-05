@@ -4,9 +4,13 @@
 import MainMenu from './mainmenu';
 import ToController from '../interfaces/to.controller';
 import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
-import ToScreen from '../interfaces/to.screen';
-import {ControllerCommand, ControllerState} from '../interfaces/controllercommand';
+import {ToScreen, ScreenRequest} from '../interfaces/to.screen';
+import ControllerState from '../interfaces/controllerstate';
 import PlayerList from './playerlist';
+
+import Race from './race/race';
+
+import * as R from 'ramda';
 
 
 export enum GameState {
@@ -22,6 +26,7 @@ export class Game {
   private mainMenu: MainMenu;
   private playerList: PlayerList;
   private state: GameState;
+  private race: Race;
 
   constructor(
     private airConsole,
@@ -62,9 +67,29 @@ export class Game {
   }
   private onMessage = (device_id: number, data: ToScreen) => {
     console.log(`SCREEN - Device ${device_id} sent `, data);
-    if (this.playerList.Leader.DeviceId == device_id && data.menu) {
-      this.mainMenu.HandleCommandFromLeader(data.menu.cmd);
+    if (R.is(Number, data.request)) {
+      console.log(`Heard request from ${device_id}`, data);
+      switch (data.request) {
+        case ScreenRequest.UpdateControllerState:
+          this.updateDeviceIdControllerState(device_id);
+          break;
+        default:
+      }
     }
+    switch (this.state) {
+      case GameState.Lobby:
+        if (this.playerList.Leader.DeviceId == device_id && data.menu) {
+          this.mainMenu.HandleCommandFromLeader(data.menu.cmd);
+        }
+        break;
+      case GameState.Game:
+        if (data.racer) {
+
+        }
+        break;
+      default:
+    }
+
   }
 
   private managePlayerRoster = () => {
@@ -78,21 +103,30 @@ export class Game {
     if (this.playerList.Players.length < 1) return;
 
     //now set current player states
+    this.playerList.Players.forEach((p) => {
+      this.updateDeviceIdControllerState(p.DeviceId);
+    });
+    this.mainMenu.HandlePlayerList(this.playerList.Players);
+  }
+
+  private updateDeviceIdControllerState = (device_id: number) => {
+    this.message(device_id, { state: this.getControllerStateFromDeviceId(device_id) });
+  }
+
+  private getControllerStateFromDeviceId = (device_id: number): ControllerState => {
     switch (this.state) {
       case GameState.Game:
-        this.playerList.Players.forEach((p) => {
-          this.message(p.DeviceId, { state: { state: ControllerState.Main } });
-        });
-        break;
+        const isRacing = R.pipe(
+          R.map(R.prop('DeviceId')),
+          R.contains(device_id)
+        )(this.race.Racers);
+        return isRacing ? ControllerState.Main : ControllerState.Waiting;
       default:
       case GameState.Lobby:
-        this.message(this.playerList.Leader.DeviceId, { state: { state: ControllerState.Leader } });
-        this.playerList.Followers.forEach((p) => {
-          this.message(p.DeviceId, { state: { state: ControllerState.Honk } });
-        });
-        break;
+        return (this.playerList.Leader.DeviceId == device_id) ?
+          ControllerState.Leader :
+          ControllerState.Honk;
     }
-    this.mainMenu.HandlePlayerList(this.playerList.Players);
   }
 
   private message = (device_id: number, message: ToController) => {
