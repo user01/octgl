@@ -112,43 +112,69 @@ export class Race {
 
   private babylonSceneLoaded = () => {
 
-    this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.OimoJSPlugin());
+    // this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.OimoJSPlugin());
     // this.scene.enablePhysics(new BABYLON.Vector3(0, -.0981, 0), new BABYLON.CannonJSPlugin());
     // this.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
     this.scene.workerCollisions = true;
     this.scene.collisionsEnabled = true;
 
     this.scene.meshes.filter((m) => {
-      return m.name.indexOf('Cube') > -1;
+      return m.name.indexOf('static') > -1;
     }).map((m) => {
       console.log(m.name);
+      m.checkCollisions = true;
     });
 
-    this.scene.meshes.filter((m) => {
-      return m.name.indexOf('ground') > -1;
-    }).map((m) => {
-      console.log('grounding', m.name);
-      // m.setPhysicsState(BABYLON.PhysicsEngine.ConvexHullImpostor);
-      m.setPhysicsState(BABYLON.PhysicsEngine.HeightmapImpostor, { mass: 0, friction: 2.5, restitution: 0 });
-    });
+    // this.scene.meshes.filter((m) => {
+    //   return m.name.indexOf('ground') > -1;
+    // }).map((m) => {
+    //   console.log('grounding', m.name);
+    //   // m.coll
+    //   // m.checkCollisions = true;
+    //   // m.setPhysicsState(BABYLON.PhysicsEngine.ConvexHullImpostor);
+    //   // m.setPhysicsState(BABYLON.PhysicsEngine.HeightmapImpostor, { mass: 0, friction: 2.5, restitution: 0 });
+    // });
 
 
+
+    // this.scene.meshes.filter((m) => {
+    //   return m.name.indexOf('_ACD') > -1;
+    // }).map((m) => {
+    //   console.log('grounding', m.name);
+    //   // m.coll
+    //   // m.checkCollisions = true;
+    //   // m.setPhysicsState(BABYLON.PhysicsEngine.ConvexHullImpostor);
+    //   // m.setPhysicsState(BABYLON.PhysicsEngine.ConvexHullImpostor, { mass: 0, friction: 2.5, restitution: 0 });
+    //   m.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, friction: 2.5, restitution: 0 });
+    // });
+
+    // var g = BABYLON.Mesh.CreateGroundFromHeightMap()
 
     // // create a built-in "ground" shape; its constructor takes the same 5 params as the sphere's one
     // var ground = BABYLON.Mesh.CreateGround('ground1', 6, 6, 2, this.scene);
     // ground.setPhysicsState(BABYLON.PhysicsEngine.PlaneImpostor, { mass: 0, friction: 0, restitution: 0.7 });
     // // ground.checkCollisions = true;
 
+    // var box = BABYLON.Mesh.CreateBox("crate", 0.5, this.scene);
+    // // box.material = new BABYLON.StandardMaterial("Mat", this.scene);
+    // // box.material.diffuseTexture = new BABYLON.Texture("textures/crate.png", this.scene);
+    // // box.material.diffuseTexture.hasAlpha = true;
+    // box.position = new BABYLON.Vector3(0, 10, 0);
+    // // box.checkCollisions = true;
+    // // box.ellipsoid = new BABYLON.Vector3(1, 1, 1);
+    // console.log(box);
+    // // box.apply
+    // box.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor, { mass: 1, friction: 0.5, restitution: 0.5 });
+    // // box.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 1, friction: 0.5, restitution: 0.5 });
+
+
+
     var box = BABYLON.Mesh.CreateBox("crate", 0.5, this.scene);
-    // box.material = new BABYLON.StandardMaterial("Mat", this.scene);
-    // box.material.diffuseTexture = new BABYLON.Texture("textures/crate.png", this.scene);
-    // box.material.diffuseTexture.hasAlpha = true;
     box.position = new BABYLON.Vector3(0, 10, 0);
-    // box.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 1, friction: 0.5, restitution: 0.5 });
-    box.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 1, friction: 0.5, restitution: 0.5 });
+    box.checkCollisions = true;
+    box.ellipsoid = new BABYLON.Vector3(1, 1, 1);
 
-
-    // var me = this.scene.getMeshByID('Bin');
+    var me = this.scene.getMeshByID('HumanScale');
     // me.setPhysicsState(BABYLON.PhysicsEngine.MeshImpostor, { mass: 0, friction: 1.5, restitution: 0.1 });
 
     var camera01 = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 5, -10), this.scene);
@@ -157,6 +183,7 @@ export class Race {
     // alpha rotates around y and beta rotates around x
     // var camera02 = new BABYLON.ArcFollowCamera('camera2', 0, Math.PI / 6, 8, box, this.scene);
     var camera02 = new BABYLON.ArcFollowCamera('camera2', 0, Math.PI / 6, 8, box, this.scene);
+    // camera01.applyGravity
 
     this.scene.activeCameras.push(camera01);
     this.scene.activeCameras.push(camera02);
@@ -190,7 +217,7 @@ export class Race {
     this.engine.runRenderLoop(() => {
       // sphere.position.y = Math.sin((new Date()).getMilliseconds() / 200);
       camera02.alpha += Math.PI / 512;
-      // box.moveWithCollisions()
+      box.moveWithCollisions(new BABYLON.Vector3(0.05, 0, 0));
       // sphere.position.y = 1;
       this.scene.render();
     });
