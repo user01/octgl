@@ -7,6 +7,7 @@ import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
 import {ToScreen, ScreenRequest} from '../interfaces/to.screen';
 import ControllerState from '../interfaces/controllerstate';
 import PlayerList from './playerlist';
+import Player from './player';
 
 import Race from './race/race.tsx';
 
@@ -121,7 +122,14 @@ export class Game {
     this.airConsole.message(device_id, message);
   }
 
-  private requestNewGame = () => {
+  public DEBUG_RequestNewGame = () => {
+    this.requestNewGame([
+      new Player(0xFF3300, 4, 'One'),
+      new Player(0x0033FF, 6, 'Two'),
+    ]);
+  }
+
+  private requestNewGame = (players = this.playerList.Players) => {
     console.log('Requesting a new game with payload of ', this.mainMenu.CurrentGamePayload);
 
     //Switch the game state
@@ -129,7 +137,7 @@ export class Game {
     this.mainMenu.Hide();
 
     this.race = new Race(
-      this.playerList.Players,
+      players,
       this.raceElement,
       this.mainMenu.CurrentGamePayload.track.filename,
       () => {

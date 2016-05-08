@@ -114,6 +114,21 @@ export class Race {
       console.log(m.name, m.position.toString());
       m.setPhysicsState(BABYLON.PhysicsEngine.MeshImpostor, { mass: 0, friction: 2.5, restitution: 0 });
     });
+    
+    const spawns = this.scene.getMeshByID('spawns');
+    const t = spawns.getVerticesData(BABYLON.VertexBuffer.NormalKind);
+    for (var i=0;i<t.length;i++){
+      let tt = t[i];
+      
+    }
+    // .forEach(v=>{
+      
+    // })
+    // spawns.subMeshes.forEach(m=>{
+    //   console.log(`Spawns has ${m.verticesCount} vertices`);
+    //   // m.getMesh().getVerticesData()
+    // })
+    
 
     const sphereMat = new BABYLON.StandardMaterial("spheremat", this.scene);
     sphereMat.diffuseColor = new BABYLON.Color3(1, 0.4, 0);
@@ -122,7 +137,6 @@ export class Race {
     roller.material = sphereMat;
     roller.position = new BABYLON.Vector3(0, 15, 0);
     roller.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor, { mass: 5, friction: 1.5, restitution: 0.1 });
-    // const imp = box.getPhysicsImpostor();
 
     var camera01 = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 500, -500), this.scene);
     camera01.setTarget(new BABYLON.Vector3(0, 0, 0));
