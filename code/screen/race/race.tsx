@@ -4,6 +4,7 @@
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as R from 'ramda';
 
 import Player from '../player';
 import Racer from './racer';
@@ -102,70 +103,60 @@ export class Race {
   }
 
   private babylonSceneLoaded = () => {
-
-    // this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.OimoJSPlugin());
     this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin());
-
-    var temp = {};
 
     this.scene.meshes.filter((m) => {
       return m.name.indexOf('static') > -1;
-    }).map((m) => {
-      console.log(m.name, m.position.toString());
+    }).forEach((m) => {
       m.setPhysicsState(BABYLON.PhysicsEngine.MeshImpostor, { mass: 0, friction: 2.5, restitution: 0 });
     });
-    
-    const spawns = this.scene.getMeshByID('spawns');
-    const t = spawns.getVerticesData(BABYLON.VertexBuffer.NormalKind);
-    for (var i=0;i<t.length;i++){
-      let tt = t[i];
-      
-    }
-    // .forEach(v=>{
-      
-    // })
-    // spawns.subMeshes.forEach(m=>{
-    //   console.log(`Spawns has ${m.verticesCount} vertices`);
-    //   // m.getMesh().getVerticesData()
-    // })
-    
 
-    const sphereMat = new BABYLON.StandardMaterial("spheremat", this.scene);
-    sphereMat.diffuseColor = new BABYLON.Color3(1, 0.4, 0);
-    sphereMat.wireframe = true;
-    var roller = BABYLON.Mesh.CreateSphere("roller", 6, 2.5, this.scene);
-    roller.material = sphereMat;
-    roller.position = new BABYLON.Vector3(0, 15, 0);
-    roller.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor, { mass: 5, friction: 1.5, restitution: 0.1 });
+    const spawns = Race.spawnObjToSpawns(this.scene.getMeshByID('spawns'));
+    console.log(spawns.map(v => v.toString()));
 
-    var camera01 = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 500, -500), this.scene);
-    camera01.setTarget(new BABYLON.Vector3(0, 0, 0));
-    var camera02 = new BABYLON.ArcFollowCamera('camera2', 0, Math.PI / 6, 25, roller, this.scene);
+    this.Racers.forEach((r, idx) => r.configureRacerInScene(this.scene, spawns[idx]));
 
-    this.scene.activeCameras.push(camera01);
-    this.scene.activeCameras.push(camera02);
 
-    camera01.viewport = new BABYLON.Viewport(0, 0, 0.5, 1);
-    camera02.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 1);
+    // const sphereMat = new BABYLON.StandardMaterial("spheremat", this.scene);
+    // sphereMat.diffuseColor = new BABYLON.Color3(1, 0.4, 0);
+    // sphereMat.wireframe = true;
+    // var roller = BABYLON.Mesh.CreateSphere("roller", 6, 2.5, this.scene);
+    // roller.material = sphereMat;
+    // roller.position = new BABYLON.Vector3(0, 15, 0);
+    // roller.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor, { mass: 5, friction: 1.5, restitution: 0.1 });
+
+    // var camera01 = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 500, -500), this.scene);
+    // camera01.setTarget(new BABYLON.Vector3(0, 0, 0));
+    // var camera02 = new BABYLON.ArcFollowCamera('camera2', 0, Math.PI / 6, 25, roller, this.scene);
+
+    this.setupCameras(this.Racers.length);
+
+    // this.scene.activeCameras.push(camera01);
+    // this.scene.activeCameras.push(camera02);
+
+    // camera01.viewport = new BABYLON.Viewport(0, 0, 0.5, 1);
+    // camera02.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 1);
 
     // create a basic light, aiming 0,1,0 - meaning, to the sky
     var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
 
-    camera01.attachControl(this.canvas);
-    camera02.setTarget(BABYLON.Vector3.Zero());
+    // camera01.attachControl(this.canvas);
+    // camera02.setTarget(BABYLON.Vector3.Zero());
 
-    window.addEventListener("keyup", (evt) => {
-      console.log('Kick');
-      roller.applyImpulse(new BABYLON.Vector3(10.5, 0, 0), roller.getAbsolutePosition());
-    });
+    // window.addEventListener("keyup", (evt) => {
+    //   console.log('Kick');
+    //   roller.applyImpulse(new BABYLON.Vector3(10.5, 0, 0), roller.getAbsolutePosition());
+    // });
 
 
     this.scene.beforeRender = () => {
 
     }
-    var tempCount = 0;
+    var presentMilliseconds = +Date.now();
     this.engine.runRenderLoop(() => {
-      camera02.alpha += Math.PI / 512;
+      const currentMilliseconds = +Date.now();
+      this.racers.forEach(r => r.onEveryFrame(currentMilliseconds - presentMilliseconds));
+      presentMilliseconds = currentMilliseconds;
       this.scene.render();
     });
   }
@@ -175,13 +166,58 @@ export class Race {
   private babylonEngineResize = () => {
     this.engine.resize();
   }
-  private setupCameras = (count: number) => {
-
+  private setupCameras = (count: number = this.Racers.length) => {
+    switch (count) {
+      case 1:
+        this.racers[0].Camera.viewport = new BABYLON.Viewport(0, 0, 1, 1);
+        break;
+      case 2:
+        this.racers[0].Camera.viewport = new BABYLON.Viewport(0, 0, 0.5, 1);
+        this.racers[1].Camera.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 1);
+        break;
+      case 3:
+        this.racers[0].Camera.viewport = new BABYLON.Viewport(0, 0, 0.5, 0.5);
+        this.racers[1].Camera.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 0.5);
+        this.racers[2].Camera.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 1);
+        break;
+      case 4:
+        this.racers[0].Camera.viewport = new BABYLON.Viewport(0, 0, 0.5, 0.5);
+        this.racers[1].Camera.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 0.5);
+        this.racers[2].Camera.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 0.5);
+        this.racers[3].Camera.viewport = new BABYLON.Viewport(0.5, 0.5, 0.5, 0.5);
+        break;
+    }
   }
 
   private closeLevel = () => {
     window.removeEventListener(`resize.${this.id}`, this.babylonEngineResize);
     this.onRaceDone();
+  }
+
+  private static spawnObjToSpawns = (spawns: BABYLON.AbstractMesh) => {
+    if (!spawns) {
+      console.warn('Track lacks a spawn object');
+      return [];
+    }
+    spawns.isVisible = false;
+    const rawVertexes = spawns.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+    const vertsAll: number[] = [];
+    for (var i = 0; i < rawVertexes.length; i++) {
+      let vertexValue = rawVertexes[i];
+      vertsAll.push(rawVertexes[i]);
+    }
+    const groupByIndexed: any = R.groupBy;
+    const vertsObj = R.addIndex(groupByIndexed)((elm, idx) => {
+      return '' + Math.floor(idx / 3);
+    }, vertsAll);
+    const vertsGroups = R.values(vertsObj);
+
+    return R.map(([x, y, z]) => {
+      return new BABYLON.Vector3(
+        x + spawns.position.x,
+        y + spawns.position.y,
+        z + spawns.position.z);
+    }, vertsGroups);
   }
 
 }
