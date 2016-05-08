@@ -113,17 +113,25 @@ export class Race {
   private babylonSceneLoaded = () => {
 
     // this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.OimoJSPlugin());
-    this.scene.enablePhysics(new BABYLON.Vector3(0, -.0981, 0), new BABYLON.CannonJSPlugin());
+    this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin());
     // this.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
     // this.scene.workerCollisions = true;
     // this.scene.collisionsEnabled = true;
 
+    var temp = {};
+
     this.scene.meshes.filter((m) => {
       return m.name.indexOf('static') > -1;
     }).map((m) => {
-      console.log(m.name);
-      // m.checkCollisions = true;
+      console.log(m.name, m.position.toString());
+      temp[m.name] = m.position.clone();
       m.setPhysicsState(BABYLON.PhysicsEngine.MeshImpostor, { mass: 0, friction: 2.5, restitution: 0 });
+      // // m.checkCollisions = true;
+      // // debugger;
+      // // console.log('PRE ',m.name, oldPos.toString());
+      // // console.log('PRE ',m.name, m.position.toString());
+      // // // m.position = oldPos;
+      // // console.log('PRE ',m.name, m.position.toString());
     });
 
     // this.scene.meshes.filter((m) => {
@@ -174,7 +182,7 @@ export class Race {
     // box.position = new BABYLON.Vector3(0, 10, 0);
     // box.checkCollisions = true;
     // box.ellipsoid = new BABYLON.Vector3(1, 1, 1);
-    
+
     var box = BABYLON.Mesh.CreateBox("crate", 2.5, this.scene);
     box.position = new BABYLON.Vector3(0, 15, 0);
     box.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor, { mass: 50, friction: 1.5, restitution: 0.1 });
@@ -220,12 +228,36 @@ export class Race {
     this.scene.beforeRender = () => {
 
     }
-
+    var tempCount = 0;
     this.engine.runRenderLoop(() => {
       // sphere.position.y = Math.sin((new Date()).getMilliseconds() / 200);
       camera02.alpha += Math.PI / 512;
       // box.moveWithCollisions(new BABYLON.Vector3(0.05, 0, 0));
       // sphere.position.y = 1;
+
+      if (tempCount == 30) {
+
+        this.scene.meshes.filter((m) => {
+          return m.name.indexOf('static') > -1;
+        }).map((m) => {
+          console.log('POST ', m.name, m.position.toString());
+          // m.setPhysicsState(BABYLON.PhysicsEngine.MeshImpostor, { mass: 0, friction: 2.5, restitution: 0 });
+          // m.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, { mass: 0, friction: 2.5, restitution: 0 });
+          // m.position = temp[m.name];
+        });
+      }
+
+      if (tempCount++ % 600 == 0) {
+
+        this.scene.meshes.filter((m) => {
+          return m.name.indexOf('static') > -1;
+        }).map((m) => {
+          console.log('POST ', m.name, m.position.toString());
+          // m.position.copyFrom(temp[m.name]);
+        });
+      }
+
+
       this.scene.render();
     });
   }
