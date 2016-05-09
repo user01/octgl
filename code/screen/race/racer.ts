@@ -17,9 +17,13 @@ export class Racer extends Player {
   private camera: BABYLON.FreeCamera;
   private baseMesh: BABYLON.AbstractMesh;
   private pointerMesh: BABYLON.AbstractMesh;
+  private kartMesh: BABYLON.AbstractMesh;
 
   private linearHelper: BABYLON.LinesMesh;
   private linearVelocity: number = 0;
+
+  /** Angle around Y axis kart is currently pointed (ie, where thrust is applied) */
+  private turnAngleRadians = 0;
 
 
   constructor(color: number,
@@ -31,10 +35,12 @@ export class Racer extends Player {
 
   public configureRacerInScene = (
     scene: BABYLON.Scene,
-    spawn: BABYLON.Vector3
+    spawn: BABYLON.Vector3,
+    kart: BABYLON.AbstractMesh
   ) => {
     const color = BABYLON.Color3.FromHexString(`#${this.Color.toString(16)}`);
     this.baseMesh = new BABYLON.AbstractMesh(`base.${this.DeviceId}`, scene);
+    this.kartMesh = kart.clone(`kart.${this.DeviceId}`, this.baseMesh);
 
     this.linearHelper = BABYLON.Mesh.CreateLines("lines", [
       new BABYLON.Vector3(0, 0, 0),
@@ -69,7 +75,7 @@ export class Racer extends Player {
       const linear: BABYLON.Vector3 = (<any>this.roller.getPhysicsImpostor()).getLinearVelocity();
       console.log(linear.length(), linear.toString());
 
-      this.roller.applyImpulse(new BABYLON.Vector3(10.5, 0, 0), this.roller.getAbsolutePosition());
+      this.roller.applyImpulse(new BABYLON.Vector3(-10.5, 0, 0), this.roller.getAbsolutePosition());
     });
 
     const dir = new BABYLON.Vector3(1, 0, 0);
@@ -80,19 +86,14 @@ export class Racer extends Player {
   }
 
   public onEveryFrame = (millisecondsSinceLastFrame: number) => {
-    // console.log(millisecondsSinceLastFrame);
     const linear: BABYLON.Vector3 = (<any>this.roller.getPhysicsImpostor()).getLinearVelocity();
     const movement = linear.lengthSquared() < 0.05 ? new BABYLON.Vector3(20, 0, 0) : linear;
     this.linearVelocity = linear.lengthSquared();
 
     const flippedMovement = movement.multiplyByFloats(1, 0, 1).normalize().negate().scale(15).add(new BABYLON.Vector3(0, 6, 0));
     this.baseMesh.position = this.roller.position;
-    // this.camera.position = this.baseMesh.position.add(new BABYLON.Vector3(-20, 8, 0));
     this.camera.position = this.baseMesh.position.add(flippedMovement);
     this.pointerMesh.position = this.baseMesh.position.add(linear);
-    // this.Camera.alpha += Math.PI / 1024;
-    // this.Camera.alpha = 1;
-    // console.log(linear.toString());
 
     let scale = linear.lengthSquared() / 50;
     this.linearHelper.scaling = new BABYLON.Vector3(scale, scale, scale);

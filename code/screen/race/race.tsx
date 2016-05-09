@@ -38,6 +38,8 @@ export class Race {
 
   private engine: BABYLON.Engine;
   private scene: BABYLON.Scene;
+  private assetsManager: BABYLON.AssetsManager;
+  private kart: BABYLON.AbstractMesh;
 
   private periodicUpdateId: any;
   private presentMilliseconds = 0;
@@ -105,6 +107,8 @@ export class Race {
   }
 
   private babylonSceneLoaded = () => {
+    // create a basic light, aiming 0,1,0 - meaning, to the sky
+    var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
     this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin());
 
     this.scene.meshes.filter((m) => {
@@ -113,23 +117,38 @@ export class Race {
       m.setPhysicsState(BABYLON.PhysicsEngine.MeshImpostor, { mass: 0, friction: 2.5, restitution: 0 });
     });
 
+    this.assetsManager = new BABYLON.AssetsManager(this.scene);
+    const kartTask = this.assetsManager.addMeshTask('ship', '', './assets/', 'kart.babylon');
+    kartTask.onSuccess = (task: any) => {
+      console.log(task);
+      const kart = task.loadedMeshes[0];
+      this.scene.removeMesh(kart);
+      this.kart = kart;
+    }
+    this.assetsManager.onFinish = this.babylonAssetsLoaded;
+    this.assetsManager.load();
+  }
+
+  private babylonAssetsLoaded = (tasks) => {
+    console.log('Done loading');
+
     const spawns = Race.spawnObjToSpawns(this.scene.getMeshByID('spawns'));
-    console.log(spawns.map(v => v.toString()));
+    // console.log(spawns.map(v => v.toString()));
 
-    this.Racers.forEach((r, idx) => r.configureRacerInScene(this.scene, spawns[idx]));
-
+    this.Racers.forEach((r, idx) =>
+      r.configureRacerInScene(
+        this.scene,
+        spawns[idx],
+        this.kart
+      )
+    );
     this.setupCameras(this.Racers.length);
 
-    // create a basic light, aiming 0,1,0 - meaning, to the sky
-    var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
-
-    this.scene.beforeRender = () => {
-
-    }
     this.presentMilliseconds = +Date.now();
     this.engine.runRenderLoop(this.babylonEngineLoop);
     this.periodicUpdateId = setInterval(this.perodicUpdate, 100);
   }
+
   private babylonEngineLoop = () => {
     const currentMilliseconds = +Date.now();
     this.racers.forEach(r => r.onEveryFrame(currentMilliseconds - this.presentMilliseconds));
