@@ -16,6 +16,7 @@ export class Racer extends Player {
   // private camera: BABYLON.ArcFollowCamera;
   private camera: BABYLON.FreeCamera;
   private baseMesh: BABYLON.AbstractMesh;
+  private pointerMesh: BABYLON.AbstractMesh;
 
   private linearHelper: BABYLON.LinesMesh;
 
@@ -50,6 +51,10 @@ export class Racer extends Player {
     this.roller.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor,
       { mass: 5, friction: 1.5, restitution: 0.1 });
 
+    this.pointerMesh = BABYLON.Mesh.CreateSphere(`roller.${this.DeviceId}`, 6, 0.5, scene);
+    this.pointerMesh.material = sphereMat;
+    this.pointerMesh.position = spawn;
+
     // this.camera = new BABYLON.ArcFollowCamera(`camera.${this.DeviceId}`, Math.PI, Math.PI / 6, 25, this.roller, scene);
     this.camera = new BABYLON.FreeCamera(`camera.${this.DeviceId}`, this.baseMesh.position.add(new BABYLON.Vector3(-20, 8, 0)), scene);
     this.camera.lockedTarget = this.baseMesh;
@@ -66,7 +71,10 @@ export class Racer extends Player {
       this.roller.applyImpulse(new BABYLON.Vector3(10.5, 0, 0), this.roller.getAbsolutePosition());
     });
 
-
+    const dir = new BABYLON.Vector3(1, 0, 0);
+    console.log(Racer.rotateVector(dir, Math.PI / 4));
+    console.log(Racer.rotateVector(dir, Math.PI / 2));
+    console.log(Racer.rotateVector(dir, Math.PI));
 
   }
 
@@ -79,6 +87,7 @@ export class Racer extends Player {
     this.baseMesh.position = this.roller.position;
     // this.camera.position = this.baseMesh.position.add(new BABYLON.Vector3(-20, 8, 0));
     this.camera.position = this.baseMesh.position.add(flippedMovement);
+    this.pointerMesh.position = this.baseMesh.position.add(linear);
     // this.Camera.alpha += Math.PI / 1024;
     // this.Camera.alpha = 1;
     // console.log(linear.toString());
@@ -92,6 +101,12 @@ export class Racer extends Player {
     return players.map(player =>
       new Racer(player.Color, player.DeviceId, player.Nickname)
     );
+  }
+
+
+  private static rotateVector(vect: BABYLON.Vector3, radians = Math.PI / 2, rotAxis = BABYLON.Axis.Y) {
+    const matrix = BABYLON.Matrix.RotationAxis(rotAxis, radians);
+    return BABYLON.Vector3.TransformCoordinates(vect, matrix);
   }
 }
 
