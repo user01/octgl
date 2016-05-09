@@ -39,6 +39,8 @@ export class Race {
   private engine: BABYLON.Engine;
   private scene: BABYLON.Scene;
 
+  private periodicUpdateId: any;
+  private presentMilliseconds = 0;
   private static id = 0;
   private id = Race.id++;
 
@@ -116,56 +118,31 @@ export class Race {
 
     this.Racers.forEach((r, idx) => r.configureRacerInScene(this.scene, spawns[idx]));
 
-
-    // const sphereMat = new BABYLON.StandardMaterial("spheremat", this.scene);
-    // sphereMat.diffuseColor = new BABYLON.Color3(1, 0.4, 0);
-    // sphereMat.wireframe = true;
-    // var roller = BABYLON.Mesh.CreateSphere("roller", 6, 2.5, this.scene);
-    // roller.material = sphereMat;
-    // roller.position = new BABYLON.Vector3(0, 15, 0);
-    // roller.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor, { mass: 5, friction: 1.5, restitution: 0.1 });
-
-    // var camera01 = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 500, -500), this.scene);
-    // camera01.setTarget(new BABYLON.Vector3(0, 0, 0));
-    // var camera02 = new BABYLON.ArcFollowCamera('camera2', 0, Math.PI / 6, 25, roller, this.scene);
-
     this.setupCameras(this.Racers.length);
-
-    // this.scene.activeCameras.push(camera01);
-    // this.scene.activeCameras.push(camera02);
-
-    // camera01.viewport = new BABYLON.Viewport(0, 0, 0.5, 1);
-    // camera02.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 1);
 
     // create a basic light, aiming 0,1,0 - meaning, to the sky
     var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
 
-    // camera01.attachControl(this.canvas);
-    // camera02.setTarget(BABYLON.Vector3.Zero());
-
-    // window.addEventListener("keyup", (evt) => {
-    //   console.log('Kick');
-    //   roller.applyImpulse(new BABYLON.Vector3(10.5, 0, 0), roller.getAbsolutePosition());
-    // });
-
-
     this.scene.beforeRender = () => {
 
     }
-    var presentMilliseconds = +Date.now();
-    this.engine.runRenderLoop(() => {
-      const currentMilliseconds = +Date.now();
-      this.racers.forEach(r => r.onEveryFrame(currentMilliseconds - presentMilliseconds));
-      presentMilliseconds = currentMilliseconds;
-      this.scene.render();
-    });
+    this.presentMilliseconds = +Date.now();
+    this.engine.runRenderLoop(this.babylonEngineLoop);
+    this.periodicUpdateId = setInterval(this.perodicUpdate, 100);
   }
   private babylonEngineLoop = () => {
-
+    const currentMilliseconds = +Date.now();
+    this.racers.forEach(r => r.onEveryFrame(currentMilliseconds - this.presentMilliseconds));
+    this.presentMilliseconds = currentMilliseconds;
+    this.scene.render();
   }
   private babylonEngineResize = () => {
     this.engine.resize();
   }
+  private perodicUpdate = () => {
+    this.render();
+  }
+
   private setupCameras = (count: number = this.Racers.length) => {
     switch (count) {
       case 1:
@@ -191,6 +168,7 @@ export class Race {
 
   private closeLevel = () => {
     window.removeEventListener(`resize.${this.id}`, this.babylonEngineResize);
+    window.clearTimeout(this.periodicUpdateId);
     this.onRaceDone();
   }
 

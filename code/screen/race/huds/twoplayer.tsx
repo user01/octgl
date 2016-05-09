@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import Racer from '../racer';
+import RacerHUD from '../racer.hud.tsx';
 
 interface IAppProps {
   racers: Racer[];
@@ -23,12 +24,12 @@ class TwoPlayer extends React.Component<IAppProps, IAppState> {
         <div className="pure-g">
           <div className="pure-u-1-2">
             <div className="player-box half-full">
-              ${this.props.racers[0].DeviceId }
+              <RacerHUD racer={this.props.racers[0]} />
             </div>
           </div>
           <div className="pure-u-1-2">
             <div className="player-box half-full">
-              ${this.props.racers[1].DeviceId }
+              <RacerHUD racer={this.props.racers[1]} />
             </div>
           </div>
         </div>

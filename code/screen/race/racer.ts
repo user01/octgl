@@ -8,7 +8,7 @@ import Player from '../player';
  * and current data on race
 */
 export class Racer extends Player {
-  // public get DeviceId() { return this.device_id; }
+  public get LinearVelocity() { return this.linearVelocity; }
 
   private roller: BABYLON.Mesh;
 
@@ -19,6 +19,7 @@ export class Racer extends Player {
   private pointerMesh: BABYLON.AbstractMesh;
 
   private linearHelper: BABYLON.LinesMesh;
+  private linearVelocity: number = 0;
 
 
   constructor(color: number,
@@ -82,6 +83,7 @@ export class Racer extends Player {
     // console.log(millisecondsSinceLastFrame);
     const linear: BABYLON.Vector3 = (<any>this.roller.getPhysicsImpostor()).getLinearVelocity();
     const movement = linear.lengthSquared() < 0.05 ? new BABYLON.Vector3(20, 0, 0) : linear;
+    this.linearVelocity = linear.lengthSquared();
 
     const flippedMovement = movement.multiplyByFloats(1, 0, 1).normalize().negate().scale(15).add(new BABYLON.Vector3(0, 6, 0));
     this.baseMesh.position = this.roller.position;

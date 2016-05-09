@@ -2,8 +2,10 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
+import Racer from './racer';
+
 interface IAppProps {
-  device_id: number;
+  racer: Racer;
 }
 
 interface IAppState {
@@ -15,12 +17,17 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
   }
 
   render() {
+    let style = {
+      color: `#${this.props.racer.Color.toString(16)}`
+    }
     return (
       <div>
-        <div className="controls">
-          <canvas ref="render-canvas"></canvas>
-        </div>
-
+        <h1 style={style} className="screen-header">
+          Device: {this.props.racer.DeviceId}
+        </h1>
+        <h3 style={style} className="screen-header">
+          Velocity: {Math.round(this.props.racer.LinearVelocity * 100) / 100}
+        </h3>
       </div>
     );
   }

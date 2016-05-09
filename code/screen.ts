@@ -4,7 +4,6 @@ declare var AirConsole;
 
 import Game from './screen/game';
 import Utility from './data/utility';
-import RaceHUD from './screen/race/race.hud.tsx';
 
 const getAirConsole = () => {
   try {
