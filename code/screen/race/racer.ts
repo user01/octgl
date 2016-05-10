@@ -88,6 +88,7 @@ export class Racer extends Player {
     //#########################################################################
     const fractionOfSecond = millisecondsSinceLastFrame / 1000;
     let impulseScalar = 1;
+    millisecondsSinceLastFrame = Math.min(millisecondsSinceLastFrame, 100);
 
 
     //#########################################################################
@@ -178,7 +179,6 @@ export class Racer extends Player {
       this.turnAngleRadians,
       BABYLON.Axis.Y);
     this.roller.applyImpulse(impulseVector, this.roller.getAbsolutePosition());
-
 
 
     //#########################################################################
