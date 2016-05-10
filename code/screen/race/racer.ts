@@ -31,6 +31,7 @@ export class Racer extends Player {
   /** Angle around Y axis kart is currently pointed (ie, where thrust is applied) */
   private turnAngleRadians = 0;
   private static TURN_ANGLE_RADIANS_PER_SECOND = Math.PI / 4;
+  private static IMPULSE_PER_SECOND = 100;
 
 
   constructor(color: number,
@@ -93,17 +94,46 @@ export class Racer extends Player {
   }
 
   public onEveryFrame = (millisecondsSinceLastFrame: number) => {
+    const fractionOfSecond = millisecondsSinceLastFrame / 1000;
+    let impulseScalar = 1;
+    if (this.racerCommand.left && !this.racerCommand.right) {
+      // turning left
+      this.turnAngleRadians -= fractionOfSecond * Racer.TURN_ANGLE_RADIANS_PER_SECOND;
+      impulseScalar = 0.8;
+    } else if (!this.racerCommand.left && this.racerCommand.right) {
+      // turning right
+      this.turnAngleRadians += fractionOfSecond * Racer.TURN_ANGLE_RADIANS_PER_SECOND;
+      impulseScalar = 0.8;
+    } else if (this.racerCommand.left && this.racerCommand.right) {
+      // reverse
+      impulseScalar = -0.3;
+    }
+
+    const impulseVector = Racer.rotateVector(
+      new BABYLON.Vector3(1, 0, 0).scale(impulseScalar * Racer.IMPULSE_PER_SECOND * fractionOfSecond),
+      this.turnAngleRadians,
+      BABYLON.Axis.Y);
+      
+    const cameraVector = Racer.rotateVector(
+      new BABYLON.Vector3(20, 8, 0),
+      this.turnAngleRadians + Math.PI,
+      BABYLON.Axis.Y);
+
+    this.roller.applyImpulse(impulseVector, this.roller.getAbsolutePosition());
+
     const linear: BABYLON.Vector3 = (<any>this.roller.getPhysicsImpostor()).getLinearVelocity();
     const movement = linear.lengthSquared() < 0.05 ? new BABYLON.Vector3(20, 0, 0) : linear;
     this.linearVelocity = linear.lengthSquared();
 
-    this.kartMesh.rotation.y += Math.PI / 1024;
+    this.kartMesh.rotation.y = this.turnAngleRadians;
+    // this.kartMesh.rotation.y += Math.PI / 1024;
     // this.kartMesh.rotate(BABYLON.Axis.Y, Math.PI / 1024);
 
-    const flippedMovement = movement.multiplyByFloats(1, 0, 1).normalize().negate().scale(15).add(new BABYLON.Vector3(0, 6, 0));
+    // const flippedMovement = movement.multiplyByFloats(1, 0, 1).normalize().negate().scale(15).add(new BABYLON.Vector3(0, 6, 0));
     this.baseMesh.position = this.roller.position;
-    this.camera.position = this.baseMesh.position.add(flippedMovement);
+    this.camera.position = this.baseMesh.position.add(cameraVector);
     this.pointerMesh.position = this.baseMesh.position.add(linear);
+    // this.pointerMesh.position = this.baseMesh.position.add(impulseVector);
 
     let scale = linear.lengthSquared() / 50;
     this.linearHelper.scaling = new BABYLON.Vector3(scale, scale, scale);
