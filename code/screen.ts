@@ -39,6 +39,63 @@ const initScreen = () => {
 
   if (getParameterByName('DEBUG') != null) {
     setTimeout(() => game.DEBUG_RequestNewGame(), 150);
+    var left = false;
+    var right = false;
+    var special = false;
+
+    const send = () => {
+      game.DEBUG_onmessage(4, {
+        racer: {
+          left,
+          right,
+          special
+        }
+      });
+    }
+
+    window.addEventListener("keyup", (evt) => {
+      if (!(evt.keyCode == 37 ||
+        evt.keyCode == 39 ||
+        evt.keyCode == 32)) {
+        return;
+      }
+      if (evt.keyCode == 37) {
+        //left
+        if (!left) return;
+        left = false;
+      } else if (evt.keyCode == 39) {
+        //right
+        if (!right) return;
+        right = false;
+      } else if (evt.keyCode == 32) {
+        //space
+        if (!special) return;
+        special = false;
+      }
+      send();
+    });
+    window.addEventListener("keydown", (evt) => {
+      if (!(evt.keyCode == 37 ||
+        evt.keyCode == 39 ||
+        evt.keyCode == 32)) {
+        return;
+      }
+      if (evt.keyCode == 37) {
+        //left
+        if (left) return;
+        left = true;
+      } else if (evt.keyCode == 39) {
+        //right
+        if (right) return;
+        right = true;
+      } else if (evt.keyCode == 32) {
+        //space
+        if (special) return;
+        special = true;
+      }
+      send();
+    });
+
   }
 
 }

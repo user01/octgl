@@ -8,6 +8,7 @@ import * as R from 'ramda';
 
 import Player from '../player';
 import Racer from './racer';
+import RacerCommand from '../../interfaces/racercommand';
 
 import OnePlayer from './huds/oneplayer.tsx';
 import TwoPlayer from './huds/twoplayer.tsx';
@@ -160,6 +161,12 @@ export class Race {
   }
   private perodicUpdate = () => {
     this.render();
+  }
+
+  public UpdateRacerState = (device_id: number, racerCommand: RacerCommand) => {
+    const racer = R.find((r) => r.DeviceId == device_id, this.Racers);
+    if (!racer) return;
+    racer.UpdateRacerCommand(racerCommand);
   }
 
   private setupCameras = (count: number = this.Racers.length) => {

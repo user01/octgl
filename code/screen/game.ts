@@ -73,13 +73,15 @@ export class Game {
         break;
       case GameState.Game:
         if (data.racer) {
-
+          this.race.UpdateRacerState(device_id, data.racer);
         }
         break;
       default:
     }
 
   }
+
+  public DEBUG_onmessage = this.onMessage;
 
   private managePlayerRoster = () => {
     //now set current player states

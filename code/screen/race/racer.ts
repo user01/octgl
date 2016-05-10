@@ -2,6 +2,7 @@
 /// <reference path="../../../typings/references.d.ts" />
 
 import Player from '../player';
+import RacerCommand from '../../interfaces/racercommand';
 
 /** A Racer Player
  * Hold information on location, references to babylon objects
@@ -9,21 +10,27 @@ import Player from '../player';
 */
 export class Racer extends Player {
   public get LinearVelocity() { return this.linearVelocity; }
+  public get Camera() { return this.camera; }
+
+  private camera: BABYLON.FreeCamera;
 
   private roller: BABYLON.Mesh;
-
-  public get Camera() { return this.camera; }
-  // private camera: BABYLON.ArcFollowCamera;
-  private camera: BABYLON.FreeCamera;
   private baseMesh: BABYLON.AbstractMesh;
   private pointerMesh: BABYLON.AbstractMesh;
   private kartMesh: BABYLON.AbstractMesh;
+
+  private racerCommand: RacerCommand = {
+    left: false,
+    right: false,
+    special: false
+  };
 
   private linearHelper: BABYLON.LinesMesh;
   private linearVelocity: number = 0;
 
   /** Angle around Y axis kart is currently pointed (ie, where thrust is applied) */
   private turnAngleRadians = 0;
+  private static TURN_ANGLE_RADIANS_PER_SECOND = Math.PI / 4;
 
 
   constructor(color: number,
@@ -70,18 +77,18 @@ export class Racer extends Player {
     scene.activeCameras.push(this.camera);
 
 
-    window.addEventListener("keyup", (evt) => {
-      console.log('Kick');
-      const linear: BABYLON.Vector3 = (<any>this.roller.getPhysicsImpostor()).getLinearVelocity();
-      console.log(linear.length(), linear.toString());
+    // window.addEventListener("keyup", (evt) => {
+    //   console.log('Kick');
+    //   const linear: BABYLON.Vector3 = (<any>this.roller.getPhysicsImpostor()).getLinearVelocity();
+    //   console.log(linear.length(), linear.toString());
 
-      this.roller.applyImpulse(new BABYLON.Vector3(-10.5, 0, 0), this.roller.getAbsolutePosition());
-    });
+    //   this.roller.applyImpulse(new BABYLON.Vector3(-10.5, 0, 0), this.roller.getAbsolutePosition());
+    // });
 
-    const dir = new BABYLON.Vector3(1, 0, 0);
-    console.log(Racer.rotateVector(dir, Math.PI / 4));
-    console.log(Racer.rotateVector(dir, Math.PI / 2));
-    console.log(Racer.rotateVector(dir, Math.PI));
+    // const dir = new BABYLON.Vector3(1, 0, 0);
+    // console.log(Racer.rotateVector(dir, Math.PI / 4));
+    // console.log(Racer.rotateVector(dir, Math.PI / 2));
+    // console.log(Racer.rotateVector(dir, Math.PI));
 
   }
 
@@ -89,6 +96,9 @@ export class Racer extends Player {
     const linear: BABYLON.Vector3 = (<any>this.roller.getPhysicsImpostor()).getLinearVelocity();
     const movement = linear.lengthSquared() < 0.05 ? new BABYLON.Vector3(20, 0, 0) : linear;
     this.linearVelocity = linear.lengthSquared();
+
+    this.kartMesh.rotation.y += Math.PI / 1024;
+    // this.kartMesh.rotate(BABYLON.Axis.Y, Math.PI / 1024);
 
     const flippedMovement = movement.multiplyByFloats(1, 0, 1).normalize().negate().scale(15).add(new BABYLON.Vector3(0, 6, 0));
     this.baseMesh.position = this.roller.position;
@@ -98,6 +108,10 @@ export class Racer extends Player {
     let scale = linear.lengthSquared() / 50;
     this.linearHelper.scaling = new BABYLON.Vector3(scale, scale, scale);
     this.linearHelper.lookAt(this.baseMesh.position.add(linear), 0, 0, 0);
+  }
+
+  public UpdateRacerCommand = (racerCommand: RacerCommand) => {
+    this.racerCommand = racerCommand;
   }
 
   public static PlayersToRacers = (players: Player[]): Racer[] => {
