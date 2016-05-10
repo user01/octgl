@@ -115,7 +115,7 @@ export class Race {
     this.scene.meshes.filter((m) => {
       return m.name.indexOf('static') > -1;
     }).forEach((m) => {
-      m.setPhysicsState(BABYLON.PhysicsEngine.MeshImpostor, { mass: 0, friction: 2.5, restitution: 0 });
+      m.setPhysicsState(BABYLON.PhysicsEngine.MeshImpostor, { mass: 0, friction: 20.5, restitution: 0 });
     });
 
     this.assetsManager = new BABYLON.AssetsManager(this.scene);
