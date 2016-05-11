@@ -14,7 +14,7 @@ export class Racer extends Player {
   public get LinearVelocity() { return this.linearVelocity; }
   public get Camera() { return this.camera; }
   private get cartYRotation() { return this.radiansForwardMain + this.radiansForwardTilt; }
-  public zLinear:number=0
+  public zLinear: number = 0
 
   private camera: BABYLON.FreeCamera;
 
@@ -45,18 +45,22 @@ export class Racer extends Player {
   /** Constants for angles */
   /** Farthest from actual turn direction allowed */
   private static TURN_TILT_MAX = Math.PI / 10;
-  private static FULL_X_TILT = Math.PI / 10;
-  private static TURN_TILT_RADIANS_PER_SECOND = Math.PI / 3;
+  /** How far over the kart will tilt */
+  private static FULL_X_TILT = Math.PI / 12;
+  /** How quickly the kart can tilt away from the forward center */
+  private static TURN_TILT_RADIANS_PER_SECOND = Math.PI / 6;
+  /** How quickly the kart can turn the forward center */
   private static TURN_FORWARD_RADIANS_PER_SECOND = Math.PI / 4;
 
   /** Linear speeds */
-  private static IMPULSE_PER_SECOND = 14;
-  private static MAX_NORMAL_LINEAR_VELOCITY = 8;
-  private static MAX_GROUND_LINEAR_VELOCITY = 5;
+  private static IMPULSE_PER_SECOND = 18;
+  private static MAX_NORMAL_LINEAR_VELOCITY = 12;
+  private static MAX_GROUND_LINEAR_VELOCITY = 7;
 
   /** Drag constants */
   private static DRAG_GROUND_PER_SECOND = 0.3;
   private static DRAG_ROAD_PER_SECOND = 0.1;
+  private static DRAG_ZSLIDE_NO_TILT = 8.8;
   private static DRAG_ZSLIDE_FULL_TILT = 4.8;
 
 
@@ -215,7 +219,10 @@ export class Racer extends Player {
     zDrag += fractionOfSecond * Racer.DRAG_ROAD_PER_SECOND;
 
     // sliding - drags Z
-    zDrag += fractionOfSecond * Racer.DRAG_ZSLIDE_FULL_TILT;
+    const zFract = Math.abs(this.radiansForwardTilt) / Racer.TURN_TILT_MAX;
+
+    zDrag += fractionOfSecond *
+      (zFract * Racer.DRAG_ZSLIDE_FULL_TILT + (1 - zFract) * Racer.DRAG_ZSLIDE_NO_TILT);
 
     // console.log(`Xdrag ${xDrag} ZDrag ${zDrag}`);
 
@@ -224,7 +231,7 @@ export class Racer extends Player {
     const newZLinear = cartZLinear.scale(Math.max(0, (cartZLength - zDrag) / cartZLength));
 
     // console.log(`Linear Z drag ${zDrag} - ${Racer.roundPlace(cartZLength)} => ${Racer.roundPlace(newZLinear.length())}`);
-    console.log(`Linear Z ${Racer.roundPlace(newZLinear.length())} fraction ${Racer.roundPlace(Math.max(0, (cartZLength - zDrag) / cartZLength), 3)}`);
+    // console.log(`Linear Z ${Racer.roundPlace(newZLinear.length())} fraction ${Racer.roundPlace(Math.max(0, (cartZLength - zDrag) / cartZLength), 3)}`);
     this.zLinear = Racer.roundPlace(Math.max(0, (cartZLength - zDrag) / cartZLength), 3);
 
     const newLinear = newXLinear.add(newYLinear).add(newZLinear);
