@@ -28,6 +28,9 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
         <h3 style={style} className="screen-header">
           Velocity: {Math.round(this.props.racer.LinearVelocity * 100) / 100}
         </h3>
+        <h3 style={style} className="screen-header">
+          Z Velocity: {this.props.racer.zLinear}
+        </h3>
       </div>
     );
   }

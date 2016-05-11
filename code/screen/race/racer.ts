@@ -14,6 +14,7 @@ export class Racer extends Player {
   public get LinearVelocity() { return this.linearVelocity; }
   public get Camera() { return this.camera; }
   private get cartYRotation() { return this.radiansForwardMain + this.radiansForwardTilt; }
+  public zLinear:number=0
 
   private camera: BABYLON.FreeCamera;
 
@@ -42,20 +43,21 @@ export class Racer extends Player {
   private radiansForwardTilt = 0;
 
   /** Constants for angles */
-  private static TURN_TILT_MAX = Math.PI / 3;
+  /** Farthest from actual turn direction allowed */
+  private static TURN_TILT_MAX = Math.PI / 10;
   private static FULL_X_TILT = Math.PI / 10;
   private static TURN_TILT_RADIANS_PER_SECOND = Math.PI / 3;
   private static TURN_FORWARD_RADIANS_PER_SECOND = Math.PI / 4;
 
   /** Linear speeds */
-  private static IMPULSE_PER_SECOND = 2;
-  private static MAX_NORMAL_LINEAR_VELOCITY = 5;
-  private static MAX_GROUND_LINEAR_VELOCITY = 3;
+  private static IMPULSE_PER_SECOND = 14;
+  private static MAX_NORMAL_LINEAR_VELOCITY = 8;
+  private static MAX_GROUND_LINEAR_VELOCITY = 5;
 
   /** Drag constants */
-  private static DRAG_GROUND_PER_SECOND = 0.9;
-  private static DRAG_ROAD_PER_SECOND = 0.6;
-  private static DRAG_ZSLIDE_FULL_TILT = 1.4;
+  private static DRAG_GROUND_PER_SECOND = 0.3;
+  private static DRAG_ROAD_PER_SECOND = 0.1;
+  private static DRAG_ZSLIDE_FULL_TILT = 4.8;
 
 
   constructor(color: number,
@@ -109,7 +111,10 @@ export class Racer extends Player {
     //#########################################################################
     const fractionOfSecond = millisecondsSinceLastFrame / 1000;
     let impulseScalar = 1;
-    millisecondsSinceLastFrame = Math.min(millisecondsSinceLastFrame, 100);
+    millisecondsSinceLastFrame = R.pipe(
+      R.max(1),
+      R.min(100)
+    )(millisecondsSinceLastFrame);
 
 
     //#########################################################################
@@ -117,6 +122,12 @@ export class Racer extends Player {
     //#########################################################################
     const linear: BABYLON.Vector3 = (<any>this.roller.getPhysicsImpostor()).getLinearVelocity();
     this.linearVelocity = linear.length();
+    // console.log(`Initial Linear ${linear.toString()}`);
+    if (R.identical(NaN, this.linearVelocity)) {
+      console.warn('NAN linear vel');
+      this.linearVelocity = 0;
+      return;
+    }
     // this.currentVelocityAroundY = this.linearVelocity > 0.05 ? Racer.removeYComponent(linear) : this.currentVelocityAroundY;
     // const linearVelocityAngle = Racer.radiansBetweenVectors(this.currentVelocityAroundY);
 
@@ -149,6 +160,7 @@ export class Racer extends Player {
         impulseScalar = -0.3;
       }
     }
+    // console.log(`Impulse Scalar ${impulseScalar}`);
 
 
     //#########################################################################
@@ -161,6 +173,7 @@ export class Racer extends Player {
       // too large, decrease
       this.radiansForwardTilt = Racer.TURN_TILT_MAX;
     }
+    // console.log(`Tilt ${this.radiansForwardTilt}`);
 
 
     //#########################################################################
@@ -188,6 +201,8 @@ export class Racer extends Player {
     const cartYLinear = Racer.projectVectorOntoVector(linear, cartYAxis);
     const cartZLinear = Racer.projectVectorOntoVector(linear, cartZAxis);
 
+    // console.log(`cart X ${cartXLinear.toString()} Y ${cartYLinear.toString()} Z ${cartZLinear.toString()}`);
+
     const cartXLength = cartXLinear.length();
     const cartZLength = cartZLinear.length();
 
@@ -202,9 +217,15 @@ export class Racer extends Player {
     // sliding - drags Z
     zDrag += fractionOfSecond * Racer.DRAG_ZSLIDE_FULL_TILT;
 
+    // console.log(`Xdrag ${xDrag} ZDrag ${zDrag}`);
+
     const newXLinear = cartXLinear.scale(Math.max(0, (cartXLength - xDrag) / cartXLength));
     const newYLinear = cartYLinear.clone();
-    const newZLinear = cartZLinear.scale(Math.max(0, (cartZLength - xDrag) / cartZLength));
+    const newZLinear = cartZLinear.scale(Math.max(0, (cartZLength - zDrag) / cartZLength));
+
+    // console.log(`Linear Z drag ${zDrag} - ${Racer.roundPlace(cartZLength)} => ${Racer.roundPlace(newZLinear.length())}`);
+    console.log(`Linear Z ${Racer.roundPlace(newZLinear.length())} fraction ${Racer.roundPlace(Math.max(0, (cartZLength - zDrag) / cartZLength), 3)}`);
+    this.zLinear = Racer.roundPlace(Math.max(0, (cartZLength - zDrag) / cartZLength), 3);
 
     const newLinear = newXLinear.add(newYLinear).add(newZLinear);
     const newLinearLength = newLinear.length();
@@ -226,6 +247,7 @@ export class Racer extends Player {
       this.cartYRotation,
       BABYLON.Axis.Y);
     this.roller.applyImpulse(impulseVector, this.roller.getAbsolutePosition());
+    // console.log(`Linear ${linear.length()} and reduced ${linearVelocityReduced.length()}`)
 
 
     //#########################################################################
@@ -240,9 +262,9 @@ export class Racer extends Player {
     this.camera.position = this.baseMesh.position.add(cameraVector);
     this.pointerMesh.position = this.baseMesh.position.add(linear);
 
-    // this.xMesh.position = this.baseMesh.position.add(cartXAxis.scale(10));
-    // this.yMesh.position = this.baseMesh.position.add(cartYAxis.scale(10));
-    // this.zMesh.position = this.baseMesh.position.add(cartZAxis.scale(5));
+    this.xMesh.position = this.baseMesh.position.add(cartXAxis.scale(10));
+    this.yMesh.position = this.baseMesh.position.add(cartYAxis.scale(5));
+    this.zMesh.position = this.baseMesh.position.add(cartZAxis.scale(5));
 
     // console.log('Drag ', allDragEffects);
     // console.log('            Turn Angle', this.turnAngleRadians * 57.29);
@@ -276,6 +298,11 @@ export class Racer extends Player {
   private static projectVectorOntoVector(root: BABYLON.Vector3, axis = BABYLON.Axis.X) {
     const factor = BABYLON.Vector3.Dot(root, axis) / axis.lengthSquared();
     return axis.scale(factor);
+  }
+
+  private static roundPlace(num: number, places = 1) {
+    const factor = Math.pow(10, places);
+    return Math.floor(num * factor) / factor;
   }
 }
 
