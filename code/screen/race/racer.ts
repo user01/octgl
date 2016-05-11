@@ -13,6 +13,7 @@ import * as R from 'ramda';
 export class Racer extends Player {
   public get LinearVelocity() { return this.linearVelocity; }
   public get Camera() { return this.camera; }
+  private get cartYRotation() { return this.radiansForwardMain + this.radiansForwardTilt; }
 
   private camera: BABYLON.FreeCamera;
 
@@ -30,18 +31,27 @@ export class Racer extends Player {
   private linearVelocity: number = 0;
 
   /** Current direction of travel */
-  private currentVelocityAroundY: BABYLON.Vector3 = new BABYLON.Vector3(1, 0, 0);
+  // private currentVelocityAroundY: BABYLON.Vector3 = new BABYLON.Vector3(1, 0, 0);
+  /** Current Forward angle around Y */
+  private radiansForwardMain = 0;
   /** Angle around Y axis kart offset from the angle of the current velocity */
-  private turnAngleRadians = 0;
+  private radiansForwardTilt = 0;
 
-  private static TURN_ANGLE_MAX_DIFF_FROM_VELOCITY = Math.PI / 3;
+  /** Constants for angles */
+  private static TURN_TILT_MAX = Math.PI / 3;
   private static FULL_X_TILT = Math.PI / 10;
-  private static TURN_ANGLE_RADIANS_PER_SECOND = Math.PI / 4;
-  private static IMPULSE_PER_SECOND = 5;
-  private static MAX_LINEAR_VELOCITY = 5;
-  private static DRAG_GROUND = 0.65;
-  private static DRAG_FULL_TILT = 0.45;
-  private static VELOCITY_FROM_DRAG_PER_SECOND = 5;
+  private static TURN_TILT_RADIANS_PER_SECOND = Math.PI / 3;
+  private static TURN_FORWARD_RADIANS_PER_SECOND = Math.PI / 4;
+
+  /** Linear speeds */
+  private static IMPULSE_PER_SECOND = 2;
+  private static MAX_NORMAL_LINEAR_VELOCITY = 5;
+  private static MAX_GROUND_LINEAR_VELOCITY = 3;
+
+  /** Drag constants */
+  private static DRAG_GROUND_PER_SECOND = 0.9;
+  private static DRAG_ROAD_PER_SECOND = 0.6;
+  private static DRAG_ZSLIDE_FULL_TILT = 1.4;
 
 
   constructor(color: number,
@@ -96,8 +106,8 @@ export class Racer extends Player {
     //#########################################################################
     const linear: BABYLON.Vector3 = (<any>this.roller.getPhysicsImpostor()).getLinearVelocity();
     this.linearVelocity = linear.length();
-    this.currentVelocityAroundY = this.linearVelocity > 0.05 ? Racer.removeYComponent(linear) : this.currentVelocityAroundY;
-    const linearVelocityAngle = Racer.radiansBetweenVectors(this.currentVelocityAroundY);
+    // this.currentVelocityAroundY = this.linearVelocity > 0.05 ? Racer.removeYComponent(linear) : this.currentVelocityAroundY;
+    // const linearVelocityAngle = Racer.radiansBetweenVectors(this.currentVelocityAroundY);
 
 
     //#########################################################################
@@ -105,18 +115,23 @@ export class Racer extends Player {
     //#########################################################################
     if (this.racerCommand.left && !this.racerCommand.right) {
       // turning left
-      this.turnAngleRadians -= fractionOfSecond * Racer.TURN_ANGLE_RADIANS_PER_SECOND;
+      this.radiansForwardTilt -= fractionOfSecond * Racer.TURN_TILT_RADIANS_PER_SECOND;
+      this.radiansForwardMain -= fractionOfSecond * Racer.TURN_FORWARD_RADIANS_PER_SECOND;
       impulseScalar = 0.8;
     } else if (!this.racerCommand.left && this.racerCommand.right) {
       // turning right
-      this.turnAngleRadians += fractionOfSecond * Racer.TURN_ANGLE_RADIANS_PER_SECOND;
+      this.radiansForwardTilt += fractionOfSecond * Racer.TURN_TILT_RADIANS_PER_SECOND;
+      this.radiansForwardMain += fractionOfSecond * Racer.TURN_FORWARD_RADIANS_PER_SECOND;
       impulseScalar = 0.8;
     } else {
-      if (this.turnAngleRadians > linearVelocityAngle + 0.05) {
-        this.turnAngleRadians -= fractionOfSecond * Racer.TURN_ANGLE_RADIANS_PER_SECOND;
-      } else if (this.turnAngleRadians < linearVelocityAngle - 0.05) {
-        this.turnAngleRadians -= fractionOfSecond * Racer.TURN_ANGLE_RADIANS_PER_SECOND;
-
+      // push tilt back towards zero
+      console.log('tilt', this.radiansForwardTilt);
+      if (this.radiansForwardTilt > 0.001) {
+        this.radiansForwardTilt -= fractionOfSecond * Racer.TURN_TILT_RADIANS_PER_SECOND;
+        this.radiansForwardTilt = this.radiansForwardTilt < 0 ? 0 : this.radiansForwardTilt;
+      } else if (this.radiansForwardTilt < 0.001) {
+        this.radiansForwardTilt += fractionOfSecond * Racer.TURN_TILT_RADIANS_PER_SECOND;
+        this.radiansForwardTilt = this.radiansForwardTilt > 0 ? 0 : this.radiansForwardTilt;
       }
       if (this.racerCommand.left && this.racerCommand.right) {
         // reverse
@@ -128,47 +143,68 @@ export class Racer extends Player {
     //#########################################################################
     // Bind Turn Angle
     //#########################################################################
-    if (this.turnAngleRadians < linearVelocityAngle - Racer.TURN_ANGLE_MAX_DIFF_FROM_VELOCITY) {
+    if (this.radiansForwardTilt < -Racer.TURN_TILT_MAX) {
       // too small, increase
-      this.turnAngleRadians = linearVelocityAngle - Racer.TURN_ANGLE_MAX_DIFF_FROM_VELOCITY;
-    } else if (this.turnAngleRadians > linearVelocityAngle + Racer.TURN_ANGLE_MAX_DIFF_FROM_VELOCITY) {
+      this.radiansForwardTilt = -Racer.TURN_TILT_MAX;
+    } else if (this.radiansForwardTilt > Racer.TURN_TILT_MAX) {
       // too large, decrease
-      this.turnAngleRadians = linearVelocityAngle + Racer.TURN_ANGLE_MAX_DIFF_FROM_VELOCITY;
+      this.radiansForwardTilt = Racer.TURN_TILT_MAX;
     }
 
 
     //#########################################################################
     // Set Car rotation around Y (direction) and X (tilt)
     //#########################################################################
-    const fractionCarAngleSigned = ((linearVelocityAngle - this.turnAngleRadians) / Racer.TURN_ANGLE_MAX_DIFF_FROM_VELOCITY);
-    this.kartMesh.rotation.y = this.turnAngleRadians;
-    this.kartMesh.rotation.x = Racer.FULL_X_TILT * ((linearVelocityAngle - this.turnAngleRadians) / Racer.TURN_ANGLE_MAX_DIFF_FROM_VELOCITY);
+    const fractionCarAngleSigned = this.radiansForwardTilt / Racer.TURN_TILT_MAX;
+    this.kartMesh.rotation.y = this.cartYRotation;
+    this.kartMesh.rotation.x = Racer.FULL_X_TILT * fractionCarAngleSigned;
 
 
     //#########################################################################
     // Compute Max Linear Velocity
     //#########################################################################
-    // ground
-    const dragGround = 1;
+    const cartXAxis = Racer.rotateVector(
+      BABYLON.Axis.X,
+      this.cartYRotation,
+      BABYLON.Axis.Y);
+    const cartZAxis = Racer.rotateVector(
+      BABYLON.Axis.Z,
+      this.cartYRotation,
+      BABYLON.Axis.Y);
+    const cartYAxis = BABYLON.Axis.Y.clone();
 
-    // car angle
-    const fractionCarAngleUnsigned = Math.abs(fractionCarAngleSigned); //0 means no drag, 1 means full
-    const dragCarAngle = fractionCarAngleSigned * Racer.DRAG_FULL_TILT;
+    const cartXLinear = Racer.projectVectorOntoVector(linear, cartXAxis);
+    const cartYLinear = Racer.projectVectorOntoVector(linear, cartYAxis);
+    const cartZLinear = Racer.projectVectorOntoVector(linear, cartZAxis);
 
-    // effects
-    const dragEffects = 1;
+    const cartXLength = cartXLinear.length();
+    const cartZLength = cartZLinear.length();
 
-    const allDragEffects = <number>R.reduce(R.multiply, 1, [dragGround, dragCarAngle, dragEffects]);
-    // const currentMaxVelocity = allDragEffects * Racer.MAX_LINEAR_VELOCITY;
+    let xDrag = 0;
+    let zDrag = 0;
 
+    // ground - drags both X and Z
+    // check if on ground or not (road or air)
+    xDrag += fractionOfSecond * Racer.DRAG_ROAD_PER_SECOND;
+    zDrag += fractionOfSecond * Racer.DRAG_ROAD_PER_SECOND;
+
+    // sliding - drags Z
+    zDrag += fractionOfSecond * Racer.DRAG_ZSLIDE_FULL_TILT;
+
+    const newXLinear = cartXLinear.scale(Math.max(0, (cartXLength - xDrag) / cartXLength));
+    const newYLinear = cartYLinear.clone();
+    const newZLinear = cartZLinear.scale(Math.max(0, (cartZLength - xDrag) / cartZLength));
+
+    const newLinear = newXLinear.add(newYLinear).add(newZLinear);
+    const newLinearLength = newLinear.length();
 
     //#########################################################################
-    // Reduce Velocity
+    // Reduce Velocity based on state and maxes
     //#########################################################################
-    // always apply drag effects on the current linear motion
-    const cappedVelocity = Math.min(this.linearVelocity, Racer.MAX_LINEAR_VELOCITY);
-    const scaleFactor = (cappedVelocity - Racer.VELOCITY_FROM_DRAG_PER_SECOND * fractionOfSecond * (1 - allDragEffects)) / cappedVelocity;
-    const linearVelocityReduced = linear.scale(scaleFactor);
+    const cappedVelocity = true ? Racer.MAX_NORMAL_LINEAR_VELOCITY : Racer.MAX_GROUND_LINEAR_VELOCITY;
+    const scaleFactor = newLinearLength > 0 ? Math.min(newLinearLength, cappedVelocity) / newLinearLength : 1;
+    const linearVelocityReduced = newLinear.scale(scaleFactor);
+    (<any>this.roller.getPhysicsImpostor()).setLinearVelocity(linearVelocityReduced);
 
 
     //#########################################################################
@@ -176,7 +212,7 @@ export class Racer extends Player {
     //#########################################################################
     const impulseVector = Racer.rotateVector(
       BABYLON.Axis.X.scale(impulseScalar * Racer.IMPULSE_PER_SECOND * fractionOfSecond),
-      this.turnAngleRadians,
+      this.cartYRotation,
       BABYLON.Axis.Y);
     this.roller.applyImpulse(impulseVector, this.roller.getAbsolutePosition());
 
@@ -186,15 +222,15 @@ export class Racer extends Player {
     //#########################################################################
     const cameraVector = Racer.rotateVector(
       new BABYLON.Vector3(20, 8, 0),
-      this.turnAngleRadians + Math.PI,
+      this.radiansForwardMain + 0.5 * this.radiansForwardTilt + Math.PI,
       BABYLON.Axis.Y);
 
     this.baseMesh.position = this.roller.position;
     this.camera.position = this.baseMesh.position.add(cameraVector);
     this.pointerMesh.position = this.baseMesh.position.add(linear);
 
-    console.log('Drag ', allDragEffects);
-    console.log('            Turn Angle', this.turnAngleRadians * 57.29);
+    // console.log('Drag ', allDragEffects);
+    // console.log('            Turn Angle', this.turnAngleRadians * 57.29);
   }
 
   public UpdateRacerCommand = (racerCommand: RacerCommand) => {
@@ -220,6 +256,11 @@ export class Racer extends Player {
 
   private static removeYComponent(v: BABYLON.Vector3): BABYLON.Vector3 {
     return new BABYLON.Vector3(v.x, 0, v.z);
+  }
+
+  private static projectVectorOntoVector(root: BABYLON.Vector3, axis = BABYLON.Axis.X) {
+    const factor = BABYLON.Vector3.Dot(root, axis) / axis.lengthSquared();
+    return axis.scale(factor);
   }
 }
 
