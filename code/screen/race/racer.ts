@@ -22,6 +22,10 @@ export class Racer extends Player {
   private pointerMesh: BABYLON.AbstractMesh;
   private kartMesh: BABYLON.AbstractMesh;
 
+  private xMesh: BABYLON.AbstractMesh;
+  private yMesh: BABYLON.AbstractMesh;
+  private zMesh: BABYLON.AbstractMesh;
+
   private racerCommand: RacerCommand = {
     left: false,
     right: false,
@@ -84,6 +88,13 @@ export class Racer extends Player {
     this.pointerMesh.material = sphereMat;
     this.pointerMesh.position = spawn;
 
+    this.xMesh = BABYLON.Mesh.CreateBox(`xMesh.${this.DeviceId}`, 0.5, scene);
+    this.xMesh.position = spawn;
+    this.yMesh = BABYLON.Mesh.CreateBox(`yMesh.${this.DeviceId}`, 0.5, scene);
+    this.yMesh.position = spawn;
+    this.zMesh = BABYLON.Mesh.CreateBox(`zMesh.${this.DeviceId}`, 0.5, scene);
+    this.zMesh.position = spawn;
+
     this.camera = new BABYLON.FreeCamera(`camera.${this.DeviceId}`, this.baseMesh.position.add(new BABYLON.Vector3(-20, 8, 0)), scene);
     this.camera.lockedTarget = this.baseMesh;
 
@@ -125,7 +136,7 @@ export class Racer extends Player {
       impulseScalar = 0.8;
     } else {
       // push tilt back towards zero
-      console.log('tilt', this.radiansForwardTilt);
+      // console.log('tilt', this.radiansForwardTilt);
       if (this.radiansForwardTilt > 0.001) {
         this.radiansForwardTilt -= fractionOfSecond * Racer.TURN_TILT_RADIANS_PER_SECOND;
         this.radiansForwardTilt = this.radiansForwardTilt < 0 ? 0 : this.radiansForwardTilt;
@@ -228,6 +239,10 @@ export class Racer extends Player {
     this.baseMesh.position = this.roller.position;
     this.camera.position = this.baseMesh.position.add(cameraVector);
     this.pointerMesh.position = this.baseMesh.position.add(linear);
+
+    // this.xMesh.position = this.baseMesh.position.add(cartXAxis.scale(10));
+    // this.yMesh.position = this.baseMesh.position.add(cartYAxis.scale(10));
+    // this.zMesh.position = this.baseMesh.position.add(cartZAxis.scale(5));
 
     // console.log('Drag ', allDragEffects);
     // console.log('            Turn Angle', this.turnAngleRadians * 57.29);
