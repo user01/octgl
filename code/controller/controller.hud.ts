@@ -12,6 +12,7 @@ import * as R from 'ramda';
 export class ControllerHUD {
   private trackName: HTMLHeadingElement;
   private huds: HTMLElement[];
+  private periodicUpdateId: any;
 
   private get currentRacerCommand(): RacerCommand {
     return {
@@ -55,11 +56,14 @@ export class ControllerHUD {
     this.SwitchTo(ControllerState.Default);
     const x = defaultOverlay.getElementsByClassName("screen-header");
     this.huds.forEach(this.assignClick);
+    this.periodicUpdateId = setInterval(this.perodicUpdate, 2000);
   }
 
-  // public setPlayerIdAndNick = (id: number, nick: string) => {
-  //   this.hackElm.innerText = `Heard: ${id} - ${nick}`;
-  // }
+  /** Force an update, in case the state gets dropped */
+  private perodicUpdate = () => {
+    this.handleNewCommand({ racer: this.currentRacerCommand });
+  }
+
 
   private assignClick = (elm: HTMLElement) => {
     const clickableBtns = elm.getElementsByClassName('btn');
