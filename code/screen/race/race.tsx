@@ -8,6 +8,7 @@ import * as R from 'ramda';
 
 import Player from '../player';
 import Racer from './racer';
+import TrackTools from './track.tools';
 import RacerCommand from '../../interfaces/racercommand';
 
 import OnePlayer from './huds/oneplayer.tsx';
@@ -36,6 +37,7 @@ export class Race {
   private _canvasElm: HTMLCanvasElement;
   private racers: Racer[];
   private state: RaceState = RaceState.Loading;
+  private trackTools: TrackTools;
 
   private engine: BABYLON.Engine;
   private scene: BABYLON.Scene;
@@ -112,6 +114,8 @@ export class Race {
     var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
     this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin());
 
+    this.trackTools = new TrackTools(this.scene.meshes, this.scene);
+
     this.scene.meshes.filter((m) => {
       return m.name.indexOf('static') > -1;
     }).forEach((m) => {
@@ -159,7 +163,9 @@ export class Race {
   private babylonEngineResize = () => {
     this.engine.resize();
   }
+  /** Expensive but less fps sensitive tasks */
   private perodicUpdate = () => {
+    this.updateRacersOnTrack();
     this.render();
   }
 
@@ -167,6 +173,10 @@ export class Race {
     const racer = R.find((r) => r.DeviceId == device_id, this.Racers);
     if (!racer) return;
     racer.UpdateRacerCommand(racerCommand);
+  }
+
+  private updateRacersOnTrack = () => {
+    this.racers.forEach(r => r.UpdateRacerPosition(this.trackTools));
   }
 
   private setupCameras = (count: number = this.Racers.length) => {

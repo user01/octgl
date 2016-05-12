@@ -55,7 +55,7 @@ export class Game {
     this.managePlayerRoster();
   }
   private onMessage = (device_id: number, data: ToScreen) => {
-    console.log(`SCREEN - Device ${device_id} sent `, data);
+    // console.log(`SCREEN - Device ${device_id} sent `, data);
     if (R.is(Number, data.request)) {
       console.log(`Heard request from ${device_id}`, data);
       switch (data.request) {

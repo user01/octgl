@@ -2,6 +2,7 @@
 /// <reference path="../../../typings/references.d.ts" />
 
 import Player from '../player';
+import TrackTools from './track.tools';
 import RacerCommand from '../../interfaces/racercommand';
 
 import * as R from 'ramda';
@@ -14,7 +15,14 @@ export class Racer extends Player {
   public get LinearVelocity() { return this.linearVelocity; }
   public get Camera() { return this.camera; }
   private get cartYRotation() { return this.radiansForwardMain + this.radiansForwardTilt; }
-  public zLinear: number = 0
+  public zLinear: number = 0;
+  public get Lap() { return this.lap; }
+  private lap: number = 1;
+  public PercentDoneTrack = 0;
+  /** Hitbox set index for TrackTools to search for next hit */
+  public get CurrentTrackIndex() { return this.currentTrackIndex; }
+  private currentTrackIndex = 0;
+
 
   private camera: BABYLON.FreeCamera;
 
@@ -280,6 +288,12 @@ export class Racer extends Player {
 
     // console.log('Drag ', allDragEffects);
     // console.log('            Turn Angle', this.turnAngleRadians * 57.29);
+  }
+
+  public UpdateRacerPosition = (trackTools: TrackTools) => {
+    this.currentTrackIndex = trackTools.NextTrackIndex(this.roller, this.currentTrackIndex, 5);
+    this.lap = trackTools.Lap(this.currentTrackIndex);
+    this.PercentDoneTrack = trackTools.DistanceOnTrack(this.roller, this.currentTrackIndex) / trackTools.TrackLength;
   }
 
   public UpdateRacerCommand = (racerCommand: RacerCommand) => {
