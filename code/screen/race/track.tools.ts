@@ -24,13 +24,6 @@ export class TrackTools {
     sceneObjects: BABYLON.AbstractMesh[],
     scene: BABYLON.Scene
   ) {
-    // R.pipe(
-    //   R.map((mesh: BABYLON.AbstractMesh) => [mesh.name, TrackTools.pathRegExp.exec(mesh.name)]),
-    //   R.forEach((a: any) => console.log(a[0], a[1]))
-    //   // R.filter((mesh: BABYLON.AbstractMesh) => TrackTools.pathRegExp.test(mesh.name)),
-    //   // R.forEach((mesh: BABYLON.AbstractMesh)=>console.log(mesh.name))
-    // )(sceneObjects)
-
     this.raceHitObjects = R.pipe(
       R.filter((mesh: BABYLON.AbstractMesh) => TrackTools.pathRegExp.test(mesh.name)),
       R.sort((a: BABYLON.AbstractMesh, b: BABYLON.AbstractMesh) => {
@@ -43,14 +36,13 @@ export class TrackTools {
       R.values,
       R.filter((list: BABYLON.AbstractMesh[]) => list.length > 0)
     )(sceneObjects);
-    console.log(this.raceHitObjects);
 
     const hitboxmat = new BABYLON.StandardMaterial(`hitboxmat`, scene);
     hitboxmat.diffuseColor = BABYLON.Color3.Magenta();
     hitboxmat.wireframe = true;
     R.forEach(R.forEach((m: BABYLON.AbstractMesh) => m.material = hitboxmat))(this.raceHitObjects);
     // R.forEach(R.forEach((m: BABYLON.AbstractMesh) => m.isVisible = false))(this.raceHitObjects);
-    // R.forEach(R.forEach((m: any) => console.log(m.name)))(this.raceHitObjects);
+    
     for (var i = 0; i < this.IndexLength; i++) {
       this.trackLengthAtIndexes.push(R.sum(this.distances));
       this.distances.push(R.head(this.getIndex(i)).position.subtract(R.head(this.getIndex(i + 1)).position).length());
@@ -69,7 +61,7 @@ export class TrackTools {
     for (var index = currentTrackIndex; index < currentTrackIndex + reach; index++) {
       // console.log(`Testing for contact with ${index}`, this.getIndex(index));
       if (R.any(hitbox => hitbox.intersectsMesh(roller, true), this.getIndex(index))) {
-        console.log(`Hit with index ${index}`);
+        // console.log(`Hit with index ${index}`);
         return index;
       }
     }
