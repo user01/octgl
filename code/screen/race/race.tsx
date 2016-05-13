@@ -152,6 +152,7 @@ export class Race {
     this.presentMilliseconds = +Date.now();
     this.engine.runRenderLoop(this.babylonEngineLoop);
     this.periodicUpdateId = setInterval(this.perodicUpdate, 100);
+    this.state = RaceState.Pending;
   }
 
   private babylonEngineLoop = () => {
