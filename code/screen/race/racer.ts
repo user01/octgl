@@ -126,7 +126,7 @@ export class Racer extends Player {
     let impulseScalar = 1;
     millisecondsSinceLastFrame = R.pipe(
       R.max(1),
-      R.min(100)
+      R.min(Math.floor(1000 / 20))
     )(millisecondsSinceLastFrame);
 
 
