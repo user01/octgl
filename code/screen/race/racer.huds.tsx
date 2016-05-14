@@ -22,6 +22,7 @@ class RacerHUDs extends React.Component<IAppProps, IAppState> {
       <div className="controls player-hud">
         {this.props.racers.map((racer, index) =>
           <RacerHUD
+            key={`racerhud.${index}`}
             racer={racer}
             frame={WindowFrames.WindowFrameToBABYLONViewport(WindowFrames.Frames[this.props.racers.length - 1][index]) }
             />) }
