@@ -7,6 +7,7 @@ import * as WindowFrames from './../../interfaces/window.frame';
 
 interface IAppProps {
   racers: Racer[];
+  totalLaps: number;
 }
 
 interface IAppState {
@@ -24,6 +25,7 @@ class RacerHUDs extends React.Component<IAppProps, IAppState> {
           <RacerHUD
             key={`racerhud.${index}`}
             racer={racer}
+            totalLaps={this.props.totalLaps}
             frame={WindowFrames.WindowFrameToBABYLONViewport(WindowFrames.Frames[this.props.racers.length - 1][index]) }
             />) }
       </div>

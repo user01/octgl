@@ -57,6 +57,7 @@ export class Race {
     currentPlayers: Player[],
     private rootElement: HTMLElement,
     trackFileName: string,
+    private lapsToWin = 3,
     private onRaceDone: () => void
   ) {
     this.racers = Racer.PlayersToRacers(currentPlayers);
@@ -72,7 +73,7 @@ export class Race {
           <canvas ref={ref => this._canvasElm = ref} className="render-canvas"></canvas>
         </div>
 
-        <RacerHUDs racers={this.racers} />
+        <RacerHUDs racers={this.racers} totalLaps={this.lapsToWin} />
 
         {this.state == RaceState.Red ? <ReadySet seconds={2} /> : ''}
         {this.state == RaceState.Yellow ? <ReadySet seconds={1} /> : ''}

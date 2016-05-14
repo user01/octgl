@@ -142,6 +142,7 @@ export class Game {
       players,
       this.raceElement,
       this.mainMenu.CurrentGamePayload.track.filename,
+      3,
       () => {
         console.log('race done');
         this.mainMenu.Show();

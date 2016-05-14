@@ -10,6 +10,7 @@ import * as R from 'ramda';
 interface IAppProps {
   racer: Racer;
   frame: WindowFrames.WindowFrame;
+  totalLaps: number;
 }
 
 interface IAppState {
@@ -42,7 +43,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
 
   render() {
 
-    let style = R.merge(
+    let mainHudStyle = R.merge(
       {
         // 'boxShadow': `0 0 0 1em ${RacerHUD.NumberToColor(this.props.racer.Color)} inset`,
         // 'padding': '1em',
@@ -51,13 +52,13 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
       this.windowFrameToStyle()
     );
 
-    let ss = {
-      float: 'right'
-    };
     return (
-      <div style={style}>
-        <div style={ss}>
-          <p>Floated content.</p>
+      <div className="racer-hud" style={mainHudStyle}>
+        <div className="left">
+          <p className="lap-count"><i className="fa fa-flag-checkered fa-2x"></i> {this.props.racer.Lap} / {this.props.totalLaps}</p>
+        </div>
+        <div className="right">
+          <p className="racer-place">{this.props.racer.Place}st</p>
         </div>
       </div>
     );
