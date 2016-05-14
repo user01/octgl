@@ -10,6 +10,7 @@ import Player from '../player';
 import Racer from './racer';
 import TrackTools from './track.tools';
 import RacerCommand from '../../interfaces/racercommand';
+import * as WindowFrames from '../../interfaces/window.frame';
 
 import OnePlayer from './huds/oneplayer.tsx';
 import TwoPlayer from './huds/twoplayer.tsx';
@@ -181,26 +182,10 @@ export class Race {
   }
 
   private setupCameras = (count: number = this.Racers.length) => {
-    switch (count) {
-      case 1:
-        this.racers[0].Camera.viewport = new BABYLON.Viewport(0, 0, 1, 1);
-        break;
-      case 2:
-        this.racers[0].Camera.viewport = new BABYLON.Viewport(0, 0, 0.5, 1);
-        this.racers[1].Camera.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 1);
-        break;
-      case 3:
-        this.racers[0].Camera.viewport = new BABYLON.Viewport(0, 0, 0.5, 0.5);
-        this.racers[1].Camera.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 0.5);
-        this.racers[2].Camera.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 1);
-        break;
-      case 4:
-        this.racers[0].Camera.viewport = new BABYLON.Viewport(0, 0, 0.5, 0.5);
-        this.racers[1].Camera.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 0.5);
-        this.racers[2].Camera.viewport = new BABYLON.Viewport(0.5, 0, 0.5, 0.5);
-        this.racers[3].Camera.viewport = new BABYLON.Viewport(0.5, 0.5, 0.5, 0.5);
-        break;
-    }
+    this.racers.forEach((racer, index) => {
+      // console.log(`Racer ${index} goes to frame `, WindowFrames.WindowFrameToBABYLONViewport(WindowFrames.Frames[this.Racers.length][index]))
+      racer.Camera.viewport = WindowFrames.WindowFrameToBABYLONViewport(WindowFrames.Frames[this.Racers.length - 1][index]);
+    });
   }
 
   private closeLevel = () => {
