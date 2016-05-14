@@ -5,6 +5,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as R from 'ramda';
+import * as Promise from 'bluebird';
 
 import Player from '../player';
 import Racer from './racer';
@@ -17,6 +18,7 @@ import RacerHUDs from './racer.huds.tsx';
 import LoadingBoard from './loading.board.tsx';
 import LeaderBoard from './leader.board.tsx';
 import UnsupportedBoard from './unsupported.board.tsx';
+import ReadySet from './ready.set.tsx';
 
 export enum RaceState {
   Unsupported, // Cannot run the asset
@@ -24,6 +26,7 @@ export enum RaceState {
   Pending, // before race starts
   Red, //red flag
   Yellow, //yellow flag
+  Green, // Go flag
   Race, //race in progress
   Post // leaderboard
 }
@@ -46,6 +49,7 @@ export class Race {
 
   private periodicUpdateId: any;
   private presentMilliseconds = 0;
+  private static PENDING_MS_PER_STATE = 2200;
   private static id = 0;
   private id = Race.id++;
 
@@ -70,6 +74,9 @@ export class Race {
 
         <RacerHUDs racers={this.racers} />
 
+        {this.state == RaceState.Red ? <ReadySet seconds={2} /> : ''}
+        {this.state == RaceState.Yellow ? <ReadySet seconds={1} /> : ''}
+        {this.state == RaceState.Green ? <ReadySet seconds={0} /> : ''}
         {this.state == RaceState.Post ? <LeaderBoard /> : ''}
         {this.state == RaceState.Loading ? <LoadingBoard /> : ''}
         {this.state == RaceState.Unsupported ? <UnsupportedBoard /> : ''}
@@ -124,10 +131,7 @@ export class Race {
   }
 
   private babylonAssetsLoaded = (tasks) => {
-    console.log('Done loading');
-
     const spawns = Race.spawnObjToSpawns(this.scene.getMeshByID('spawns'));
-    // console.log(spawns.map(v => v.toString()));
 
     this.Racers.forEach((r, idx) =>
       r.configureRacerInScene(
@@ -141,13 +145,34 @@ export class Race {
     this.presentMilliseconds = +Date.now();
     this.engine.runRenderLoop(this.babylonEngineLoop);
     this.periodicUpdateId = setInterval(this.perodicUpdate, 100);
+
+    // force camera position
+    this.racers.forEach(r => r.onEveryFrame(1));
     this.state = RaceState.Pending;
+    Promise.delay(Race.PENDING_MS_PER_STATE)
+      .then(() => {
+        this.state = RaceState.Red;
+      })
+      .delay(Race.PENDING_MS_PER_STATE)
+      .then(() => {
+        this.state = RaceState.Yellow;
+      })
+      .delay(Race.PENDING_MS_PER_STATE)
+      .then(() => {
+        this.state = RaceState.Green;
+      })
+      .delay(Race.PENDING_MS_PER_STATE)
+      .then(() => {
+        this.state = RaceState.Race;
+      })
   }
 
   private babylonEngineLoop = () => {
-    const currentMilliseconds = +Date.now();
-    this.racers.forEach(r => r.onEveryFrame(currentMilliseconds - this.presentMilliseconds));
-    this.presentMilliseconds = currentMilliseconds;
+    if (this.state == RaceState.Race || this.state == RaceState.Green) {
+      const currentMilliseconds = +Date.now();
+      this.racers.forEach(r => r.onEveryFrame(currentMilliseconds - this.presentMilliseconds));
+      this.presentMilliseconds = currentMilliseconds;
+    }
     this.scene.render();
   }
   private babylonEngineResize = () => {
@@ -167,6 +192,17 @@ export class Race {
 
   private updateRacersOnTrack = () => {
     this.racers.forEach(r => r.UpdateRacerPosition(this.trackTools));
+    const placements = this.racers.map((racer, index) => {
+      return { racer, position: racer.TrackPosition };
+    });
+    const sortedPlacements = placements.sort((a, b) => {
+      if (a.position > b.position) return 1;
+      if (a.position < b.position) return -1;
+      return 0;
+    });
+    // sortedPlacements.forEach((payload, index) => {
+    //   payload.racer.
+    // })
   }
 
   private setupCameras = (count: number = this.Racers.length) => {

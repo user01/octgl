@@ -15,12 +15,17 @@ export class Racer extends Player {
   public get LinearVelocity() { return this.linearVelocity; }
   public get Camera() { return this.camera; }
   private get cartYRotation() { return this.radiansForwardMain + this.radiansForwardTilt; }
-  public zLinear: number = 0;
   public get Lap() { return this.lap; }
-  private lap: number = 1;
-  public PercentDoneTrack = 0;
   /** Hitbox set index for TrackTools to search for next hit */
   public get CurrentTrackIndex() { return this.currentTrackIndex; }
+  public get TrackPosition() { return this.Lap + this.PercentDoneTrack / 100; }
+
+  /** Placement in pack */
+  public Place: number = 0;
+
+  public zLinear: number = 0;
+  private lap: number = 1;
+  public PercentDoneTrack = 0;
   private currentTrackIndex = 0;
 
 
