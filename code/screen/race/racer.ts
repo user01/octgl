@@ -93,6 +93,9 @@ export class Racer extends Player {
     const color = BABYLON.Color3.FromHexString(`#${this.Color.toString(16)}`);
     this.baseMesh = new BABYLON.AbstractMesh(`base.${this.DeviceId}`, scene);
     this.kartMesh = kart.clone(`kart.${this.DeviceId}`, this.baseMesh);
+    const kartMat = new BABYLON.StandardMaterial(`kartmat.${this.DeviceId}`, scene);
+    kartMat.diffuseColor = color;
+    this.kartMesh.material = kartMat;
 
 
     const sphereMat = new BABYLON.StandardMaterial(`spheremat.${this.DeviceId}`, scene);
