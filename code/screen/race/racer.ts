@@ -4,6 +4,7 @@
 import Player from '../player';
 import TrackTools from './track.tools';
 import RacerCommand from '../../interfaces/racercommand';
+import Utility from '../../data/utility';
 
 import * as R from 'ramda';
 
@@ -90,7 +91,10 @@ export class Racer extends Player {
     spawn: BABYLON.Vector3,
     kart: BABYLON.AbstractMesh
   ) => {
-    const color = BABYLON.Color3.FromHexString(`#${this.Color.toString(16)}`);
+    // console.log(this.Color, Utility.NumberToColor(this.Color));
+    const colors = Utility.NumberToColorSet(this.Color);
+    const color = BABYLON.Color3.FromInts(colors.r, colors.g, colors.b);
+    // const color = BABYLON.Color3.FromHexString(Utility.NumberToColor(this.Color));
     this.baseMesh = new BABYLON.AbstractMesh(`base.${this.DeviceId}`, scene);
     this.kartMesh = kart.clone(`kart.${this.DeviceId}`, this.baseMesh);
     const kartMat = new BABYLON.StandardMaterial(`kartmat.${this.DeviceId}`, scene);

@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import Racer from './racer';
+import Utility from '../../data/utility';
 import * as WindowFrames from '../../interfaces/window.frame';
 
 import * as R from 'ramda';
@@ -78,7 +79,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
     const height = (Math.floor(this.windowHeight * frame.height) - borderChunk) + 'px';
 
     return {
-      border: `${borderSize}px ${RacerHUD.NumberToColor(this.props.racer.Color)} solid`,
+      border: `${borderSize}px ${Utility.NumberToColor(this.props.racer.Color)} solid`,
       position: 'absolute',
       left,
       top,
@@ -87,13 +88,6 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
     };
   }
 
-  public static NumberToColor(num) {
-    num >>>= 0;
-    var b = num & 0xFF,
-      g = (num & 0xFF00) >>> 8,
-      r = (num & 0xFF0000) >>> 16;
-    return "rgb(" + [r, g, b].join(",") + ")";
-  }
 }
 
 // <div className={`player-box ${this.props.class}`} style={style}>
