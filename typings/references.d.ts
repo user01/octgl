@@ -3,3 +3,4 @@
 /// <reference path="./ramda.d.ts" />
 /// <reference path="./react.d.ts" />
 /// <reference path="./react-dom.d.ts" />
+/// <reference path="./bluebird.d.ts" />

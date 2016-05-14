@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^3.3.5",
     "ramda": "^0.21.0",
     "react": "^15.0.2",
     "react-dom": "^15.0.2"
