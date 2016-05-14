@@ -17,8 +17,8 @@ class ReadySet extends React.Component<IAppProps, IAppState> {
 
   render() {
     return (
-      <div id="loading-view" className="controls">
-        <h1 className="screen-header">{this.props.seconds > 0 ? this.props.seconds : 'Go!'}</h1>
+      <div id="ready-set" className="controls">
+        <h1 className="count-down">{this.props.seconds > 0 ? this.props.seconds : 'Go!'}</h1>
       </div>
     );
   }
