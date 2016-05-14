@@ -50,6 +50,7 @@ export class Race {
   private periodicUpdateId: any;
   private presentMilliseconds = 0;
   private static PENDING_MS_PER_STATE = 2200;
+  private static PERIODIC_UPDATE_MS = 50;
   private static id = 0;
   private id = Race.id++;
 
@@ -145,7 +146,7 @@ export class Race {
 
     this.presentMilliseconds = +Date.now();
     this.engine.runRenderLoop(this.babylonEngineLoop);
-    this.periodicUpdateId = setInterval(this.perodicUpdate, 100);
+    this.periodicUpdateId = setInterval(this.perodicUpdate, Race.PERIODIC_UPDATE_MS);
 
     // force camera position
     this.racers.forEach(r => r.onEveryFrame(1));
