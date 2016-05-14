@@ -12,8 +12,7 @@ import TrackTools from './track.tools';
 import RacerCommand from '../../interfaces/racercommand';
 import * as WindowFrames from '../../interfaces/window.frame';
 
-import OnePlayer from './huds/oneplayer.tsx';
-import TwoPlayer from './huds/twoplayer.tsx';
+import RacerHUDs from './racer.huds.tsx';
 
 import LoadingBoard from './loading.board.tsx';
 import LeaderBoard from './leader.board.tsx';
@@ -69,23 +68,12 @@ export class Race {
           <canvas ref={ref => this._canvasElm = ref} className="render-canvas"></canvas>
         </div>
 
-        {this.selectPlayerHud() }
+        <RacerHUDs racers={this.racers} />
 
         {this.state == RaceState.Post ? <LeaderBoard /> : ''}
         {this.state == RaceState.Loading ? <LoadingBoard /> : ''}
         {this.state == RaceState.Unsupported ? <UnsupportedBoard /> : ''}
       </div>), this.rootElement);
-  }
-
-  private selectPlayerHud = () => {
-    switch (this.racers.length) {
-      case 1:
-        return (<OnePlayer racers={this.racers} />)
-      case 2:
-        return (<TwoPlayer racers={this.racers} />)
-      default:
-        return (<span>Bad player length of {this.racers.length}</span>);
-    }
   }
 
   private loadLevel = (filename) => {
@@ -183,7 +171,6 @@ export class Race {
 
   private setupCameras = (count: number = this.Racers.length) => {
     this.racers.forEach((racer, index) => {
-      // console.log(`Racer ${index} goes to frame `, WindowFrames.WindowFrameToBABYLONViewport(WindowFrames.Frames[this.Racers.length][index]))
       racer.Camera.viewport = WindowFrames.WindowFrameToBABYLONViewport(WindowFrames.Frames[this.Racers.length - 1][index]);
     });
   }
