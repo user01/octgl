@@ -98,7 +98,7 @@ export class Race {
       this.scene.executeWhenReady(this.babylonSceneLoaded);
     }, (progress) => {
       // To do: give progress feedback to user
-      console.log('progress', progress);
+      // console.log('progress', progress);
     });
 
 
@@ -159,6 +159,7 @@ export class Race {
       })
       .delay(Race.PENDING_MS_PER_STATE)
       .then(() => {
+        this.presentMilliseconds = +Date.now();
         this.state = RaceState.Green;
       })
       .delay(Race.PENDING_MS_PER_STATE)
@@ -168,7 +169,7 @@ export class Race {
   }
 
   private babylonEngineLoop = () => {
-    if (this.state == RaceState.Race || this.state == RaceState.Green) {
+    if (this.shouldUpdateRacer()) {
       const currentMilliseconds = +Date.now();
       this.racers.forEach(r => r.onEveryFrame(currentMilliseconds - this.presentMilliseconds));
       this.presentMilliseconds = currentMilliseconds;
@@ -180,7 +181,9 @@ export class Race {
   }
   /** Expensive but less fps sensitive tasks */
   private perodicUpdate = () => {
-    this.updateRacersOnTrack();
+    if (this.shouldUpdateRacer()) {
+      this.updateRacersOnTrack();
+    }
     this.render();
   }
 
@@ -215,6 +218,10 @@ export class Race {
     window.removeEventListener(`resize.${this.id}`, this.babylonEngineResize);
     window.clearTimeout(this.periodicUpdateId);
     this.onRaceDone();
+  }
+
+  private shouldUpdateRacer = () => {
+    return (this.state == RaceState.Race || this.state == RaceState.Green);
   }
 
   private static spawnObjToSpawns = (spawns: BABYLON.AbstractMesh) => {
