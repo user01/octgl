@@ -139,7 +139,8 @@ export class Race {
       r.configureRacerInScene(
         this.scene,
         spawns[idx],
-        this.kart
+        this.kart,
+        this.trackTools
       )
     );
     this.setupCameras(this.Racers.length);
@@ -203,18 +204,18 @@ export class Race {
   }
 
   private updateRacersOnTrack = () => {
-    this.racers.forEach(r => r.UpdateRacerPosition(this.trackTools));
-    const placements = this.racers.map((racer, index) => {
-      return { racer, position: racer.TrackPosition };
-    });
-    const sortedPlacements = placements.sort((a, b) => {
-      if (a.position > b.position) return 1;
-      if (a.position < b.position) return -1;
-      return 0;
-    });
-    // sortedPlacements.forEach((payload, index) => {
-    //   payload.racer.
-    // })
+    // this.racers.forEach(r => r.UpdateRacerPosition(this.trackTools));
+    // const placements = this.racers.map((racer, index) => {
+    //   return { racer, position: racer.TrackPosition };
+    // });
+    // const sortedPlacements = placements.sort((a, b) => {
+    //   if (a.position > b.position) return 1;
+    //   if (a.position < b.position) return -1;
+    //   return 0;
+    // });
+    // // sortedPlacements.forEach((payload, index) => {
+    // //   payload.racer.
+    // // })
   }
 
   private setupCameras = (count: number = this.Racers.length) => {

@@ -28,9 +28,9 @@ export class Racer extends Player {
   public PercentDoneTrack = 0;
   private currentTrackIndex = 0;
 
+  private trackTools: TrackTools;
 
   private camera: BABYLON.FreeCamera;
-
   private roller: BABYLON.Mesh;
   private baseMesh: BABYLON.AbstractMesh;
   private pointerMesh: BABYLON.AbstractMesh;
@@ -85,12 +85,13 @@ export class Racer extends Player {
   public configureRacerInScene = (
     scene: BABYLON.Scene,
     spawn: BABYLON.Vector3,
-    kart: BABYLON.AbstractMesh
+    kart: BABYLON.AbstractMesh,
+    trackTools: TrackTools
   ) => {
-    // console.log(this.Color, Utility.NumberToColor(this.Color));
+    this.trackTools = trackTools;
+
     const colors = Utility.NumberToColorSet(this.Color);
     const color = BABYLON.Color3.FromInts(colors.r, colors.g, colors.b);
-    // const color = BABYLON.Color3.FromHexString(Utility.NumberToColor(this.Color));
     this.baseMesh = new BABYLON.AbstractMesh(`base.${this.DeviceId}`, scene);
     this.kartMesh = kart.clone(`kart.${this.DeviceId}`, this.baseMesh);
     const kartMat = new BABYLON.StandardMaterial(`kartmat.${this.DeviceId}`, scene);
@@ -282,14 +283,13 @@ export class Racer extends Player {
     this.camera.position = this.baseMesh.position.add(cameraVector);
     this.pointerMesh.position = this.baseMesh.position.add(linear);
 
-    // console.log('Drag ', allDragEffects);
-    // console.log('            Turn Angle', this.turnAngleRadians * 57.29);
+    this.UpdateRacerPosition();
   }
 
-  public UpdateRacerPosition = (trackTools: TrackTools) => {
-    this.currentTrackIndex = trackTools.NextTrackIndex(this.roller, this.currentTrackIndex, 5);
-    this.lap = trackTools.Lap(this.currentTrackIndex);
-    this.PercentDoneTrack = trackTools.DistanceOnTrack(this.roller, this.currentTrackIndex) / trackTools.TrackLength;
+  public UpdateRacerPosition = () => {
+    this.currentTrackIndex = this.trackTools.NextTrackIndex(this.roller, this.currentTrackIndex, 5);
+    this.lap = this.trackTools.Lap(this.currentTrackIndex);
+    this.PercentDoneTrack = this.trackTools.DistanceOnTrack(this.roller, this.currentTrackIndex) / this.trackTools.TrackLength;
   }
 
   public UpdateRacerCommand = (racerCommand: RacerCommand) => {
