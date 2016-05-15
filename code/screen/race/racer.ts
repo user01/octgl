@@ -24,7 +24,6 @@ export class Racer extends Player {
   /** Placement in pack */
   public Place: number = 0;
 
-  public zLinear: number = 0;
   private lap: number = 1;
   public PercentDoneTrack = 0;
   private currentTrackIndex = 0;
@@ -238,7 +237,6 @@ export class Racer extends Player {
     // To emulate cars that can turn, transfer some of the burned motion while
     // tilting to push the car forward.
     const zDragIntoxBoon = fractionOfSecond * zFract * Racer.DRAG_ZSLIDE_FULL_TILT * Racer.BOON_ZSLIDE_FULL_TILT_TO_X;
-    this.zLinear = Racer.roundPlace(zDragIntoxBoon, 4);
     // console.log(`Xdrag ${xDrag} ZDrag ${zDrag}`);
 
     const newXLinear = cartXLinear.scale(Math.max(0, (cartXLength - xDrag + zDragIntoxBoon) / cartXLength));
