@@ -17,8 +17,10 @@ export class TrackTools {
   private distances: number[] = [];
   private trackLengthAtIndexes: number[] = [];
   private totalDistance: number;
+  private groundHitObjects: BABYLON.AbstractMesh[];
 
   private static pathRegExp = /^_path\.(\d+)/mi;
+  private static groundRegExp = /^_ground\.(\d+)/mi;
 
   constructor(
     sceneObjects: BABYLON.AbstractMesh[],
@@ -37,12 +39,23 @@ export class TrackTools {
       R.filter((list: BABYLON.AbstractMesh[]) => list.length > 0)
     )(sceneObjects);
 
+    this.groundHitObjects = R.pipe(
+      R.filter((mesh: BABYLON.AbstractMesh) => TrackTools.groundRegExp.test(mesh.name))
+    )(sceneObjects);
+
     const hitboxmat = new BABYLON.StandardMaterial(`hitboxmat`, scene);
     hitboxmat.diffuseColor = BABYLON.Color3.Magenta();
     hitboxmat.wireframe = true;
     R.forEach(R.forEach((m: BABYLON.AbstractMesh) => m.material = hitboxmat))(this.raceHitObjects);
     // R.forEach(R.forEach((m: BABYLON.AbstractMesh) => m.isVisible = false))(this.raceHitObjects);
-    
+
+    const groundboxmat = new BABYLON.StandardMaterial(`groundboxmat`, scene);
+    groundboxmat.diffuseColor = BABYLON.Color3.Blue();
+    // groundboxmat.wireframe = true;
+    groundboxmat.alpha = 0.4;
+    R.forEach((m: BABYLON.AbstractMesh) => m.material = groundboxmat)(this.groundHitObjects);
+    // R.forEach((m: BABYLON.AbstractMesh) => m.isVisible = false)(this.groundHitObjects);
+
     for (var i = 0; i < this.IndexLength; i++) {
       this.trackLengthAtIndexes.push(R.sum(this.distances));
       this.distances.push(R.head(this.getIndex(i)).position.subtract(R.head(this.getIndex(i + 1)).position).length());
