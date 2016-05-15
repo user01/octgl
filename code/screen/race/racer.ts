@@ -120,33 +120,30 @@ export class Racer extends Player {
   }
 
   public onEveryFrame = (millisecondsSinceLastFrame: number) => {
-
-    //#########################################################################
-    // Starting Definitions
-    //#########################################################################
-    const fractionOfSecond = millisecondsSinceLastFrame / 1000;
-    let impulseScalar = 1;
-    millisecondsSinceLastFrame = R.pipe(
+    // fraction of second since last frame, min of 1ms, max of 20fps, in decimal seconds
+    const fractionOfSecond = R.pipe(
       R.max(1),
-      R.min(Math.floor(1000 / 20))
+      R.min(Math.floor(1000 / 20)),
+      R.flip(R.divide)(1000)
     )(millisecondsSinceLastFrame);
-
 
     //#########################################################################
     // Current Linear Velocity
     //#########################################################################
-    const linear: BABYLON.Vector3 = (<any>this.roller.getPhysicsImpostor()).getLinearVelocity();
-    this.linearVelocity = linear.length();
+    const linearVelocity: BABYLON.Vector3 = (<any>this.roller.getPhysicsImpostor()).getLinearVelocity();
+    this.linearVelocity = linearVelocity.length();
     // console.log(`Initial Linear ${linear.toString()}`);
-    if (R.identical(NaN, this.linearVelocity)) {
-      console.warn('NAN linear vel');
-      this.linearVelocity = 0;
-      return;
-    }
-    // this.currentVelocityAroundY = this.linearVelocity > 0.05 ? Racer.removeYComponent(linear) : this.currentVelocityAroundY;
-    // const linearVelocityAngle = Racer.radiansBetweenVectors(this.currentVelocityAroundY);
 
+    const impulseScalar = this.updateControls(fractionOfSecond);
+    this.driveRacer(linearVelocity, fractionOfSecond, impulseScalar);
+    this.updateChildObjects(linearVelocity);
 
+    this.UpdateRacerPosition();
+  }
+
+  /** Preforms controls, either from player input or  */
+  private updateControls = (fractionOfSecond: number) => {
+    let impulseScalar = 1;
     //#########################################################################
     // Handle Inputs
     //#########################################################################
@@ -177,7 +174,11 @@ export class Racer extends Player {
     }
     // console.log(`Impulse Scalar ${impulseScalar}`);
 
+    return impulseScalar;
+  }
 
+  /** Handle current physic states to push the racer */
+  private driveRacer = (linearVelocity: BABYLON.Vector3, fractionOfSecond: number, impulseScalar: number) => {
     //#########################################################################
     // Bind Turn Angle
     //#########################################################################
@@ -212,9 +213,9 @@ export class Racer extends Player {
       BABYLON.Axis.Y);
     const cartYAxis = BABYLON.Axis.Y.clone();
 
-    const cartXLinear = Racer.projectVectorOntoVector(linear, cartXAxis);
-    const cartYLinear = Racer.projectVectorOntoVector(linear, cartYAxis);
-    const cartZLinear = Racer.projectVectorOntoVector(linear, cartZAxis);
+    const cartXLinear = Racer.projectVectorOntoVector(linearVelocity, cartXAxis);
+    const cartYLinear = Racer.projectVectorOntoVector(linearVelocity, cartYAxis);
+    const cartZLinear = Racer.projectVectorOntoVector(linearVelocity, cartZAxis);
 
     // console.log(`cart X ${cartXLinear.toString()} Y ${cartYLinear.toString()} Z ${cartZLinear.toString()}`);
 
@@ -270,10 +271,12 @@ export class Racer extends Player {
     this.roller.applyImpulse(impulseVector, this.roller.getAbsolutePosition());
     // console.log(`Linear ${linear.length()} and reduced ${linearVelocityReduced.length()}`)
 
+  }
 
-    //#########################################################################
-    // Configure Child Objects
-    //#########################################################################
+  //#########################################################################
+  // Configure Child Objects
+  //#########################################################################
+  private updateChildObjects = (linearVelocity: BABYLON.Vector3) => {
     const cameraVector = Racer.rotateVector(
       new BABYLON.Vector3(20, 8, 0),
       this.radiansForwardMain + 0.5 * this.radiansForwardTilt + Math.PI,
@@ -281,9 +284,8 @@ export class Racer extends Player {
 
     this.baseMesh.position = this.roller.position;
     this.camera.position = this.baseMesh.position.add(cameraVector);
-    this.pointerMesh.position = this.baseMesh.position.add(linear);
+    this.pointerMesh.position = this.baseMesh.position.add(linearVelocity);
 
-    this.UpdateRacerPosition();
   }
 
   public UpdateRacerPosition = () => {
