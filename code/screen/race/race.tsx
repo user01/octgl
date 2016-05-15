@@ -24,8 +24,7 @@ export enum RaceState {
   Unsupported, // Cannot run the asset
   Loading, //loading assets
   Pending, // before race starts
-  Red, //red flag
-  Yellow, //yellow flag
+  Counting, //Numbers being displayed
   Green, // Go flag
   Race, //race in progress
   Post // leaderboard
@@ -49,10 +48,12 @@ export class Race {
 
   private periodicUpdateId: any;
   private presentMilliseconds = 0;
-  private static PENDING_MS_PER_STATE = 2200;
   private static PERIODIC_UPDATE_MS = 50;
   private static id = 0;
   private id = Race.id++;
+
+  private static PENDING_MS_PER_STATE = 1200;
+  private countDownRemaining = 4;
 
   constructor(
     currentPlayers: Player[],
@@ -76,8 +77,7 @@ export class Race {
 
         <RacerHUDs racers={this.racers} totalLaps={this.lapsToWin} />
 
-        {this.state == RaceState.Red ? <ReadySet seconds={2} /> : ''}
-        {this.state == RaceState.Yellow ? <ReadySet seconds={1} /> : ''}
+        {this.state == RaceState.Counting ? <ReadySet seconds={this.countDownRemaining} /> : ''}
         {this.state == RaceState.Green ? <ReadySet seconds={0} /> : ''}
         {this.state == RaceState.Post ? <LeaderBoard /> : ''}
         {this.state == RaceState.Loading ? <LoadingBoard /> : ''}
@@ -151,21 +151,28 @@ export class Race {
     // force camera position
     this.racers.forEach(r => r.onEveryFrame(1));
     this.state = RaceState.Pending;
+
+    const countDown = () => {
+      this.countDownRemaining--;
+      if (this.countDownRemaining > 0) {
+        this.state = RaceState.Counting;
+        this.render();
+        return Promise.delay(Race.PENDING_MS_PER_STATE).then(countDown);
+      } else {
+        return Promise.resolve();
+      }
+    }
     Promise.delay(Race.PENDING_MS_PER_STATE)
-      .then(() => {
-        this.state = RaceState.Red;
-      })
-      .delay(Race.PENDING_MS_PER_STATE)
-      .then(() => {
-        this.state = RaceState.Yellow;
-      })
+      .then(countDown)
       .delay(Race.PENDING_MS_PER_STATE)
       .then(() => {
         this.presentMilliseconds = +Date.now();
         this.state = RaceState.Green;
+        this.render();
       })
       .delay(Race.PENDING_MS_PER_STATE)
       .then(() => {
+        this.render();
         this.state = RaceState.Race;
       })
   }

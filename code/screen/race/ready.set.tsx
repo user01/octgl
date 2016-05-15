@@ -18,7 +18,7 @@ class ReadySet extends React.Component<IAppProps, IAppState> {
   render() {
     return (
       <div id="ready-set" className="controls">
-        <h1 className="count-down">{this.props.seconds > 0 ? this.props.seconds : 'Go!'}</h1>
+        <h1 className="count-down pulsate">{this.props.seconds > 0 ? this.props.seconds : 'Go!'}</h1>
       </div>
     );
   }
