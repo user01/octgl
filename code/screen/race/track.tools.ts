@@ -63,6 +63,11 @@ export class TrackTools {
     this.totalDistance = R.sum(this.distances);
   }
 
+  /** Tests if roller is on the ground or not */
+  public IsOnGround = (roller: BABYLON.AbstractMesh): boolean => {
+    return R.any(hitbox => hitbox.intersectsMesh(roller, true), this.groundHitObjects);
+  }
+
   /** Computes the next hit index
    * Will look ahead rach number, just in case a hitbox was missed
   */

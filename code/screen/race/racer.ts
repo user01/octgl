@@ -15,6 +15,7 @@ import * as R from 'ramda';
 export class Racer extends Player {
   public get LinearVelocity() { return this.linearVelocity; }
   public get Camera() { return this.camera; }
+  public get IsGrounded() { return this.isGrounded; }
   private get cartYRotation() { return this.radiansForwardMain + this.radiansForwardTilt; }
   public get Lap() { return this.lap; }
   /** Hitbox set index for TrackTools to search for next hit */
@@ -27,6 +28,7 @@ export class Racer extends Player {
   private lap: number = 1;
   public PercentDoneTrack = 0;
   private currentTrackIndex = 0;
+  private isGrounded = false;
 
   private trackTools: TrackTools;
 
@@ -292,6 +294,7 @@ export class Racer extends Player {
     this.currentTrackIndex = this.trackTools.NextTrackIndex(this.roller, this.currentTrackIndex, 5);
     this.lap = this.trackTools.Lap(this.currentTrackIndex);
     this.PercentDoneTrack = this.trackTools.DistanceOnTrack(this.roller, this.currentTrackIndex) / this.trackTools.TrackLength;
+    this.isGrounded = this.trackTools.IsOnGround(this.roller);
   }
 
   public UpdateRacerCommand = (racerCommand: RacerCommand) => {

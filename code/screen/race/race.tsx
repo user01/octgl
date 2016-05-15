@@ -185,16 +185,14 @@ export class Race {
       this.presentMilliseconds = currentMilliseconds;
     }
     this.scene.render();
+    this.render();
+
   }
   private babylonEngineResize = () => {
     this.engine.resize();
   }
   /** Expensive but less fps sensitive tasks */
   private perodicUpdate = () => {
-    if (this.shouldUpdateRacer()) {
-      this.updateRacersOnTrack();
-    }
-    this.render();
   }
 
   public UpdateRacerState = (device_id: number, racerCommand: RacerCommand) => {
@@ -203,20 +201,6 @@ export class Race {
     racer.UpdateRacerCommand(racerCommand);
   }
 
-  private updateRacersOnTrack = () => {
-    // this.racers.forEach(r => r.UpdateRacerPosition(this.trackTools));
-    // const placements = this.racers.map((racer, index) => {
-    //   return { racer, position: racer.TrackPosition };
-    // });
-    // const sortedPlacements = placements.sort((a, b) => {
-    //   if (a.position > b.position) return 1;
-    //   if (a.position < b.position) return -1;
-    //   return 0;
-    // });
-    // // sortedPlacements.forEach((payload, index) => {
-    // //   payload.racer.
-    // // })
-  }
 
   private setupCameras = (count: number = this.Racers.length) => {
     this.racers.forEach((racer, index) => {

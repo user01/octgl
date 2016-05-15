@@ -61,6 +61,9 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
         <div className="right">
           <p className="racer-place">{this.props.racer.Place}st</p>
         </div>
+        <div className="message">
+          <p>{this.props.racer.IsGrounded ? 'Grounded' : 'Free'}</p>
+        </div>
       </div>
     );
   }
