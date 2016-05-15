@@ -172,8 +172,8 @@ export class Race {
       })
       .delay(Race.PENDING_MS_PER_STATE)
       .then(() => {
-        this.render();
         this.state = RaceState.Race;
+        this.render();
       })
   }
 
