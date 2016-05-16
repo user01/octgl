@@ -8,7 +8,7 @@ import * as R from 'ramda';
 import * as Promise from 'bluebird';
 
 import Player from '../player';
-import Racer from './racer';
+import {Racer, RacerState} from './racer';
 import TrackTools from './track.tools';
 import RacerCommand from '../../interfaces/racercommand';
 import * as WindowFrames from '../../interfaces/window.frame';
@@ -169,6 +169,7 @@ export class Race {
       .then(() => {
         this.presentMilliseconds = +Date.now();
         this.state = RaceState.Green;
+        this.racers.forEach(r => r.State = RacerState.Play);
         this.render();
       })
       .delay(Race.PENDING_MS_PER_STATE)
@@ -179,11 +180,9 @@ export class Race {
   }
 
   private babylonEngineLoop = () => {
-    if (this.shouldUpdateRacer()) {
-      const currentMilliseconds = +Date.now();
-      this.racers.forEach(r => r.onEveryFrame(currentMilliseconds - this.presentMilliseconds));
-      this.presentMilliseconds = currentMilliseconds;
-    }
+    const currentMilliseconds = +Date.now();
+    this.racers.forEach(r => r.onEveryFrame(currentMilliseconds - this.presentMilliseconds));
+    this.presentMilliseconds = currentMilliseconds;
     this.scene.render();
     this.render();
 

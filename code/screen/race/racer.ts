@@ -37,7 +37,7 @@ export class Racer extends Player {
   private isGrounded = false;
 
   private trackTools: TrackTools;
-  private state = RacerState.Pending;
+  public State = RacerState.Pending;
 
   private camera: BABYLON.FreeCamera;
   private roller: BABYLON.Mesh;
@@ -155,6 +155,10 @@ export class Racer extends Player {
 
   /** Preforms controls, either from player input or  */
   private updateControls = (fractionOfSecond: number) => {
+    if (this.State == RacerState.AI) {
+      this.aiHandleControls();
+    }
+
     let impulseScalar = 1;
     //#########################################################################
     // Handle Inputs
@@ -191,6 +195,14 @@ export class Racer extends Player {
 
   /** Handle current physic states to push the racer */
   private driveRacer = (linearVelocity: BABYLON.Vector3, fractionOfSecond: number, impulseScalar: number) => {
+    if (this.State == RacerState.Pending) {
+      // force velocity to ignore everything but falling during pending
+      console.log('Locked in pending');
+      (<any>this.roller.getPhysicsImpostor()).setLinearVelocity(new BABYLON.Vector3(0, 0, linearVelocity.z));
+      return;
+    }
+
+
     //#########################################################################
     // Bind Turn Angle
     //#########################################################################
@@ -311,6 +323,10 @@ export class Racer extends Player {
       // recompute the target for AI use
       this.forceNextTargetUpdate();
     }
+  }
+
+  private aiHandleControls = () => {
+    console.log('AI controls requested');
   }
 
   private forceNextTargetUpdate = () => {
