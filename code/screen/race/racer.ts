@@ -5,13 +5,16 @@ import Player from '../player';
 import TrackTools from './track.tools';
 import RacerCommand from '../../interfaces/racercommand';
 import Utility from '../../data/utility';
+import * as Promise from 'bluebird';
 
 import * as R from 'ramda';
+import * as moment from 'moment';
 
 export enum RacerState {
   Pending, // waiting for race to start
   Play, // human control
   AI, // AI control
+  Done, // Player has signaled to leave the placement list
 }
 
 enum RacerAiState {
@@ -45,10 +48,28 @@ export class Racer extends Player {
 
   public temptemp = 0;
   public temptemptemp = '??';
-  // public Message = '';
+
+
+  public get ShowLapTime() { return this.showLapTime; }
+  private showLapTime = false;
+  public get LapTimeMessage() { return this.lapTimeMessage; }
+  private lapTimeMessage = '??';
 
   private trackTools: TrackTools;
-  public State = RacerState.Pending;
+  public get State() { return this.state; }
+  public set State(newState: RacerState) {
+    if (this.state == RacerState.Pending) {
+      if (newState == RacerState.Play || newState == RacerState.AI) {
+        this.timeStart = moment();
+      }
+    }
+    this.state = newState;
+  }
+  private state = RacerState.Pending;
+  private timeStart: moment.Moment;
+  private lapTimes: moment.Moment[] = [];
+  public get LapDurations() { return this.lapDurations; }
+  private lapDurations: moment.Duration[];
 
   private camera: BABYLON.FreeCamera;
   private roller: BABYLON.Mesh;
@@ -350,7 +371,17 @@ export class Racer extends Player {
   public UpdateRacerPosition = () => {
     const computedIndex = this.trackTools.NextTrackIndex(this.roller, this.currentTrackIndex, 5);
     // this.currentTrackIndex = this.trackTools.NextTrackIndex(this.roller, this.currentTrackIndex, 5);
-    this.lap = this.trackTools.Lap(this.currentTrackIndex);
+    const newLap = this.trackTools.Lap(this.currentTrackIndex);
+    if (this.lap != newLap) { //finished a lap!
+      this.lapTimes.push(moment());
+      this.computeLapDurations();
+      this.lapTimeMessage = Racer.RenderDurationAsLapTime(this.LapDurations[this.LapDurations.length - 1]);
+      this.showLapTime = true;
+      Promise.delay(2000).then(() => {
+        this.showLapTime = false;
+      })
+    }
+    this.lap = newLap;
     this.PercentDoneTrack = this.trackTools.DistanceOnTrack(this.roller, this.currentTrackIndex) / this.trackTools.TrackLength;
     this.isGrounded = this.trackTools.IsOnGround(this.roller);
 
@@ -380,7 +411,6 @@ export class Racer extends Player {
       const newState = this.computeAiState(angleBetweenTargetAndDirection, targetDirection);
 
       if (this.aiState != newState) {
-        // this.racerCommand = 
         this.aiState = newState;
         this.aiHandleControls(newState);
       }
@@ -436,6 +466,21 @@ export class Racer extends Player {
     }
   }
 
+  private computeLapDurations = () => {
+    const times = R.concat([this.timeStart], this.lapTimes);
+    const lapDurations = <any>R.pipe(
+      R.aperture(2),
+      R.map(
+        ([start, end]: [moment.Moment, moment.Moment]) => {
+          return moment.duration(end.diff(start));
+        }))(times);
+    return this.lapDurations = lapDurations;
+  }
+
+  private lastLapWasFastest = () => {
+
+  }
+
   private forceNextTargetUpdate = () => {
     return this.nextTarget = this.trackTools.GetNextTrackTarget(this.CurrentTrackIndex);
   }
@@ -474,6 +519,20 @@ export class Racer extends Player {
   private static roundPlace(num: number, places = 1) {
     const factor = Math.pow(10, places);
     return Math.floor(num * factor) / factor;
+  }
+
+  public static RenderDurationAsLapTime = (duration: moment.Duration) => {
+    var str = '';
+    console.log('duration', duration);
+    if (duration.minutes() > 0) {
+      str += `${duration.minutes()}:`;
+    }
+    const seconds = `${duration.seconds()}`;
+    const pad = '00';
+    str += pad.substring(0, pad.length - seconds.length) + seconds;
+
+    str += '.' + Math.round(duration.milliseconds() / 100);
+    return str;
   }
 }
 
