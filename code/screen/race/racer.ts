@@ -70,7 +70,7 @@ export class Racer extends Player {
   private static MAX_GROUND_LINEAR_VELOCITY = 18;
 
   /** Drag constants */
-  private static DRAG_GROUND_PER_SECOND = 0.3;
+  private static DRAG_GROUND_PER_SECOND = 0.4;
   private static DRAG_ROAD_PER_SECOND = 0.1;
   private static DRAG_ZSLIDE_NO_TILT = Racer.IMPULSE_PER_SECOND * 0.75;
   private static DRAG_ZSLIDE_FULL_TILT = Racer.IMPULSE_PER_SECOND * 0.35;
@@ -230,8 +230,8 @@ export class Racer extends Player {
 
     // ground - drags both X and Z
     // check if on ground or not (road or air)
-    xDrag += fractionOfSecond * Racer.DRAG_ROAD_PER_SECOND;
-    zDrag += fractionOfSecond * Racer.DRAG_ROAD_PER_SECOND;
+    xDrag += fractionOfSecond * (this.IsGrounded ? Racer.DRAG_GROUND_PER_SECOND : Racer.DRAG_ROAD_PER_SECOND);
+    zDrag += fractionOfSecond * (this.IsGrounded ? Racer.DRAG_GROUND_PER_SECOND : Racer.DRAG_ROAD_PER_SECOND);
 
     // sliding - drags Z
     const zFract = Math.abs(this.radiansForwardTilt) / Racer.TURN_TILT_MAX;
