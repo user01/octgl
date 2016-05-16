@@ -10,6 +10,7 @@ import * as Promise from 'bluebird';
 import Player from '../player';
 import {Racer, RacerState} from './racer';
 import TrackTools from './track.tools';
+import PlacementTools from './placement.tools';
 import RacerCommand from '../../interfaces/racercommand';
 import * as WindowFrames from '../../interfaces/window.frame';
 
@@ -40,6 +41,7 @@ export class Race {
   private racers: Racer[];
   private state: RaceState = RaceState.Loading;
   private trackTools: TrackTools;
+  private placementTools: PlacementTools;
 
   private engine: BABYLON.Engine;
   private scene: BABYLON.Scene;
@@ -113,6 +115,7 @@ export class Race {
     this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin());
 
     this.trackTools = new TrackTools(this.scene.meshes, this.scene);
+    this.placementTools = new PlacementTools(this.racers, this.lapsToWin);
 
     this.scene.meshes.filter((m) => {
       return m.name.indexOf('static') > -1;
@@ -192,6 +195,8 @@ export class Race {
   }
   /** Expensive but less fps sensitive tasks */
   private perodicUpdate = () => {
+    this.placementTools.UpdateRanks();
+    this.racers.forEach(r => r.Place = this.placementTools.CheckPosition(r));
   }
 
   public UpdateRacerState = (device_id: number, racerCommand: RacerCommand) => {

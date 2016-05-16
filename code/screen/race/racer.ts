@@ -5,8 +5,9 @@ import Player from '../player';
 import TrackTools from './track.tools';
 import RacerCommand from '../../interfaces/racercommand';
 import Utility from '../../data/utility';
-import * as Promise from 'bluebird';
 
+
+import * as Promise from 'bluebird';
 import * as R from 'ramda';
 import * as moment from 'moment';
 
@@ -67,6 +68,7 @@ export class Racer extends Player {
   }
   private state = RacerState.Pending;
   private timeStart: moment.Moment;
+  public get LapTimes() { return this.lapTimes; }
   private lapTimes: moment.Moment[] = [];
   public get LapDurations() { return this.lapDurations; }
   private lapDurations: moment.Duration[];
