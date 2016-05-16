@@ -56,7 +56,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
     return (
       <div className="racer-hud" style={mainHudStyle}>
         <div className="left">
-          <p className="lap-count"><i className="fa fa-flag-checkered fa-2x"></i> {this.props.racer.Lap} / {this.props.totalLaps}</p>
+          <p className="lap-count"><i className="fa fa-flag-checkered"></i> {this.props.racer.Lap} / {this.props.totalLaps}</p>
         </div>
         <div className="right">
           <p className="racer-place">{this.props.racer.Place}st</p>
@@ -64,6 +64,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
         <div className="message">
           <p>{this.props.racer.IsGrounded ? 'Grounded' : 'Free'} - {this.props.racer.CurrentTrackIndex}</p>
           <p>Angle {this.props.racer.temptemp}</p>
+          <p>Angle {this.props.racer.temptemptemp}</p>
           {this.props.racer.IsWrongWay ? <p>Wrong Way</p> : ''}
         </div>
       </div>

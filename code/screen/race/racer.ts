@@ -14,6 +14,12 @@ export enum RacerState {
   AI, // AI control
 }
 
+enum RacerAiState {
+  Left,
+  Right,
+  Straight
+}
+
 /** A Racer Player
  * Hold information on location, references to babylon objects
  * and current data on race
@@ -35,8 +41,10 @@ export class Racer extends Player {
   public PercentDoneTrack = 0;
   private currentTrackIndex = 0;
   private isGrounded = false;
+  private aiState = RacerAiState.Straight;
 
   public temptemp = 0;
+  public temptemptemp = '??';
   // public Message = '';
 
   private trackTools: TrackTools;
@@ -48,6 +56,10 @@ export class Racer extends Player {
   private pointerMesh: BABYLON.AbstractMesh;
   private kartMesh: BABYLON.AbstractMesh;
   private nextTarget: BABYLON.Vector3 = null;
+
+  private targetMesh: BABYLON.AbstractMesh;
+  private tempMesh: BABYLON.AbstractMesh;
+  private temp2Mesh: BABYLON.AbstractMesh;
 
   // Message flags
   public get IsWrongWay() { return this.isWrongWay; }
@@ -79,7 +91,7 @@ export class Racer extends Player {
   /** How quickly the kart can turn the forward center */
   private static TURN_FORWARD_RADIANS_PER_SECOND = Math.PI / 4;
   /** Max angle the kart can turn from the next _path hitbox before the Wrong Way message */
-  private static MAX_TURN_ANGLE = Math.PI * 0.85;
+  private static MAX_TURN_ANGLE = Math.PI * 0.6;
 
   /** Linear speeds */
   private static IMPULSE_PER_SECOND = 32;
@@ -135,9 +147,21 @@ export class Racer extends Player {
     this.camera = new BABYLON.FreeCamera(`camera.${this.DeviceId}`, this.baseMesh.position.add(new BABYLON.Vector3(-20, 8, 0)), scene);
     this.camera.lockedTarget = this.baseMesh;
 
+    this.targetMesh = BABYLON.Mesh.CreateBox(`something.${this.DeviceId}`, 8, scene);
+    this.targetMesh.material = sphereMat;
+
+    this.tempMesh = BABYLON.Mesh.CreateSphere(`tempish.${this.DeviceId}`, 6, 5.5, scene);
+    this.tempMesh.material = sphereMat;
+    this.temp2Mesh = BABYLON.Mesh.CreateBox(`tempish2.${this.DeviceId}`, 4, scene);
+    this.temp2Mesh.material = sphereMat;
+
     this.forceNextTargetUpdate();
 
     scene.activeCameras.push(this.camera);
+  }
+
+  private updateTargetLocation = () => {
+    this.targetMesh.position = this.nextTarget;
   }
 
   public onEveryFrame = (millisecondsSinceLastFrame: number) => {
@@ -158,6 +182,7 @@ export class Racer extends Player {
     const impulseScalar = this.updateControls(fractionOfSecond);
     this.driveRacer(linearVelocity, fractionOfSecond, impulseScalar);
     this.updateChildObjects(linearVelocity);
+    this.updateTargetLocation();
 
     this.UpdateRacerPosition();
   }
@@ -328,28 +353,87 @@ export class Racer extends Player {
     this.lap = this.trackTools.Lap(this.currentTrackIndex);
     this.PercentDoneTrack = this.trackTools.DistanceOnTrack(this.roller, this.currentTrackIndex) / this.trackTools.TrackLength;
     this.isGrounded = this.trackTools.IsOnGround(this.roller);
+
+    // if a new target has been found, 
     if (computedIndex != this.currentTrackIndex) {
       this.currentTrackIndex = computedIndex;
       // recompute the target for AI use
       this.forceNextTargetUpdate();
     }
 
-    const cameraVector = Racer.rotateVector(
-      new BABYLON.Vector3(20, 0, 0),
+    const travelDirection = Racer.rotateVector(
+      new BABYLON.Vector3(1, 0, 0),
       this.radiansForwardMain,
       BABYLON.Axis.Y);
-    const angleBetweenTargetAndDirection =
-      Racer.radiansBetweenVectors(
-        this.nextTarget.subtract(this.roller.position),
-        cameraVector
-      );
-    // this.temptemp = Racer.roundPlace(angleBetweenTargetAndDirection * 57.2958);
-    this.temptemp = Racer.roundPlace(angleBetweenTargetAndDirection, 4);
+    const vectorFromRollerToTarget = this.nextTarget.subtract(this.roller.position);
+    const targetDirection = new BABYLON.Vector3(vectorFromRollerToTarget.x, 0, vectorFromRollerToTarget.z);
+    const angleBetweenTargetAndDirection = Racer.radiansBetweenVectors(targetDirection, travelDirection);
+
+    this.tempMesh.position = this.roller.position.add(travelDirection.scale(10));
+    this.temp2Mesh.position = this.roller.position.add(targetDirection.scale(10 / targetDirection.length()));
+
+    this.temptemp = Racer.roundPlace(angleBetweenTargetAndDirection * 57.2958);
+    // this.temptemp = Racer.roundPlace(angleBetweenTargetAndDirection, 2);
     this.isWrongWay = (angleBetweenTargetAndDirection > Racer.MAX_TURN_ANGLE);
+
+    if (this.State == RacerState.AI) {
+      const newState = this.computeAiState(angleBetweenTargetAndDirection, targetDirection);
+
+      if (this.aiState != newState) {
+        // this.racerCommand = 
+        this.aiState = newState;
+        this.aiHandleControls(newState);
+      }
+
+      this.temptemptemp = this.aiState == RacerAiState.Straight ? 'Straight' : (this.aiState == RacerAiState.Right ? 'Right' : 'Left');
+
+    }
   }
 
-  private aiHandleControls = () => {
-    console.log('AI controls requested');
+  private computeAiState = (angleBetweenTargetAndDirection: number, cleanedVectorToNextTarget: BABYLON.Vector3) => {
+
+    if (Math.abs(angleBetweenTargetAndDirection) < 0.1) {
+      return RacerAiState.Straight;
+    }
+    const rightTurn = Racer.rotateVector(
+      new BABYLON.Vector3(20, 0, 0),
+      this.radiansForwardMain + angleBetweenTargetAndDirection,
+      BABYLON.Axis.Y);
+    const angleBetweenThisAndRightTurn = Racer.radiansBetweenVectors(rightTurn, cleanedVectorToNextTarget);
+    const right = Math.abs(angleBetweenThisAndRightTurn) < 0.1;
+
+    return right ? RacerAiState.Right : RacerAiState.Left;
+
+  }
+
+  private aiHandleControls = (state = this.aiState) => {
+    // console.log('AI controls requested');
+    switch (state) {
+      case RacerAiState.Straight:
+        this.racerCommand = {
+          left: false,
+          right: false,
+          special: false
+        };
+        break;
+      case RacerAiState.Left:
+        this.racerCommand = {
+          left: true,
+          right: false,
+          special: false
+        };
+        break;
+      case RacerAiState.Right:
+        this.racerCommand = {
+          left: false,
+          right: true,
+          special: false
+        };
+        break;
+      default:
+        console.error('Bad AI state');
+        break;
+    }
   }
 
   private forceNextTargetUpdate = () => {
@@ -357,6 +441,7 @@ export class Racer extends Player {
   }
 
   public UpdateRacerCommand = (racerCommand: RacerCommand) => {
+    if (this.State == RacerState.AI) return;
     this.racerCommand = racerCommand;
   }
 
