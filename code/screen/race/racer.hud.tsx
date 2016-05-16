@@ -56,7 +56,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
     return (
       <div className="racer-hud" style={mainHudStyle}>
         <div className="left">
-          <p className="lap-count"><i className="fa fa-flag-checkered"></i> {this.props.racer.Lap} / {this.props.totalLaps}</p>
+          <p className="lap-count"><i className="fa fa-flag-checkered"></i> {this.props.racer.Lap} <span className="lap-total">/ {this.props.totalLaps}</span></p>
         </div>
         <div className="right">
           <p className="racer-place">{this.props.racer.Place}st</p>
