@@ -166,6 +166,8 @@ export class Racer extends Player {
   private updateControls = (fractionOfSecond: number) => {
     if (this.State == RacerState.AI) {
       this.aiHandleControls();
+    } else if (this.State == RacerState.Pending) {
+      return;
     }
 
     let impulseScalar = 1;
