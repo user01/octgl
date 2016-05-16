@@ -63,6 +63,8 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
         </div>
         <div className="message">
           <p>{this.props.racer.IsGrounded ? 'Grounded' : 'Free'} - {this.props.racer.CurrentTrackIndex}</p>
+          <p>Angle {this.props.racer.temptemp}</p>
+          {this.props.racer.IsWrongWay ? <p>Wrong Way</p> : ''}
         </div>
       </div>
     );

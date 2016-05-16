@@ -36,6 +36,9 @@ export class Racer extends Player {
   private currentTrackIndex = 0;
   private isGrounded = false;
 
+  public temptemp = 0;
+  // public Message = '';
+
   private trackTools: TrackTools;
   public State = RacerState.Pending;
 
@@ -45,6 +48,10 @@ export class Racer extends Player {
   private pointerMesh: BABYLON.AbstractMesh;
   private kartMesh: BABYLON.AbstractMesh;
   private nextTarget: BABYLON.Vector3 = null;
+
+  // Message flags
+  public get IsWrongWay() { return this.isWrongWay; }
+  private isWrongWay = false;
 
 
   private racerCommand: RacerCommand = {
@@ -71,6 +78,8 @@ export class Racer extends Player {
   private static TURN_TILT_RADIANS_PER_SECOND = Math.PI / 6;
   /** How quickly the kart can turn the forward center */
   private static TURN_FORWARD_RADIANS_PER_SECOND = Math.PI / 4;
+  /** Max angle the kart can turn from the next _path hitbox before the Wrong Way message */
+  private static MAX_TURN_ANGLE = 2;
 
   /** Linear speeds */
   private static IMPULSE_PER_SECOND = 32;
@@ -197,7 +206,6 @@ export class Racer extends Player {
   private driveRacer = (linearVelocity: BABYLON.Vector3, fractionOfSecond: number, impulseScalar: number) => {
     if (this.State == RacerState.Pending) {
       // force velocity to ignore everything but falling during pending
-      console.log('Locked in pending');
       (<any>this.roller.getPhysicsImpostor()).setLinearVelocity(new BABYLON.Vector3(0, 0, linearVelocity.z));
       return;
     }
@@ -323,6 +331,19 @@ export class Racer extends Player {
       // recompute the target for AI use
       this.forceNextTargetUpdate();
     }
+
+    const cameraVector = Racer.rotateVector(
+      new BABYLON.Vector3(20, 8, 0),
+      this.radiansForwardMain + 0.5 * this.radiansForwardTilt + Math.PI,
+      BABYLON.Axis.Y);
+    const angleBetweenTargetAndDirection =
+      Racer.radiansBetweenVectors(
+        this.roller.position.subtract(this.nextTarget),
+        cameraVector
+      );
+    // this.temptemp = Racer.roundPlace(angleBetweenTargetAndDirection * 57.2958);
+    this.temptemp = Racer.roundPlace(angleBetweenTargetAndDirection, 4);
+    this.isWrongWay = (angleBetweenTargetAndDirection > Racer.MAX_TURN_ANGLE);
   }
 
   private aiHandleControls = () => {
