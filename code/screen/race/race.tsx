@@ -155,7 +155,7 @@ export class Race {
 
     const countDown = () => {
       this.countDownRemaining--;
-      if (this.countDownRemaining > 0) {
+      if (this.countDownRemaining > 1) {
         this.state = RaceState.Counting;
         this.render();
         return Promise.delay(Race.PENDING_MS_PER_STATE).then(countDown);
