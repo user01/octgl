@@ -8,6 +8,12 @@ import Utility from '../../data/utility';
 
 import * as R from 'ramda';
 
+export enum RacerState {
+  Pending, // waiting for race to start
+  Play, // human control
+  AI, // AI control
+}
+
 /** A Racer Player
  * Hold information on location, references to babylon objects
  * and current data on race
@@ -31,12 +37,14 @@ export class Racer extends Player {
   private isGrounded = false;
 
   private trackTools: TrackTools;
+  private state = RacerState.Pending;
 
   private camera: BABYLON.FreeCamera;
   private roller: BABYLON.Mesh;
   private baseMesh: BABYLON.AbstractMesh;
   private pointerMesh: BABYLON.AbstractMesh;
   private kartMesh: BABYLON.AbstractMesh;
+  private nextTarget: BABYLON.Vector3 = null;
 
 
   private racerCommand: RacerCommand = {
@@ -118,8 +126,9 @@ export class Racer extends Player {
     this.camera = new BABYLON.FreeCamera(`camera.${this.DeviceId}`, this.baseMesh.position.add(new BABYLON.Vector3(-20, 8, 0)), scene);
     this.camera.lockedTarget = this.baseMesh;
 
-    scene.activeCameras.push(this.camera);
+    this.forceNextTargetUpdate();
 
+    scene.activeCameras.push(this.camera);
   }
 
   public onEveryFrame = (millisecondsSinceLastFrame: number) => {
@@ -292,10 +301,20 @@ export class Racer extends Player {
   }
 
   public UpdateRacerPosition = () => {
-    this.currentTrackIndex = this.trackTools.NextTrackIndex(this.roller, this.currentTrackIndex, 5);
+    const computedIndex = this.trackTools.NextTrackIndex(this.roller, this.currentTrackIndex, 5);
+    // this.currentTrackIndex = this.trackTools.NextTrackIndex(this.roller, this.currentTrackIndex, 5);
     this.lap = this.trackTools.Lap(this.currentTrackIndex);
     this.PercentDoneTrack = this.trackTools.DistanceOnTrack(this.roller, this.currentTrackIndex) / this.trackTools.TrackLength;
     this.isGrounded = this.trackTools.IsOnGround(this.roller);
+    if (computedIndex != this.currentTrackIndex) {
+      this.currentTrackIndex = computedIndex;
+      // recompute the target for AI use
+      this.forceNextTargetUpdate();
+    }
+  }
+
+  private forceNextTargetUpdate = () => {
+    return this.nextTarget = this.trackTools.GetNextTrackTarget(this.CurrentTrackIndex);
   }
 
   public UpdateRacerCommand = (racerCommand: RacerCommand) => {

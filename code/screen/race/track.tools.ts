@@ -88,6 +88,19 @@ export class TrackTools {
     return currentTrackIndex;
   }
 
+  public GetNextTrackTarget = (currentTrackIndex: number) => {
+    const nextTrackIndex = currentTrackIndex + 1;
+    const hitboxes = this.getIndex(nextTrackIndex);
+    const targetPosition: BABYLON.Vector3 = (<any>R).pipe(
+      R.length,
+      R.flip(R.divide)(2),
+      Math.floor,
+      R.flip(R.nth)(hitboxes),
+      R.prop('position')
+    )(hitboxes);
+    return targetPosition;
+  }
+
   /** Distance APPROXIMATE on the track from the start */
   public DistanceOnTrack = (
     roller: BABYLON.AbstractMesh,
