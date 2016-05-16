@@ -104,9 +104,10 @@ export class Racer extends Player {
     const sphereMat = new BABYLON.StandardMaterial(`spheremat.${this.DeviceId}`, scene);
     sphereMat.diffuseColor = color;
     sphereMat.wireframe = true;
-    this.roller = BABYLON.Mesh.CreateSphere(`roller.${this.DeviceId}`, 6, 2.5, scene);
+    this.roller = BABYLON.Mesh.CreateSphere(`roller.${this.DeviceId}`, 6, 5.5, scene);
     this.roller.material = sphereMat;
     this.roller.position = spawn;
+    this.roller.showBoundingBox = true;
     this.roller.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor,
       { mass: 5, friction: 8.5, restitution: 0.1 });
 
