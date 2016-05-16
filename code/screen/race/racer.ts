@@ -79,7 +79,7 @@ export class Racer extends Player {
   /** How quickly the kart can turn the forward center */
   private static TURN_FORWARD_RADIANS_PER_SECOND = Math.PI / 4;
   /** Max angle the kart can turn from the next _path hitbox before the Wrong Way message */
-  private static MAX_TURN_ANGLE = 2;
+  private static MAX_TURN_ANGLE = Math.PI * 0.85;
 
   /** Linear speeds */
   private static IMPULSE_PER_SECOND = 32;
@@ -335,12 +335,12 @@ export class Racer extends Player {
     }
 
     const cameraVector = Racer.rotateVector(
-      new BABYLON.Vector3(20, 8, 0),
-      this.radiansForwardMain + 0.5 * this.radiansForwardTilt + Math.PI,
+      new BABYLON.Vector3(20, 0, 0),
+      this.radiansForwardMain,
       BABYLON.Axis.Y);
     const angleBetweenTargetAndDirection =
       Racer.radiansBetweenVectors(
-        this.roller.position.subtract(this.nextTarget),
+        this.nextTarget.subtract(this.roller.position),
         cameraVector
       );
     // this.temptemp = Racer.roundPlace(angleBetweenTargetAndDirection * 57.2958);
