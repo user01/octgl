@@ -72,6 +72,8 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
           <p>AI: {this.props.racer.temptemptemp}</p>
           {this.props.racer.ShowLapTime ? <p>Last Lap Time: {this.props.racer.LapTimeMessage}</p> : ''}
           {this.props.racer.IsWrongWay ? <p>Wrong Way</p> : ''}
+          {this.props.racer.ShowDerelictWarning ? <p>Derelict Warning</p> : ''}
+          {this.props.racer.IsDerelict ? <p>Derelict</p> : ''}
         </div>
       </div>
     );

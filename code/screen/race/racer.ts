@@ -15,6 +15,8 @@ export enum RacerState {
   Pending, // waiting for race to start
   Play, // human control
   AI, // AI control
+  Post, // AI control after race has finished
+  Derelict, //Player is declared broken
   Done, // Player has signaled to leave the placement list
 }
 
@@ -50,11 +52,16 @@ export class Racer extends Player {
   public temptemp = 0;
   public temptemptemp = '??';
 
-
+  // Message flags
   public get ShowLapTime() { return this.showLapTime; }
   private showLapTime = false;
   public get LapTimeMessage() { return this.lapTimeMessage; }
   private lapTimeMessage = '??';
+
+  public get ShowDerelictWarning() { return this.showDerelictWarning; }
+  private showDerelictWarning = false;
+  public get DerelictWarningMessage() { return this.DerelictWarningMessage; }
+  private derelictWarningMessage = 'Continue the Race!';
 
   private trackTools: TrackTools;
   public get State() { return this.state; }
@@ -72,6 +79,33 @@ export class Racer extends Player {
   private lapTimes: moment.Moment[] = [];
   public get LapDurations() { return this.lapDurations; }
   private lapDurations: moment.Duration[];
+
+  private lastHitboxMs = +Date.now();
+
+  private get isUnderAiControl() {
+    return (
+      this.state == RacerState.AI ||
+      this.state == RacerState.Post
+    );
+  }
+  public get DoneWithRace() {
+    return (
+      this.state == RacerState.Derelict ||
+      this.state == RacerState.Done ||
+      this.state == RacerState.Post
+    );
+  }
+  public get ShouldMove() {
+    return (
+      this.state == RacerState.Play ||
+      this.state == RacerState.AI ||
+      this.state == RacerState.Done ||
+      this.state == RacerState.Post
+    );
+  }
+  public get IsDerelict() {
+    return this.state == RacerState.Derelict;
+  }
 
   private camera: BABYLON.FreeCamera;
   private roller: BABYLON.Mesh;
@@ -128,6 +162,8 @@ export class Racer extends Player {
   private static DRAG_ZSLIDE_FULL_TILT = Racer.IMPULSE_PER_SECOND * 0.35;
   private static BOON_ZSLIDE_FULL_TILT_TO_X = 0.95;
 
+  private static MS_BEFORE_DANGER_OF_DERELICT = 15000;
+  private static MS_BEFORE_DERELICT = 25000;
 
   constructor(color: number,
     deviceId: number,
@@ -212,9 +248,9 @@ export class Racer extends Player {
 
   /** Preforms controls, either from player input or  */
   private updateControls = (fractionOfSecond: number) => {
-    if (this.State == RacerState.AI) {
+    if (this.isUnderAiControl) {
       this.aiHandleControls();
-    } else if (this.State == RacerState.Pending) {
+    } else if (!this.ShouldMove) {
       return;
     }
 
@@ -254,7 +290,7 @@ export class Racer extends Player {
 
   /** Handle current physic states to push the racer */
   private driveRacer = (linearVelocity: BABYLON.Vector3, fractionOfSecond: number, impulseScalar: number) => {
-    if (this.State == RacerState.Pending) {
+    if (!this.ShouldMove) {
       // force velocity to ignore everything but falling during pending
       (<any>this.roller.getPhysicsImpostor()).setLinearVelocity(new BABYLON.Vector3(0, 0, linearVelocity.z));
       return;
@@ -390,8 +426,21 @@ export class Racer extends Player {
     // if a new target has been found, 
     if (computedIndex != this.currentTrackIndex) {
       this.currentTrackIndex = computedIndex;
+      this.lastHitboxMs = +Date.now();
       // recompute the target for AI use
       this.forceNextTargetUpdate();
+    }
+
+    const timestamp = +Date.now();
+    if (timestamp - this.lastHitboxMs < Racer.MS_BEFORE_DANGER_OF_DERELICT) {
+      this.showDerelictWarning = false;
+    } else if (timestamp - this.lastHitboxMs < Racer.MS_BEFORE_DERELICT) {
+      //in danger of derlicition
+      this.showDerelictWarning = true;
+    } else {
+      //derilict
+      this.state = RacerState.Derelict;
+      this.showDerelictWarning = false;
     }
 
     const travelDirection = Racer.rotateVector(
@@ -409,16 +458,13 @@ export class Racer extends Player {
     // this.temptemp = Racer.roundPlace(angleBetweenTargetAndDirection, 2);
     this.isWrongWay = (angleBetweenTargetAndDirection > Racer.MAX_TURN_ANGLE);
 
-    if (this.State == RacerState.AI) {
+    if (this.isUnderAiControl) {
       const newState = this.computeAiState(angleBetweenTargetAndDirection, targetDirection);
-
       if (this.aiState != newState) {
         this.aiState = newState;
         this.aiHandleControls(newState);
       }
-
       this.temptemptemp = this.aiState == RacerAiState.Straight ? 'Straight' : (this.aiState == RacerAiState.Right ? 'Right' : 'Left');
-
     }
   }
 
@@ -488,7 +534,7 @@ export class Racer extends Player {
   }
 
   public UpdateRacerCommand = (racerCommand: RacerCommand) => {
-    if (this.State == RacerState.AI) return;
+    if (this.isUnderAiControl) return;
     this.racerCommand = racerCommand;
   }
 
@@ -525,7 +571,7 @@ export class Racer extends Player {
 
   public static RenderDurationAsLapTime = (duration: moment.Duration) => {
     var str = '';
-    
+
     if (duration.minutes() > 0) {
       str += `${duration.minutes()}:`;
     }
