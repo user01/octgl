@@ -64,7 +64,7 @@ export class Race {
     private lapsToWin = 3,
     private onRaceDone: () => void
   ) {
-    this.racers = Racer.PlayersToRacers(currentPlayers);
+    this.racers = Racer.PlayersToRacers(currentPlayers, this.lapsToWin);
     this.render();
     this.loadLevel(trackFileName);
   }
@@ -112,7 +112,7 @@ export class Race {
   private babylonSceneLoaded = () => {
     // create a basic light, aiming 0,1,0 - meaning, to the sky
     var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
-    this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin());
+    this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin(true, 5));
 
     this.trackTools = new TrackTools(this.scene.meshes, this.scene);
     this.placementTools = new PlacementTools(this.racers, this.lapsToWin);
@@ -196,7 +196,10 @@ export class Race {
   /** Expensive but less fps sensitive tasks */
   private perodicUpdate = () => {
     this.placementTools.UpdateRanks();
-    this.racers.forEach(r => r.Place = this.placementTools.CheckPosition(r));
+    this.racers.forEach(r => {
+      r.Place = this.placementTools.CheckPosition(r);
+
+    });
   }
 
   public UpdateRacerState = (device_id: number, racerCommand: RacerCommand) => {
@@ -246,6 +249,11 @@ export class Race {
         y + spawns.position.y,
         z + spawns.position.z);
     }, vertsGroups);
+  }
+
+  /** If the Racer is finished in the race or not */
+  public ShouldBeDone = (racer: Racer) => {
+
   }
 
 }

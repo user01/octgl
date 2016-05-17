@@ -53,13 +53,14 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
       this.windowFrameToStyle()
     );
 
-    return (
-      <div className="racer-hud" style={mainHudStyle}>
+    const racerPlaceClass = `racer-place place-${this.props.racer.Place}`;
+    const racingHud = (
+      <div>
         <div className="left">
           <p className="lap-count"><i className="fa fa-flag-checkered"></i> {this.props.racer.Lap} <span className="lap-total">/ {this.props.totalLaps}</span></p>
         </div>
         <div className="right">
-          <p className="racer-place">
+          <p className={racerPlaceClass}>
             {this.props.racer.Place}
             <span className="suffix">
               {RacerHUD.numberSuffix(this.props.racer.Place) }
@@ -75,6 +76,18 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
           {this.props.racer.ShowDerelictWarning ? <p>Derelict Warning</p> : ''}
           {this.props.racer.IsDerelict ? <p>Derelict</p> : ''}
         </div>
+      </div>
+    );
+
+    const postHud = (
+      <div>
+        <h1>Finished Race in {this.props.racer.Place}{RacerHUD.numberSuffix(this.props.racer.Place) } Place</h1>
+      </div>
+    );
+
+    return (
+      <div className="racer-hud" style={mainHudStyle}>
+        {this.props.racer.DoneWithRace ? postHud : racingHud}
       </div>
     );
   }

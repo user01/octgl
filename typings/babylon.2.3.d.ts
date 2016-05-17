@@ -7029,7 +7029,7 @@ declare module BABYLON {
         private _gravity;
         private _fixedTimeStep;
         name: string;
-        constructor(_useDeltaForWorldStep?: boolean);
+        constructor(_useDeltaForWorldStep?: boolean, iterations?: number);
         initialize(iterations?: number): void;
         private _checkWithEpsilon(value);
         runOneStep(delta: number): void;

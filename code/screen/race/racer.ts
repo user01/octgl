@@ -167,7 +167,8 @@ export class Racer extends Player {
 
   constructor(color: number,
     deviceId: number,
-    Nickname: string = 'Unknown'
+    Nickname: string = 'Unknown',
+    private lapsToWin: number = 3
   ) {
     super(color, deviceId, Nickname);
   }
@@ -413,6 +414,12 @@ export class Racer extends Player {
     if (this.lap != newLap) { //finished a lap!
       this.lapTimes.push(moment());
       this.computeLapDurations();
+      if (this.lap == this.lapsToWin) {
+        // DONE
+        console.log(`Device ${this.DeviceId} finished race!`);
+        this.state = RacerState.Post;
+      }
+      
       this.lapTimeMessage = Racer.RenderDurationAsLapTime(this.LapDurations[this.LapDurations.length - 1]);
       this.showLapTime = true;
       Promise.delay(2000).then(() => {
@@ -524,6 +531,10 @@ export class Racer extends Player {
         }))(times);
     return this.lapDurations = lapDurations;
   }
+  
+  private computeTotalDuration = () => {
+    
+  }
 
   private lastLapWasFastest = () => {
 
@@ -538,9 +549,9 @@ export class Racer extends Player {
     this.racerCommand = racerCommand;
   }
 
-  public static PlayersToRacers = (players: Player[]): Racer[] => {
+  public static PlayersToRacers = (players: Player[], lapsToWin: number): Racer[] => {
     return players.map(player =>
-      new Racer(player.Color, player.DeviceId, player.Nickname)
+      new Racer(player.Color, player.DeviceId, player.Nickname, lapsToWin)
     );
   }
 
