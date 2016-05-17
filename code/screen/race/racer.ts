@@ -79,6 +79,8 @@ export class Racer extends Player {
   private lapTimes: moment.Moment[] = [];
   public get LapDurations() { return this.lapDurations; }
   private lapDurations: moment.Duration[];
+  public get TotalDuration() { return this.totalDuration; }
+  private totalDuration: moment.Duration = moment.duration(0);
 
   private lastHitboxMs = +Date.now();
 
@@ -419,7 +421,8 @@ export class Racer extends Player {
         console.log(`Device ${this.DeviceId} finished race!`);
         this.state = RacerState.Post;
       }
-      
+
+      this.computeTotalDuration();
       this.lapTimeMessage = Racer.RenderDurationAsLapTime(this.LapDurations[this.LapDurations.length - 1]);
       this.showLapTime = true;
       Promise.delay(2000).then(() => {
@@ -531,9 +534,14 @@ export class Racer extends Player {
         }))(times);
     return this.lapDurations = lapDurations;
   }
-  
-  private computeTotalDuration = () => {
-    
+
+  private computeTotalDuration = (): moment.Duration => {
+    if (this.lapTimes.length < 1) {
+      return moment.duration(0);
+    }
+    const endTime = this.LapTimes.length > this.lapsToWin - 1 ?
+      this.LapTimes[this.lapsToWin - 1] : R.last(this.LapTimes);
+    return this.totalDuration = moment.duration(endTime.diff(this.timeStart));
   }
 
   private lastLapWasFastest = () => {

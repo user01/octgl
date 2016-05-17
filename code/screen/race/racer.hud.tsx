@@ -82,6 +82,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
     const postHud = (
       <div>
         <h1 className="post-race-message">Finished Race in {this.props.racer.Place}<sup>{RacerHUD.numberSuffix(this.props.racer.Place) }</sup> Place</h1>
+        <h3>Total Time of {Racer.RenderDurationAsLapTime(this.props.racer.TotalDuration) }</h3>
       </div>
     );
 
