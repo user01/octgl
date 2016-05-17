@@ -24,11 +24,7 @@ export class PlacementTools {
           R.prop('TrackPosition'),
           R.flip(R.gte(this.lapTotal))
         ),
-        R.pipe(
-          R.prop('LapTimes'),
-          R.length,
-          R.flip(R.gte)(1)
-        )
+        r => r.length > 0
       )
     ),
       R.sort((a: Racer, b: Racer) => {
