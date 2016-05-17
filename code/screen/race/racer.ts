@@ -97,6 +97,12 @@ export class Racer extends Player {
       this.state == RacerState.Post
     );
   }
+  public get FinishedRace() {
+    return (
+      this.state == RacerState.Done ||
+      this.state == RacerState.Post
+    );
+  }
   public get ShouldMove() {
     return (
       this.state == RacerState.Play ||

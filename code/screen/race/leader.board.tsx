@@ -16,11 +16,19 @@ class LeaderBoard extends React.Component<IAppProps, IAppState> {
   }
 
   render() {
+
+    const leaders = this.props.placements.map((r) => {
+
+      return (
+        <div>
+          Placeholder for leaderboard
+        </div>
+      )
+    });
+
     return (
       <div className="controls leaderboard">
-        <p>
-          Placeholder for leaderboard
-        </p>
+        <h1>Results</h1>
       </div>
     );
   }
