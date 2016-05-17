@@ -81,7 +81,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
 
     const postHud = (
       <div>
-        <h1>Finished Race in {this.props.racer.Place}{RacerHUD.numberSuffix(this.props.racer.Place) } Place</h1>
+        <h1 className="post-race-message">Finished Race in {this.props.racer.Place}<sup>{RacerHUD.numberSuffix(this.props.racer.Place) }</sup> Place</h1>
       </div>
     );
 
