@@ -1,10 +1,10 @@
 
 import * as React from 'react';
 
-// import Racer from '../racer';
+import Racer from './racer';
 
 interface IAppProps {
-  // racers: Racer[];
+  placements: Racer[];
 }
 
 interface IAppState {
@@ -17,7 +17,7 @@ class LeaderBoard extends React.Component<IAppProps, IAppState> {
 
   render() {
     return (
-      <div className="controls">
+      <div className="controls leaderboard">
         <p>
           Placeholder for leaderboard
         </p>

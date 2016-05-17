@@ -81,7 +81,7 @@ export class Race {
 
         {this.state == RaceState.Counting ? <ReadySet seconds={this.countDownRemaining} /> : ''}
         {this.state == RaceState.Green ? <ReadySet seconds={0} /> : ''}
-        {this.state == RaceState.Post ? <LeaderBoard /> : ''}
+        {this.state == RaceState.Post ? <LeaderBoard placements={this.placementTools.Placement} /> : ''}
         {this.state == RaceState.Loading ? <LoadingBoard /> : ''}
         {this.state == RaceState.Unsupported ? <UnsupportedBoard /> : ''}
       </div>), this.rootElement);
@@ -198,8 +198,12 @@ export class Race {
     this.placementTools.UpdateRanks();
     this.racers.forEach(r => {
       r.Place = this.placementTools.CheckPosition(r);
-
     });
+    if (R.all(R.prop('DoneWithRace'), this.racers)) {
+      // Race Complete, open the placement screen
+      this.state = RaceState.Post;
+      this.render();
+    }
   }
 
   public UpdateRacerState = (device_id: number, racerCommand: RacerCommand) => {
