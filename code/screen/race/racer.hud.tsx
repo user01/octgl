@@ -59,7 +59,12 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
           <p className="lap-count"><i className="fa fa-flag-checkered"></i> {this.props.racer.Lap} <span className="lap-total">/ {this.props.totalLaps}</span></p>
         </div>
         <div className="right">
-          <p className="racer-place">{this.props.racer.Place}st</p>
+          <p className="racer-place">
+            {this.props.racer.Place}
+            <span className="suffix">
+              {RacerHUD.numberSuffix(this.props.racer.Place) }
+            </span>
+          </p>
         </div>
         <div className="message">
           <p>{this.props.racer.IsGrounded ? 'Grounded' : 'Free'} - {this.props.racer.CurrentTrackIndex}</p>
@@ -93,6 +98,19 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
       width,
       height
     };
+  }
+
+  private static numberSuffix = (place: number): string => {
+    switch (place) {
+      case 1:
+        return 'st';
+      case 2:
+        return 'nd';
+      case 3:
+        return 'rd';
+      default:
+    }
+    return 'th';
   }
 
 }

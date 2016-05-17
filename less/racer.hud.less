@@ -1,3 +1,9 @@
+.floater {
+  margin: 0.2em;
+  padding: 0.3em;
+  font-size: 3em;
+}
+
 .racer-hud {
   .left {
     float: left;
@@ -5,9 +11,7 @@
       color: rgb(241, 241, 241);
       background: rgba(0, 0, 0, 0.64);
       border-radius: 0.2em;
-      margin: 0.2em;
-      padding: 0.3em;
-      font-size: 3em;
+      .floater;
       .lap-total {
         font-size: 65%;
       }
@@ -15,6 +19,17 @@
   }
   .right {
     float: right;
+    .racer-place {
+      .floater;
+      margin-top: 0;
+      font-weight: bold;
+      font-size: 8em;
+      padding-top: 0.15em;
+      .suffix {
+        font-weight: normal;
+        font-size: 65%;
+      }
+    }
   }
   .message {
     padding-top: 40%;
