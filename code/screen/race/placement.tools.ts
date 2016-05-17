@@ -10,6 +10,9 @@ import * as R from 'ramda';
  */
 export class PlacementTools {
 
+  public get Placement() { return this.racersInOrder; }
+  private racersInOrder: Racer[];
+
   private standings: number[];
 
   constructor(private racers: Racer[], private lapTotal = 3) {
@@ -47,7 +50,8 @@ export class PlacementTools {
       )
         (this.racers);
 
-    this.standings = R.map(R.prop('DeviceId'), R.concat(finishedRacers, currentRacers));
+    this.racersInOrder = R.concat(finishedRacers, currentRacers);
+    this.standings = R.map(R.prop('DeviceId'), this.racersInOrder);
   }
 
   public CheckPosition = (racer: Racer) => {
