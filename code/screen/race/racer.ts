@@ -525,7 +525,7 @@ export class Racer extends Player {
 
   public static RenderDurationAsLapTime = (duration: moment.Duration) => {
     var str = '';
-    console.log('duration', duration);
+    
     if (duration.minutes() > 0) {
       str += `${duration.minutes()}:`;
     }
