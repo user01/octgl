@@ -165,7 +165,7 @@ export class Racer extends Player {
   private static DRAG_ROAD_PER_SECOND = 0.1;
   private static DRAG_ZSLIDE_NO_TILT = Racer.IMPULSE_PER_SECOND * 0.75;
   private static DRAG_ZSLIDE_FULL_TILT = Racer.IMPULSE_PER_SECOND * 0.35;
-  private static BOON_ZSLIDE_FULL_TILT_TO_X = 0.95;
+  private static ZVELOCITY_INTO_X = 0.75;
 
   private static MS_BEFORE_DANGER_OF_DERELICT = 15000;
   private static MS_BEFORE_DERELICT = 25000;
@@ -356,18 +356,31 @@ export class Racer extends Player {
 
     // sliding - drags Z
     const zFract = Math.abs(this.radiansForwardTilt) / Racer.TURN_TILT_MAX;
+    // this.temptemptemp = `${cartXLinear.toString()}`;
 
     zDrag += fractionOfSecond *
       (zFract * Racer.DRAG_ZSLIDE_FULL_TILT + (1 - zFract) * Racer.DRAG_ZSLIDE_NO_TILT);
 
+    const newZSpeed = cartZLength - zDrag;
+    
     // To emulate cars that can turn, transfer some of the burned motion while
     // tilting to push the car forward.
-    const zDragIntoxBoon = fractionOfSecond * zFract * Racer.DRAG_ZSLIDE_FULL_TILT * Racer.BOON_ZSLIDE_FULL_TILT_TO_X;
-    // console.log(`Xdrag ${xDrag} ZDrag ${zDrag}`);
+    // const zDragIntoXBoon = 0;
+    // const zDragIntoXBoon = zDrag * Racer.ZVELOCITY_INTO_X;
+    // const zDragIntoXBoon = zDrag * 0.25;
+    const availableZSpeed = zDrag > cartZLength ? cartZLength : zDrag;
+    
+    const zDragIntoXBoon = availableZSpeed * Racer.ZVELOCITY_INTO_X;
 
-    const newXLinear = cartXLinear.scale(Math.max(0, (cartXLength - xDrag + zDragIntoxBoon) / cartXLength));
+    // this.temptemptemp = (`zDragIntoXBoon ${Racer.roundPlace(zDragIntoXBoon, 2)}`);
+    // this.temptemptemp = (`${Racer.roundPlace(xDrag, 2)} ${Racer.roundPlace(zDrag, 2)} ${Racer.roundPlace(zDragIntoXBoon, 2)}`);
+
+    // const newXSpeed = cartXLength - xDrag;
+    const newXSpeed = cartXLength - xDrag + zDragIntoXBoon;
+
+    const newXLinear = cartXLinear.scale(Math.max(0, newXSpeed / cartXLength));
     const newYLinear = cartYLinear.clone();
-    const newZLinear = cartZLinear.scale(Math.max(0, (cartZLength - zDrag) / cartZLength));
+    const newZLinear = cartZLinear.scale(Math.max(0, newZSpeed / cartZLength));
 
     // console.log(`Linear Z drag ${zDrag} - ${Racer.roundPlace(cartZLength)} => ${Racer.roundPlace(newZLinear.length())}`);
     // console.log(`Linear Z ${Racer.roundPlace(newZLinear.length())} fraction ${Racer.roundPlace(Math.max(0, (cartZLength - zDrag) / cartZLength), 3)}`);
