@@ -126,8 +126,8 @@ export class Game {
 
   public DEBUG_RequestNewGame = () => {
     this.requestNewGame([
-      new Player(0xFF3300, 4, 'One'),
-      new Player(0x0033FF, 6, 'Two'),
+      new Player(0xFF3300, 4, 'Player'),
+      new Player(0x0033FF, 6, 'AI'),
     ]);
   }
 
