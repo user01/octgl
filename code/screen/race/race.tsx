@@ -127,10 +127,20 @@ export class Race {
     this.trackTools = new TrackTools(this.scene.meshes, this.scene);
     this.placementTools = new PlacementTools(this.racers, this.lapsToWin);
 
+    // Assign physics objects their state
     this.scene.meshes.filter((m) => {
       return m.name.indexOf('static') > -1;
     }).forEach((m) => {
+      // console.log(`Setting ${m.name} to ground`);
       m.setPhysicsState(BABYLON.PhysicsEngine.MeshImpostor, { mass: 0, friction: 20.5, restitution: 0 });
+    });
+    
+    // hide invisible objects
+    this.scene.meshes.filter((m) => {
+      return m.name.indexOf('invisible') > -1;
+    }).forEach((m) => {
+      // console.log(`Setting ${m.name} invisible`);
+      m.isVisible = false;
     });
 
     this.assetsManager = new BABYLON.AssetsManager(this.scene);
