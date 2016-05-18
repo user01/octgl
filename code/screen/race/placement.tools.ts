@@ -21,10 +21,12 @@ export class PlacementTools {
 
   public UpdateRanks = () => {
     const finishedRacers: Racer[] = R.pipe(R.filter(
-      (r: Racer) => r.TrackPosition > this.lapTotal && r.LapTimes.length > 0
+      (r: Racer) => r.LapTimes.length > this.lapTotal
     ),
       R.sort((a: Racer, b: Racer) => {
-        return a.LapTimes[this.lapTotal - 1].diff(b.LapTimes[this.lapTotal - 1]);
+        const aTime = a.LapTimes[this.lapTotal - 1];
+        const bTime = b.LapTimes[this.lapTotal - 1];
+        return aTime.diff(bTime);
       }),
       R.reverse
 
@@ -32,7 +34,7 @@ export class PlacementTools {
     const currentRacers: Racer[] =
       R.pipe(
         R.filter(
-          (r: Racer) => r.TrackPosition < this.lapTotal
+          (r: Racer) => r.LapTimes.length <= this.lapTotal
         ),
         R.sort((a: Racer, b: Racer) => {
           return a.TrackPosition - b.TrackPosition;
@@ -41,7 +43,7 @@ export class PlacementTools {
       )
         (this.racers);
 
-    // console.log(`finished ${finishedRacers.length} : current ${currentRacers.length}`);
+    console.log(`finished ${finishedRacers.length} : current ${currentRacers.length}`);
 
     this.racersInOrder = R.concat(finishedRacers, currentRacers);
     this.standings = R.map(R.prop('DeviceId'), this.racersInOrder);
