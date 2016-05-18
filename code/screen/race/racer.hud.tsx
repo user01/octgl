@@ -88,7 +88,11 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
           <h3 className="post-race-message">
             {this.props.racer.IsDerelict ?
               'Did Not Finish' :
-              <span>Total Time of <span className="lap-time">Racer.RenderDurationAsLapTime(this.props.racer.TotalDuration) </span></span> }
+              <span>Total Time of&nbsp;
+                <span className="lap-time">
+                  {Racer.RenderDurationAsLapTime(this.props.racer.TotalDuration) }
+                </span>
+              </span> }
           </h3>
         </div>
       </div>
