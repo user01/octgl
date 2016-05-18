@@ -156,6 +156,9 @@ export class Racer extends Player {
   /** Max angle the kart can turn from the next _path hitbox before the Wrong Way message */
   private static MAX_TURN_ANGLE = Math.PI * 0.6;
 
+  /** Speed camera can move to reach ideal location */
+  private static UNITS_PER_SECOND_CAMERA_SPEED = 0.5;
+
   /** Linear speeds */
   private static IMPULSE_PER_SECOND = 32;
   private static MAX_NORMAL_LINEAR_VELOCITY = 28;
@@ -207,9 +210,10 @@ export class Racer extends Player {
       { mass: 5, friction: 8.5, restitution: 0.1 });
     this.roller.isVisible = false;
 
-    this.pointerMesh = BABYLON.Mesh.CreateSphere(`roller.${this.DeviceId}`, 6, 0.5, scene);
+    this.pointerMesh = BABYLON.Mesh.CreateSphere(`roller.${this.DeviceId}`, 2, 0.5, scene);
     this.pointerMesh.material = sphereMat;
     this.pointerMesh.position = spawn;
+    this.pointerMesh.isVisible = false;
 
 
     // this.targetMesh = BABYLON.Mesh.CreateBox(`something.${this.DeviceId}`, 8, scene);
@@ -252,7 +256,7 @@ export class Racer extends Player {
 
     const impulseScalar = this.updateControls(fractionOfSecond);
     this.driveRacer(linearVelocity, fractionOfSecond, impulseScalar);
-    this.updateChildObjects(linearVelocity);
+    this.updateChildObjects(linearVelocity, fractionOfSecond);
     this.updateTargetLocation();
 
     this.UpdateRacerPosition();
@@ -419,7 +423,7 @@ export class Racer extends Player {
   //#########################################################################
   // Configure Child Objects
   //#########################################################################
-  private updateChildObjects = (linearVelocity: BABYLON.Vector3) => {
+  private updateChildObjects = (linearVelocity: BABYLON.Vector3, fractionOfSecond: number) => {
     const cameraVector = Racer.rotateVector(
       new BABYLON.Vector3(20, 8, 0),
       this.radiansForwardMain + 0.5 * this.radiansForwardTilt + Math.PI,
@@ -434,11 +438,16 @@ export class Racer extends Player {
 
     this.cameraTargetBox.position = BABYLON.Vector3.Lerp(idealForwardPosition, this.pointerMesh.position, 0.1);
 
-    const cameraCloseToIdeal = idealCameraPosition.subtract(this.camera.position).lengthSquared() < 0.05
+    const vectorToAddToBeIdeal = idealCameraPosition.subtract(this.camera.position)
+    const vectorToAddToBeIdealLength = vectorToAddToBeIdeal.length();
 
+    const cameraCloseToIdeal = vectorToAddToBeIdealLength < 0.005;
     this.camera.position = cameraCloseToIdeal ?
       idealCameraPosition :
-      BABYLON.Vector3.Lerp(this.camera.position, idealCameraPosition, 1 - 0.2);
+      this.camera.position.add(vectorToAddToBeIdeal.scale(
+        (Racer.UNITS_PER_SECOND_CAMERA_SPEED * fractionOfSecond + vectorToAddToBeIdealLength) / vectorToAddToBeIdealLength
+      ))
+    // BABYLON.Vector3.Lerp(this.camera.position, idealCameraPosition, 1 - 0.2);
 
     this.baseMesh.position = this.roller.position;
     this.pointerMesh.position = this.baseMesh.position.add(linearVelocity);
