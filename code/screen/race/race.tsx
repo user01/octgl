@@ -57,6 +57,15 @@ export class Race {
   private static PENDING_MS_PER_STATE = 1200;
   private countDownRemaining = 4;
 
+  private get ShouldShowHud() {
+    return (
+      this.state == RaceState.Counting ||
+      this.state == RaceState.Green ||
+      this.state == RaceState.Race ||
+      this.state == RaceState.Pending
+    );
+  }
+
   constructor(
     currentPlayers: Player[],
     private rootElement: HTMLElement,
@@ -77,11 +86,11 @@ export class Race {
           <canvas ref={ref => this._canvasElm = ref} className="render-canvas"></canvas>
         </div>
 
-        <RacerHUDs racers={this.racers} totalLaps={this.lapsToWin} />
+        {this.ShouldShowHud ? <RacerHUDs racers={this.racers} totalLaps={this.lapsToWin} /> : ''}
 
         {this.state == RaceState.Counting ? <ReadySet seconds={this.countDownRemaining} /> : ''}
         {this.state == RaceState.Green ? <ReadySet seconds={0} /> : ''}
-        {this.state == RaceState.Post ? <LeaderBoard placements={this.placementTools.Placement} /> : ''}
+        {this.state == RaceState.Post ? <LeaderBoard placements={this.placementTools ? this.placementTools.Placement : []} /> : ''}
         {this.state == RaceState.Loading ? <LoadingBoard /> : ''}
         {this.state == RaceState.Unsupported ? <UnsupportedBoard /> : ''}
       </div>), this.rootElement);

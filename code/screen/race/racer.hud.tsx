@@ -63,7 +63,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
           <p className={racerPlaceClass}>
             {this.props.racer.Place}
             <span className="suffix">
-              {RacerHUD.numberSuffix(this.props.racer.Place) }
+              {RacerHUD.NumberSuffix(this.props.racer.Place) }
             </span>
           </p>
         </div>
@@ -80,9 +80,11 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
     );
 
     const postHud = (
-      <div>
-        <h1 className="post-race-message">Finished Race in {this.props.racer.Place}<sup>{RacerHUD.numberSuffix(this.props.racer.Place) }</sup> Place</h1>
-        <h3>Total Time of {Racer.RenderDurationAsLapTime(this.props.racer.TotalDuration) }</h3>
+      <div className="center-inner-div">
+        <div>
+          <h1 className="post-race-message">Finished Race in {this.props.racer.Place}<sup>{RacerHUD.NumberSuffix(this.props.racer.Place) }</sup> Place</h1>
+          <h3>Total Time of {Racer.RenderDurationAsLapTime(this.props.racer.TotalDuration) }</h3>
+        </div>
       </div>
     );
 
@@ -116,7 +118,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
     };
   }
 
-  private static numberSuffix = (place: number): string => {
+  public static NumberSuffix = (place: number): string => {
     switch (place) {
       case 1:
         return 'st';

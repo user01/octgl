@@ -2,6 +2,7 @@
 import * as React from 'react';
 
 import Racer from './racer';
+import RacerHUD from './racer.hud.tsx';
 import Utility from '../../data/utility';
 
 interface IAppProps {
@@ -18,17 +19,34 @@ class LeaderBoard extends React.Component<IAppProps, IAppState> {
 
   render() {
 
-    const leaders = this.props.placements.map((r) => {
+    const placements = this.props.placements ? this.props.placements : [];
+
+    const leaders = placements.map((r, idx) => {
       const color = Utility.NumberToColor(r.Color);
-      const style = { color };
+      const bgColor = Utility.NumberToColorSet(r.Color);
+      const style = {
+        // color,
+        background: `rgba(${bgColor.r * 255},${bgColor.g * 255},${bgColor.b * 255},0.4)`
+      };
       return (
-        <div>
-          <div className="pure-g">
+        <div key={`place.${idx}`}>
+          <div className="pure-g rank-line" style={style}>
             <div className="pure-u-1-3">
-              <p className="place-rank">{r.Place}</p>
+              <p className="place-rank">
+                {r.Place}
+
+                <span className="suffix">
+                  {RacerHUD.NumberSuffix(r.Place) }
+                </span>
+              </p>
             </div>
-            <div className="pure-u-2-3" style={style}>
+            <div className="pure-u-1-3">
               <p className="place-rank">{r.Nickname}</p>
+            </div>
+            <div className="pure-u-1-3">
+              <p className="place-rank">
+                {r.FinishedRace ? Racer.RenderDurationAsLapTime(r.TotalDuration) : 'DNF'}
+              </p>
             </div>
           </div>
         </div>
