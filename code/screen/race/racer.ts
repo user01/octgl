@@ -623,10 +623,9 @@ export class Racer extends Player {
     str += pad.substring(0, pad.length - seconds.length) + seconds;
 
 
-    const fractionalSeconds = `${Math.round(duration.milliseconds() / 100)}`;
-    const fractionalPad = '000';
+    const fractionalSeconds = `${Math.floor(duration.milliseconds() / 100)}`;
 
-    str += '.' + fractionalPad.substring(0, fractionalPad.length - fractionalSeconds.length) + fractionalSeconds;
+    str += '.' + fractionalSeconds;
     return str;
   }
 }
