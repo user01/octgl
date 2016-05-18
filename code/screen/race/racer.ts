@@ -622,7 +622,11 @@ export class Racer extends Player {
     const pad = '00';
     str += pad.substring(0, pad.length - seconds.length) + seconds;
 
-    str += '.' + Math.round(duration.milliseconds() / 100);
+
+    const fractionalSeconds = `${Math.round(duration.milliseconds() / 100)}`;
+    const fractionalPad = '000';
+
+    str += '.' + fractionalPad.substring(0, fractionalPad.length - fractionalSeconds.length) + fractionalSeconds;
     return str;
   }
 }
