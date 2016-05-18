@@ -80,8 +80,8 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
     );
 
     const postHud = (
-      <div className="center-inner-div">
-        <div>
+      <div className="Aligner">
+        <div className="Aligner-item--fixed Aligner-item">
           <h1 className="post-race-message">Finished Race in {this.props.racer.Place}<sup>{RacerHUD.NumberSuffix(this.props.racer.Place) }</sup> Place</h1>
           <h3>Total Time of {Racer.RenderDurationAsLapTime(this.props.racer.TotalDuration) }</h3>
         </div>
