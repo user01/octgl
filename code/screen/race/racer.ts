@@ -49,9 +49,6 @@ export class Racer extends Player {
   private isGrounded = false;
   private aiState = RacerAiState.Straight;
 
-  public temptemp = 0;
-  public temptemptemp = '??';
-
   // Message flags
   public get ShowLapTime() { return this.showLapTime; }
   private showLapTime = false;
@@ -473,8 +470,6 @@ export class Racer extends Player {
     this.tempMesh.position = this.roller.position.add(travelDirection.scale(10));
     this.temp2Mesh.position = this.roller.position.add(targetDirection.scale(10 / targetDirection.length()));
 
-    this.temptemp = Racer.roundPlace(angleBetweenTargetAndDirection * 57.2958);
-    // this.temptemp = Racer.roundPlace(angleBetweenTargetAndDirection, 2);
     this.isWrongWay = (angleBetweenTargetAndDirection > Racer.MAX_TURN_ANGLE);
 
     if (this.isUnderAiControl) {
@@ -483,7 +478,6 @@ export class Racer extends Player {
         this.aiState = newState;
         this.aiHandleControls(newState);
       }
-      this.temptemptemp = this.aiState == RacerAiState.Straight ? 'Straight' : (this.aiState == RacerAiState.Right ? 'Right' : 'Left');
     }
   }
 
