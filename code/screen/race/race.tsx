@@ -136,7 +136,7 @@ export class Race {
     this.assetsManager = new BABYLON.AssetsManager(this.scene);
     const kartTask = this.assetsManager.addMeshTask('ship', '', './assets/', 'kart.babylon');
     kartTask.onSuccess = (task: any) => {
-      console.log(task);
+      // console.log(task);
       const kart = task.loadedMeshes[0];
       this.scene.removeMesh(kart);
       this.kart = kart;
