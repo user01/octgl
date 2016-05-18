@@ -11,9 +11,9 @@ import * as R from 'ramda';
 export class PlacementTools {
 
   public get Placement() { return this.racersInOrder; }
-  private racersInOrder: Racer[];
+  private racersInOrder: Racer[] = [];
 
-  private standings: number[];
+  private standings: number[] = [];
 
   constructor(private racers: Racer[], private lapTotal = 3) {
     this.UpdateRanks();
