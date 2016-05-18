@@ -68,9 +68,6 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
           </p>
         </div>
         <div className="message">
-          <p>{this.props.racer.IsGrounded ? 'Grounded' : 'Free'} - {this.props.racer.CurrentTrackIndex}</p>
-          <p>Angle {this.props.racer.temptemp}</p>
-          <p>AI: {this.props.racer.temptemptemp}</p>
           {this.props.racer.ShowLapTime ? <p>Last Lap Time: {this.props.racer.LapTimeMessage}</p> : ''}
           {this.props.racer.IsWrongWay ? <p>Wrong Way</p> : ''}
           {this.props.racer.ShowDerelictWarning ? <p>Derelict Warning</p> : ''}
@@ -82,8 +79,15 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
     const postHud = (
       <div className="Aligner">
         <div className="Aligner-item--fixed Aligner-item">
-          <h1 className="post-race-message">Finished Race in {this.props.racer.Place}<sup>{RacerHUD.NumberSuffix(this.props.racer.Place) }</sup> Place</h1>
-          <h3>Total Time of {Racer.RenderDurationAsLapTime(this.props.racer.TotalDuration) }</h3>
+          <h1 className="post-race-message">
+            Finished Race
+          </h1>
+          <h3 className="post-race-message">
+            {this.props.racer.IsDerelict ? 'Currently ' : ''}{this.props.racer.Place}<sup>{RacerHUD.NumberSuffix(this.props.racer.Place) }</sup> Place
+          </h3>
+          <h3 className="post-race-message">
+            {this.props.racer.IsDerelict ? 'Did Not Finish' : 'Total Time of ' + Racer.RenderDurationAsLapTime(this.props.racer.TotalDuration) }
+          </h3>
         </div>
       </div>
     );

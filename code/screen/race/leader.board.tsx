@@ -55,7 +55,7 @@ class LeaderBoard extends React.Component<IAppProps, IAppState> {
 
     return (
       <div className="controls leaderboard">
-        <h1>Results</h1>
+        <h1 className="leaderboard-title">Race Complete</h1>
         {leaders}
       </div>
     );
