@@ -45,7 +45,7 @@ class LeaderBoard extends React.Component<IAppProps, IAppState> {
             </div>
             <div className="pure-u-1-3">
               <p className="place-rank">
-                {r.FinishedRace ? Racer.RenderDurationAsLapTime(r.TotalDuration) : 'DNF'}
+                {r.FinishedRace ? <span className="lap-time">{Racer.RenderDurationAsLapTime(r.TotalDuration) }</span> : 'DNF'}
               </p>
             </div>
           </div>

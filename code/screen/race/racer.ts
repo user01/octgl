@@ -429,11 +429,14 @@ export class Racer extends Player {
       }
 
       this.computeTotalDuration();
-      this.lapTimeMessage = Racer.RenderDurationAsLapTime(this.LapDurations[this.LapDurations.length - 1]);
-      this.showLapTime = true;
-      Promise.delay(2000).then(() => {
-        this.showLapTime = false;
-      })
+      if (this.lastLapWasFastest()) {
+        this.lapTimeMessage =
+          Racer.RenderDurationAsLapTime(this.LapDurations[this.LapDurations.length - 1]);
+        this.showLapTime = true;
+        Promise.delay(2000).then(() => {
+          this.showLapTime = false;
+        });
+      }
     }
     this.lap = newLap;
     this.PercentDoneTrack = this.trackTools.DistanceOnTrack(this.roller, this.currentTrackIndex) / this.trackTools.TrackLength;
@@ -551,7 +554,15 @@ export class Racer extends Player {
   }
 
   private lastLapWasFastest = () => {
-
+    if (this.LapDurations.length < 2) return false;
+    const lastLapMs = R.last(this.LapDurations).asMilliseconds();
+    const lastIsSmallest = R.pipe(
+      R.init,
+      R.all((duration: moment.Duration) => {
+        return duration.asMilliseconds() > lastLapMs;
+      })
+    )(this.LapDurations);
+    return lastIsSmallest;
   }
 
   private forceNextTargetUpdate = () => {

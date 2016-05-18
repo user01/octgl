@@ -68,7 +68,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
           </p>
         </div>
         <div className="message">
-          {this.props.racer.ShowLapTime ? <p>Last Lap Time: {this.props.racer.LapTimeMessage}</p> : ''}
+          {this.props.racer.ShowLapTime ? <p>Fastest Lap Time of <span className="lap-time">{this.props.racer.LapTimeMessage}</span></p> : ''}
           {this.props.racer.IsWrongWay ? <p>Wrong Way</p> : ''}
           {this.props.racer.ShowDerelictWarning ? <p>Derelict Warning</p> : ''}
           {this.props.racer.IsDerelict ? <p>Derelict</p> : ''}
@@ -86,7 +86,9 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
             {this.props.racer.IsDerelict ? 'Currently ' : ''}{this.props.racer.Place}<sup>{RacerHUD.NumberSuffix(this.props.racer.Place) }</sup> Place
           </h3>
           <h3 className="post-race-message">
-            {this.props.racer.IsDerelict ? 'Did Not Finish' : 'Total Time of ' + Racer.RenderDurationAsLapTime(this.props.racer.TotalDuration) }
+            {this.props.racer.IsDerelict ?
+              'Did Not Finish' :
+              <span>Total Time of <span className="lap-time">Racer.RenderDurationAsLapTime(this.props.racer.TotalDuration) </span></span> }
           </h3>
         </div>
       </div>

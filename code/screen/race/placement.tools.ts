@@ -43,7 +43,7 @@ export class PlacementTools {
       )
         (this.racers);
 
-    console.log(`finished ${finishedRacers.length} : current ${currentRacers.length}`);
+    // console.log(`finished ${finishedRacers.length} : current ${currentRacers.length}`);
 
     this.racersInOrder = R.concat(finishedRacers, currentRacers);
     this.standings = R.map(R.prop('DeviceId'), this.racersInOrder);
