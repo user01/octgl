@@ -118,10 +118,11 @@ export class Racer extends Player {
   private pointerMesh: BABYLON.AbstractMesh;
   private kartMesh: BABYLON.AbstractMesh;
   private nextTarget: BABYLON.Vector3 = null;
+  private cameraTarget: BABYLON.Vector3;
 
-  private targetMesh: BABYLON.AbstractMesh;
-  private tempMesh: BABYLON.AbstractMesh;
-  private temp2Mesh: BABYLON.AbstractMesh;
+  // private targetMesh: BABYLON.AbstractMesh;
+  private tempSphere: BABYLON.AbstractMesh;
+  private cameraTargetBox: BABYLON.AbstractMesh;
 
   // Message flags
   public get IsWrongWay() { return this.isWrongWay; }
@@ -201,24 +202,29 @@ export class Racer extends Player {
     this.roller = BABYLON.Mesh.CreateSphere(`roller.${this.DeviceId}`, 6, 5.5, scene);
     this.roller.material = sphereMat;
     this.roller.position = spawn;
-    this.roller.showBoundingBox = true;
+    // this.roller.showBoundingBox = true;
     this.roller.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor,
       { mass: 5, friction: 8.5, restitution: 0.1 });
+    this.roller.isVisible = false;
 
     this.pointerMesh = BABYLON.Mesh.CreateSphere(`roller.${this.DeviceId}`, 6, 0.5, scene);
     this.pointerMesh.material = sphereMat;
     this.pointerMesh.position = spawn;
 
+
+    // this.targetMesh = BABYLON.Mesh.CreateBox(`something.${this.DeviceId}`, 8, scene);
+    // this.targetMesh.material = sphereMat;
+
+    // this.tempSphere = BABYLON.Mesh.CreateSphere(`tempish.${this.DeviceId}`, 6, 5.5, scene);
+    // this.tempSphere.material = sphereMat;
+    this.cameraTargetBox = BABYLON.Mesh.CreateBox(`cameraTargetBox.${this.DeviceId}`, 1.4, scene);
+    this.cameraTargetBox.material = sphereMat;
+    this.cameraTargetBox.isVisible = false;
+
     this.camera = new BABYLON.FreeCamera(`camera.${this.DeviceId}`, this.baseMesh.position.add(new BABYLON.Vector3(-20, 8, 0)), scene);
-    this.camera.lockedTarget = this.baseMesh;
-
-    this.targetMesh = BABYLON.Mesh.CreateBox(`something.${this.DeviceId}`, 8, scene);
-    this.targetMesh.material = sphereMat;
-
-    this.tempMesh = BABYLON.Mesh.CreateSphere(`tempish.${this.DeviceId}`, 6, 5.5, scene);
-    this.tempMesh.material = sphereMat;
-    this.temp2Mesh = BABYLON.Mesh.CreateBox(`tempish2.${this.DeviceId}`, 4, scene);
-    this.temp2Mesh.material = sphereMat;
+    this.camera.lockedTarget = this.cameraTargetBox;
+    // this.camera.lockedTarget = this.pointerMesh;
+    // this.camera.lockedTarget = this.baseMesh;
 
     this.forceNextTargetUpdate();
 
@@ -226,7 +232,7 @@ export class Racer extends Player {
   }
 
   private updateTargetLocation = () => {
-    this.targetMesh.position = this.nextTarget;
+    // this.targetMesh.position = this.nextTarget;
   }
 
   public onEveryFrame = (millisecondsSinceLastFrame: number) => {
@@ -362,14 +368,14 @@ export class Racer extends Player {
       (zFract * Racer.DRAG_ZSLIDE_FULL_TILT + (1 - zFract) * Racer.DRAG_ZSLIDE_NO_TILT);
 
     const newZSpeed = cartZLength - zDrag;
-    
+
     // To emulate cars that can turn, transfer some of the burned motion while
     // tilting to push the car forward.
     // const zDragIntoXBoon = 0;
     // const zDragIntoXBoon = zDrag * Racer.ZVELOCITY_INTO_X;
     // const zDragIntoXBoon = zDrag * 0.25;
     const availableZSpeed = zDrag > cartZLength ? cartZLength : zDrag;
-    
+
     const zDragIntoXBoon = availableZSpeed * Racer.ZVELOCITY_INTO_X;
 
     // this.temptemptemp = (`zDragIntoXBoon ${Racer.roundPlace(zDragIntoXBoon, 2)}`);
@@ -418,11 +424,24 @@ export class Racer extends Player {
       new BABYLON.Vector3(20, 8, 0),
       this.radiansForwardMain + 0.5 * this.radiansForwardTilt + Math.PI,
       BABYLON.Axis.Y);
+    const idealCameraPosition = this.baseMesh.position.add(cameraVector);
+
+    const forwardVector = Racer.rotateVector(
+      new BABYLON.Vector3(6, -1, 0),
+      this.radiansForwardMain + 0.5 * this.radiansForwardTilt,
+      BABYLON.Axis.Y);
+    const idealForwardPosition = this.baseMesh.position.add(forwardVector);
+
+    this.cameraTargetBox.position = BABYLON.Vector3.Lerp(idealForwardPosition, this.pointerMesh.position, 0.1);
+
+    const cameraCloseToIdeal = idealCameraPosition.subtract(this.camera.position).lengthSquared() < 0.05
+
+    this.camera.position = cameraCloseToIdeal ?
+      idealCameraPosition :
+      BABYLON.Vector3.Lerp(this.camera.position, idealCameraPosition, 1 - 0.2);
 
     this.baseMesh.position = this.roller.position;
-    this.camera.position = this.baseMesh.position.add(cameraVector);
     this.pointerMesh.position = this.baseMesh.position.add(linearVelocity);
-
   }
 
   public UpdateRacerPosition = () => {
@@ -480,8 +499,8 @@ export class Racer extends Player {
     const targetDirection = new BABYLON.Vector3(vectorFromRollerToTarget.x, 0, vectorFromRollerToTarget.z);
     const angleBetweenTargetAndDirection = Racer.radiansBetweenVectors(targetDirection, travelDirection);
 
-    this.tempMesh.position = this.roller.position.add(travelDirection.scale(10));
-    this.temp2Mesh.position = this.roller.position.add(targetDirection.scale(10 / targetDirection.length()));
+    // this.tempSphere.position = this.roller.position.add(travelDirection.scale(10));
+    // this.tempBox.position = this.roller.position.add(targetDirection.scale(10 / targetDirection.length()));
 
     this.isWrongWay = (angleBetweenTargetAndDirection > Racer.MAX_TURN_ANGLE);
 
