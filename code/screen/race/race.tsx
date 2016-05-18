@@ -108,6 +108,7 @@ export class Race {
     BABYLON.SceneLoader.Load("assets/", filename, this.engine, (newScene) => {
       // Wait for textures and shaders to be ready
       this.scene = newScene;
+      this.scene.workerCollisions = true;
       this.scene.executeWhenReady(this.babylonSceneLoaded);
     }, (progress) => {
       // To do: give progress feedback to user
@@ -212,12 +213,35 @@ export class Race {
       // Race Complete, open the placement screen
       this.state = RaceState.Post;
       this.render();
+      window.clearTimeout(this.periodicUpdateId);
     }
   }
 
   public UpdateRacerState = (device_id: number, racerCommand: RacerCommand) => {
+    //find the racer
     const racer = R.find((r) => r.DeviceId == device_id, this.Racers);
     if (!racer) return;
+
+    // if in post state and leader requests done, close board
+    // or if a majority of the other players request it
+    if (this.state == RaceState.Post) {
+      const isLeader = this.Racers[0].DeviceId == device_id;
+      racer.SetToDone();
+      const votedToClose = R.pipe(
+        R.map(R.pipe(
+          R.prop('State'),
+          R.equals(RacerState.Done)
+        )),
+        R.filter(R.identity),
+        R.length,
+        R.flip(R.divide)(this.Racers.length)
+      )(this.Racers);
+
+      if (isLeader || votedToClose) {
+        this.closeLevel();
+        return;
+      }
+    }
     racer.UpdateRacerCommand(racerCommand);
   }
 
@@ -230,7 +254,7 @@ export class Race {
 
   private closeLevel = () => {
     window.removeEventListener(`resize.${this.id}`, this.babylonEngineResize);
-    window.clearTimeout(this.periodicUpdateId);
+    this.engine.stopRenderLoop();
     this.onRaceDone();
   }
 

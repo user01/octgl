@@ -574,6 +574,13 @@ export class Racer extends Player {
     this.racerCommand = racerCommand;
   }
 
+  /** Sets this player's request closing the race */
+  public SetToDone = () => {
+    if (this.DoneWithRace) {
+      this.state = RacerState.Done;
+    }
+  }
+
   public static PlayersToRacers = (players: Player[], lapsToWin: number): Racer[] => {
     return players.map(player =>
       new Racer(player.Color, player.DeviceId, player.Nickname, lapsToWin)
