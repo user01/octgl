@@ -67,21 +67,30 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
             </span>
           </p>
         </div>
-        <div className="message">
-          {this.props.racer.ShowLapTime ? <p>Fastest Lap Time of <span className="lap-time">{this.props.racer.LapTimeMessage}</span></p> : ''}
-          {this.props.racer.IsWrongWay ? <p>Wrong Way</p> : ''}
-          {this.props.racer.ShowDerelictWarning ? <p>Derelict Warning</p> : ''}
-          {this.props.racer.IsDerelict ? <p>Derelict</p> : ''}
+
+        <div className="Aligner">
+          <div className="Aligner-item--fixed Aligner-item message">
+
+            {this.props.racer.ShowLapTime ? <p>Fastest Lap Time of <span className="lap-time">{this.props.racer.LapTimeMessage}</span></p> : ''}
+            {this.props.racer.IsWrongWay ? <p>Wrong Way</p> : ''}
+            {this.props.racer.ShowDerelictWarning ? <p>Keep Racing</p> : ''}
+            {this.props.racer.IsDerelict ? <p>Race Over</p> : ''}
+          </div>
         </div>
+        
       </div>
     );
 
     const postHud = (
       <div className="Aligner">
         <div className="Aligner-item--fixed Aligner-item">
+
           <h1 className="post-race-message">
-            Finished Race
+            {this.props.racer.IsDerelict ?
+              'Waiting for Other Racers' :
+              'Finished Race'}
           </h1>
+
           <h3 className="post-race-message">
             {this.props.racer.IsDerelict ? 'Currently ' : ''}{this.props.racer.Place}<sup>{RacerHUD.NumberSuffix(this.props.racer.Place) }</sup> Place
           </h3>
