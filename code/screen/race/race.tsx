@@ -28,6 +28,7 @@ export enum RaceState {
   Counting, //Numbers being displayed
   Green, // Go flag
   Race, //race in progress
+  ForcedLeaderboard, // ignore inputs to move past leaderboard (prevents spamming)
   Post // leaderboard
 }
 
@@ -55,6 +56,7 @@ export class Race {
   private id = Race.id++;
 
   private static PENDING_MS_PER_STATE = 1200;
+  private static MS_TO_ALWAYS_HOLD_LEADERBOARD = 7500;
   private countDownRemaining = 4;
 
   private get ShouldShowHud() {
@@ -63,6 +65,12 @@ export class Race {
       this.state == RaceState.Green ||
       this.state == RaceState.Race ||
       this.state == RaceState.Pending
+    );
+  }
+  private get ShouldShowLeaderBoard() {
+    return (
+      this.state == RaceState.Post ||
+      this.state == RaceState.ForcedLeaderboard
     );
   }
 
@@ -90,7 +98,7 @@ export class Race {
 
         {this.state == RaceState.Counting ? <ReadySet seconds={this.countDownRemaining} /> : ''}
         {this.state == RaceState.Green ? <ReadySet seconds={0} /> : ''}
-        {this.state == RaceState.Post ? <LeaderBoard placements={this.placementTools ? this.placementTools.Placement : []} /> : ''}
+        {this.ShouldShowLeaderBoard ? <LeaderBoard placements={this.placementTools ? this.placementTools.Placement : []} /> : ''}
         {this.state == RaceState.Loading ? <LoadingBoard /> : ''}
         {this.state == RaceState.Unsupported ? <UnsupportedBoard /> : ''}
       </div>), this.rootElement);
@@ -134,7 +142,7 @@ export class Race {
       // console.log(`Setting ${m.name} to ground`);
       m.setPhysicsState(BABYLON.PhysicsEngine.MeshImpostor, { mass: 0, friction: 20.5, restitution: 0 });
     });
-    
+
     // hide invisible objects
     this.scene.meshes.filter((m) => {
       return m.name.indexOf('invisible') > -1;
@@ -221,9 +229,14 @@ export class Race {
     });
     if (R.all(R.prop('DoneWithRace'), this.racers)) {
       // Race Complete, open the placement screen
-      this.state = RaceState.Post;
+      console.log('EVERYONE done');
+      this.state = RaceState.ForcedLeaderboard;
       this.render();
       window.clearTimeout(this.periodicUpdateId);
+      Promise.delay(Race.MS_TO_ALWAYS_HOLD_LEADERBOARD).then(() => {
+        this.state = RaceState.Post;
+        this.render();
+      })
     }
   }
 
@@ -232,27 +245,37 @@ export class Race {
     const racer = R.find((r) => r.DeviceId == device_id, this.Racers);
     if (!racer) return;
 
+    this.handleCommandInPost(device_id, racerCommand, racer);
+
+    racer.UpdateRacerCommand(racerCommand);
+  }
+
+  private handleCommandInPost = (device_id: number, racerCommand: RacerCommand, racer: Racer) => {
+
     // if in post state and leader requests done, close board
     // or if a majority of the other players request it
-    if (this.state == RaceState.Post) {
-      const isLeader = this.Racers[0].DeviceId == device_id;
-      racer.SetToDone();
-      const votedToClose = R.pipe(
-        R.map(R.pipe(
-          R.prop('State'),
-          R.equals(RacerState.Done)
-        )),
-        R.filter(R.identity),
-        R.length,
-        R.flip(R.divide)(this.Racers.length)
-      )(this.Racers);
+    if (this.state != RaceState.Post) return;
 
-      if (isLeader || votedToClose) {
-        this.closeLevel();
-        return;
-      }
+    const allFalse = R.pipe(
+      R.values,
+      R.all(R.not)
+    )(racerCommand);
+
+    if (allFalse) return;
+
+    console.log('header possible closing command', racerCommand, device_id);
+
+    const isLeader = this.Racers[0].DeviceId == device_id;
+    racer.SetToDone();
+    const votedToClose =
+      this.Racers.filter(r => r.State == RacerState.Done).length / this.Racers.length;
+    console.log('Close vote of ', votedToClose);
+
+    if (isLeader || votedToClose > 0.5) {
+      this.closeLevel();
+      return;
     }
-    racer.UpdateRacerCommand(racerCommand);
+
   }
 
 
