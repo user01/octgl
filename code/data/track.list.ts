@@ -2,9 +2,9 @@ import TrackData from '../interfaces/track.data';
 
 const tracks: TrackData[] = [
   {
-    name: "Test Track",
-    filename: "track.test.003.babylon",
-    image: "images/temp.jpg"
+    name: "Track A",
+    filename: "track.a.babylon",
+    image: "images/track.a.png"
   },
   {
     name: "Fake",
