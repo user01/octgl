@@ -10,7 +10,8 @@ export class Player {
 
   constructor(private color: number,
     private deviceId: number,
-    public Nickname: string = 'Unknown') {
+    public Nickname: string = 'Unknown',
+    public ProfilePicture: string = 'some.jpg') {
   }
 
 }

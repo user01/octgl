@@ -39,7 +39,16 @@ export class Game {
     this.airConsole.onMessage = this.onMessage;
 
     this.mainMenu = new MainMenu(mainControls, this.requestNewGame);
-    this.playerList = new PlayerList();
+    // NOTE: These functions MUST be wrapped in anonymous functions
+    //  since the airconsole use of prototyping this won't be preserved
+    this.playerList = new PlayerList(
+      (device_id: number) => {
+        return this.airConsole.getNickname(device_id);
+      },
+      (device_id: number, image_size: number) => {
+        return this.airConsole.getProfilePicture(device_id, image_size);
+      }
+    );
     this.state = GameState.Lobby;
   }
 
@@ -142,7 +151,7 @@ export class Game {
       players,
       this.raceElement,
       this.mainMenu.CurrentGamePayload.track.filename,
-      3,
+      1,
       () => {
         console.log('race done');
         this.state = GameState.Lobby;

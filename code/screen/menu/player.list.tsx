@@ -24,18 +24,19 @@ class PlayerList extends React.Component<IAppProps, IAppState> {
       };
 
       return (
-        <li key={`player.${idx}`} style={style}>
-          {p.DeviceId} - {p.Nickname}
-        </li>
+        <div key={`player.${idx}`} style={style}>
+          <h3>{p.Nickname}</h3>
+          <img width={128} height={128} src={p.ProfilePicture}/>
+        </div>
       );
     });
 
     return (
       <div className="player-list">
         <h2>Current Players</h2>
-        <ul className="player-list">
+        <div className="player-list">
           {players}
-        </ul>
+        </div>
       </div>
     );
   }
