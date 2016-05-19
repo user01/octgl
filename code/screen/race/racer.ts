@@ -48,6 +48,7 @@ export class Racer extends Player {
   private currentTrackIndex = 0;
   private isGrounded = false;
   private aiState = RacerAiState.Straight;
+  public DEBUG_feedback = '';
 
   // Message flags
   public get ShowLapTime() { return this.showLapTime; }
@@ -162,17 +163,17 @@ export class Racer extends Player {
   /** Linear speeds */
   private static IMPULSE_PER_SECOND = 32;
   private static MAX_NORMAL_LINEAR_VELOCITY = 28;
-  private static MAX_GROUND_LINEAR_VELOCITY = 18;
+  private static MAX_GROUND_LINEAR_VELOCITY = 10;
 
   /** Drag constants */
-  private static DRAG_GROUND_PER_SECOND = 0.4;
-  private static DRAG_ROAD_PER_SECOND = 0.1;
+  private static DRAG_GROUND_PER_SECOND = Racer.IMPULSE_PER_SECOND * 0.08;
+  private static DRAG_ROAD_PER_SECOND = Racer.IMPULSE_PER_SECOND * 0.02;
   private static DRAG_ZSLIDE_NO_TILT = Racer.IMPULSE_PER_SECOND * 0.75;
   private static DRAG_ZSLIDE_FULL_TILT = Racer.IMPULSE_PER_SECOND * 0.35;
   private static ZVELOCITY_INTO_X = 0.75;
 
   private static MS_BEFORE_DANGER_OF_DERELICT = 15000;
-  private static MS_BEFORE_DERELICT = 25000;
+  private static MS_BEFORE_DERELICT = 30000;
 
   constructor(color: number,
     deviceId: number,
@@ -208,7 +209,7 @@ export class Racer extends Player {
     // this.roller.showBoundingBox = true;
     this.roller.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor,
       { mass: 5, friction: 8.5, restitution: 0.1 });
-    this.roller.isVisible = false;
+    // this.roller.isVisible = false;
 
     this.pointerMesh = BABYLON.Mesh.CreateSphere(`roller.${this.DeviceId}`, 2, 0.5, scene);
     this.pointerMesh.material = sphereMat;
@@ -311,7 +312,7 @@ export class Racer extends Player {
       (<any>this.roller.getPhysicsImpostor()).setLinearVelocity(new BABYLON.Vector3(0, 0, linearVelocity.z));
       return;
     }
-
+    const impulseLength = impulseScalar * Racer.IMPULSE_PER_SECOND * fractionOfSecond;
 
     //#########################################################################
     // Bind Turn Angle
@@ -380,7 +381,13 @@ export class Racer extends Player {
     // const zDragIntoXBoon = zDrag * 0.25;
     const availableZSpeed = zDrag > cartZLength ? cartZLength : zDrag;
 
+    // const zDragIntoXBoon = 0;
     const zDragIntoXBoon = availableZSpeed * Racer.ZVELOCITY_INTO_X;
+
+    this.DEBUG_feedback = `${Racer.roundPlace(xDrag, 2)} ${Racer.roundPlace(zDrag, 2)}`;
+    // this.DEBUG_feedback = `${Racer.roundPlace(impulseLength, 2)} / ${Racer.roundPlace(xDrag, 2)} ${Racer.roundPlace(zDrag, 2)}`;
+    // this.DEBUG_feedback = `${Racer.roundPlace(xDrag, 2)} ${Racer.roundPlace(zDragIntoXBoon, 2)}`;
+
 
     // this.temptemptemp = (`zDragIntoXBoon ${Racer.roundPlace(zDragIntoXBoon, 2)}`);
     // this.temptemptemp = (`${Racer.roundPlace(xDrag, 2)} ${Racer.roundPlace(zDrag, 2)} ${Racer.roundPlace(zDragIntoXBoon, 2)}`);
@@ -402,9 +409,21 @@ export class Racer extends Player {
     //#########################################################################
     // Reduce Velocity based on state and maxes
     //#########################################################################
-    const cappedVelocity = true ? Racer.MAX_NORMAL_LINEAR_VELOCITY : Racer.MAX_GROUND_LINEAR_VELOCITY;
-    const scaleFactor = newLinearLength > 0 ? Math.min(newLinearLength, cappedVelocity) / newLinearLength : 1;
-    const linearVelocityReduced = newLinear.scale(scaleFactor);
+    const cappedVelocity = !this.IsGrounded ? Racer.MAX_NORMAL_LINEAR_VELOCITY : Racer.MAX_GROUND_LINEAR_VELOCITY;
+    // const scaleFactor = newLinearLength > 0 ? Math.min(newLinearLength, cappedVelocity) / newLinearLength : 1;
+    // // const scaleFactor = 1;
+    // const linearVelocityReduced = newLinear.scale(scaleFactor);
+
+    const linearVelocityReduced = newLinearLength <= cappedVelocity ?
+      newLinear :
+      Racer.adjustLengthByValue(newLinear, fractionOfSecond * 5 * -Racer.DRAG_GROUND_PER_SECOND);
+    // if (newLinearLength > cappedVelocity) {
+    //   // console.log('beyond capped, new ', newLinear.length(), ' reduced ', linearVelocityReduced.length());
+    // }
+
+    // this.DEBUG_feedback = `${Racer.roundPlace(cappedVelocity, 2)}`;
+    this.DEBUG_feedback = `${Racer.roundPlace(linearVelocityReduced.length(), 2)}`;
+    // (<any>this.roller.getPhysicsImpostor()).setLinearVelocity(newLinear);
     (<any>this.roller.getPhysicsImpostor()).setLinearVelocity(linearVelocityReduced);
 
 
@@ -412,7 +431,7 @@ export class Racer extends Player {
     // Apply Impulse
     //#########################################################################
     const impulseVector = Racer.rotateVector(
-      BABYLON.Axis.X.scale(impulseScalar * Racer.IMPULSE_PER_SECOND * fractionOfSecond),
+      BABYLON.Axis.X.scale(impulseLength),
       this.cartYRotation,
       BABYLON.Axis.Y);
     this.roller.applyImpulse(impulseVector, this.roller.getAbsolutePosition());
@@ -641,6 +660,27 @@ export class Racer extends Player {
     const factor = BABYLON.Vector3.Dot(root, axis) / axis.lengthSquared();
     return axis.scale(factor);
   }
+
+  /** Changes the length a certain delta */
+  private static adjustLengthByValue(vector3: BABYLON.Vector3, delta: number) {
+    const origLength = vector3.length();
+    if (origLength < 0.0001) return vector3;
+    const newLength = origLength + delta;
+    const newScale = newLength / origLength;
+    return vector3.scale(newScale);
+  }
+
+  // /** Changes the length a certain delta */
+  // private static adjustVectorToMax(vector3: BABYLON.Vector3, maxLength: number) {
+  //   const origLength = vector3.length();
+  //   if (origLength <= maxLength) return vector3;
+
+  //   const overshoot = origLength - maxLength;
+
+  //   const newLength = origLength + delta;
+  //   const newScale = newLength / origLength;
+  //   return vector3.scale(newScale);
+  // }
 
   private static roundPlace(num: number, places = 1) {
     const factor = Math.pow(10, places);

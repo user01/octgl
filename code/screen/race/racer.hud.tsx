@@ -70,13 +70,14 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
 
         <div className="Aligner">
           <div className="Aligner-item--fixed Aligner-item message">
+            {this.props.racer.DEBUG_feedback.length > 0 ? <p>{this.props.racer.DEBUG_feedback}</p> : ''}
             {this.props.racer.ShowLapTime ? <p>Fastest Lap Time of <span className="lap-time">{this.props.racer.LapTimeMessage}</span></p> : ''}
             {this.props.racer.IsWrongWay ? <p>Wrong Way</p> : ''}
             {this.props.racer.ShowDerelictWarning ? <p>Keep Racing</p> : ''}
             {this.props.racer.IsDerelict ? <p>Race Over</p> : ''}
           </div>
         </div>
-        
+
       </div>
     );
 
