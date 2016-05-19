@@ -123,7 +123,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
     const borderChunk = borderSize * 2;
 
     const left = Math.floor(this.windowWidth * frame.x) + 'px';
-    const top = Math.floor(this.windowHeight * frame.y) + 'px';
+    const bottom = Math.floor(this.windowHeight * frame.y) + 'px';
     const width = (Math.floor(this.windowWidth * frame.width) - borderChunk) + 'px';
     const height = (Math.floor(this.windowHeight * frame.height) - borderChunk) + 'px';
 
@@ -131,7 +131,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
       border: `${borderSize}px ${Utility.NumberToColor(this.props.racer.Color)} solid`,
       position: 'absolute',
       left,
-      top,
+      bottom,
       width,
       height
     };
