@@ -126,6 +126,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
     const bottom = Math.floor(this.windowHeight * frame.y) + 'px';
     const width = (Math.floor(this.windowWidth * frame.width) - borderChunk) + 'px';
     const height = (Math.floor(this.windowHeight * frame.height) - borderChunk) + 'px';
+    const fontSize = (Math.min(this.windowWidth,this.windowHeight) * 0.018) + 'px';
 
     return {
       border: `${borderSize}px ${Utility.NumberToColor(this.props.racer.Color)} solid`,
@@ -133,6 +134,7 @@ class RacerHUD extends React.Component<IAppProps, IAppState> {
       left,
       bottom,
       width,
+      fontSize,
       height
     };
   }
