@@ -145,7 +145,9 @@ export class Game {
       3,
       () => {
         console.log('race done');
+        this.state = GameState.Lobby;
         this.mainMenu.Show();
+        this.managePlayerRoster();
       });
 
     //Set the controllers
