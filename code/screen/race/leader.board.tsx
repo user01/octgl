@@ -22,11 +22,9 @@ class LeaderBoard extends React.Component<IAppProps, IAppState> {
     const placements = this.props.placements ? this.props.placements : [];
 
     const leaders = placements.map((r, idx) => {
-      const color = Utility.NumberToColor(r.Color);
       const bgColor = Utility.NumberToColorSet(r.Color);
       const style = {
-        // color,
-        background: `rgba(${bgColor.r * 255},${bgColor.g * 255},${bgColor.b * 255},0.4)`
+        background: `rgba(${bgColor.r},${bgColor.g},${bgColor.b},0.4)`
       };
       return (
         <div key={`place.${idx}`}>
