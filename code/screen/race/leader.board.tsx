@@ -7,6 +7,7 @@ import Utility from '../../data/utility';
 
 interface IAppProps {
   placements: Racer[];
+  readyToLeave: boolean;
 }
 
 interface IAppState {
@@ -53,7 +54,7 @@ class LeaderBoard extends React.Component<IAppProps, IAppState> {
 
     return (
       <div className="controls leaderboard">
-        <h1 className="leaderboard-title">Race Complete</h1>
+        <h1 className="leaderboard-title">{this.props.readyToLeave ? 'Any Control To Exit' : 'Race Complete'}</h1>
         {leaders}
       </div>
     );

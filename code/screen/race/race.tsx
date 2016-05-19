@@ -98,7 +98,9 @@ export class Race {
 
         {this.state == RaceState.Counting ? <ReadySet seconds={this.countDownRemaining} /> : ''}
         {this.state == RaceState.Green ? <ReadySet seconds={0} /> : ''}
-        {this.ShouldShowLeaderBoard ? <LeaderBoard placements={this.placementTools ? this.placementTools.Placement : []} /> : ''}
+        {this.ShouldShowLeaderBoard ? <LeaderBoard
+          placements={this.placementTools ? this.placementTools.Placement : []}
+          readyToLeave={this.state == RaceState.Post}/> : ''}
         {this.state == RaceState.Loading ? <LoadingBoard /> : ''}
         {this.state == RaceState.Unsupported ? <UnsupportedBoard /> : ''}
       </div>), this.rootElement);
