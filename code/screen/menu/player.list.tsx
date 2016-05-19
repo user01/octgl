@@ -24,9 +24,11 @@ class PlayerList extends React.Component<IAppProps, IAppState> {
       };
 
       return (
-        <div key={`player.${idx}`} style={style}>
-          <h3>{p.Nickname}</h3>
-          <img width={128} height={128} src={p.ProfilePicture}/>
+        <div key={`player.${idx}`} className="player-block pure-u-1-2" style={style}>
+          <div className="player-block-inner">
+            <h3>{p.Nickname}</h3>
+            <img width={128} height={128} src={p.ProfilePicture}/>
+          </div>
         </div>
       );
     });
@@ -34,7 +36,7 @@ class PlayerList extends React.Component<IAppProps, IAppState> {
     return (
       <div className="player-list">
         <h2>Current Players</h2>
-        <div className="player-list">
+        <div className="player-list pure-g">
           {players}
         </div>
       </div>
