@@ -209,7 +209,7 @@ export class Racer extends Player {
     // this.roller.showBoundingBox = true;
     this.roller.setPhysicsState(BABYLON.PhysicsEngine.SphereImpostor,
       { mass: 5, friction: 8.5, restitution: 0.1 });
-    // this.roller.isVisible = false;
+    this.roller.isVisible = false;
 
     this.pointerMesh = BABYLON.Mesh.CreateSphere(`roller.${this.DeviceId}`, 2, 0.5, scene);
     this.pointerMesh.material = sphereMat;
@@ -384,7 +384,7 @@ export class Racer extends Player {
     // const zDragIntoXBoon = 0;
     const zDragIntoXBoon = availableZSpeed * Racer.ZVELOCITY_INTO_X;
 
-    this.DEBUG_feedback = `${Racer.roundPlace(xDrag, 2)} ${Racer.roundPlace(zDrag, 2)}`;
+    // this.DEBUG_feedback = `${Racer.roundPlace(xDrag, 2)} ${Racer.roundPlace(zDrag, 2)}`;
     // this.DEBUG_feedback = `${Racer.roundPlace(impulseLength, 2)} / ${Racer.roundPlace(xDrag, 2)} ${Racer.roundPlace(zDrag, 2)}`;
     // this.DEBUG_feedback = `${Racer.roundPlace(xDrag, 2)} ${Racer.roundPlace(zDragIntoXBoon, 2)}`;
 
@@ -422,7 +422,7 @@ export class Racer extends Player {
     // }
 
     // this.DEBUG_feedback = `${Racer.roundPlace(cappedVelocity, 2)}`;
-    this.DEBUG_feedback = `${Racer.roundPlace(linearVelocityReduced.length(), 2)}`;
+    // this.DEBUG_feedback = `${Racer.roundPlace(linearVelocityReduced.length(), 2)}`;
     // (<any>this.roller.getPhysicsImpostor()).setLinearVelocity(newLinear);
     (<any>this.roller.getPhysicsImpostor()).setLinearVelocity(linearVelocityReduced);
 
@@ -476,7 +476,7 @@ export class Racer extends Player {
     const computedIndex = this.trackTools.NextTrackIndex(this.roller, this.currentTrackIndex, 5);
     // this.currentTrackIndex = this.trackTools.NextTrackIndex(this.roller, this.currentTrackIndex, 5);
     const newLap = this.trackTools.Lap(this.currentTrackIndex);
-    if (this.lap != newLap) { //finished a lap!
+    if (this.lap != newLap && this.lap <= this.lapsToWin) { //finished a lap!
       this.lapTimes.push(moment());
       this.computeLapDurations();
       if (this.lap == this.lapsToWin) {
