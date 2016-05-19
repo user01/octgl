@@ -1,7 +1,7 @@
 
 /// <reference path="../../typings/references.d.ts" />
 
-import MainMenu from './mainmenu';
+import MainMenu from './menu/main.tsx';
 import ToController from '../interfaces/to.controller';
 import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
 import {ToScreen, ScreenRequest} from '../interfaces/to.screen';
