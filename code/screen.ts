@@ -23,7 +23,7 @@ const initScreen = () => {
 
   const game = new Game(
     getAirConsole(),
-    document.getElementById('main'),
+    document.getElementById('main-view'),
     document.getElementById('race-view')
   );
 

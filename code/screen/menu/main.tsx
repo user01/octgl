@@ -7,7 +7,7 @@ import * as ReactDOM from 'react-dom';
 import * as Promise from 'bluebird';
 
 import {MenuCommand, MenuCommands} from '../../interfaces/menucommand';
-import * as TrackList from '../../data/track.list';
+import TrackList from '../../data/track.list';
 import Player from '../player';
 
 import ControlBox from './control.box.tsx';
@@ -22,6 +22,9 @@ export class MainMenu {
   private currentTrackIndex: number = 0;
 
   private players: Player[] = [];
+  private showMenu = true;
+
+  private static NUMBER_OF_COLUMNS = 2;
 
   public get CurrentGamePayload() {
     return {
@@ -32,49 +35,61 @@ export class MainMenu {
   private render = () => {
 
     const rawContents = [
-      (<MapChoice/>),
-      (<PlayerList/>)
+      (<MapChoice track={this.currentTrack}/>),
+      (<PlayerList players={this.players}/>)
     ];
 
     const columns = rawContents.map((elm, idx) => {
       return (
-        <ControlBox pureClass="pure-u-1-2" key={`column.${idx}`}>
+        <ControlBox
+          pureClass="pure-u-1-2"
+          key={`column.${idx}`}
+          selected={idx == this.columnIndex}
+          >
           {elm}
         </ControlBox>
       );
     });
 
+    const mainStyle = {
+      display: this.showMenu ? 'block' : 'none'
+    };
+
     ReactDOM.render(
       (
-        <div className="pure-g">
-          {columns}
+        <div id="main" className="controls" style={mainStyle}>
+          <div className="pure-g">
+            {columns}
+          </div>
         </div>
       ), this.mainControls);
   }
   private get currentTrack() {
-    return TrackList.default.tracks[this.trackIndex];
+    return TrackList[this.trackIndex];
   }
 
-  // private get columnIndex() {
-  //   return Math.abs(this.currentColumnIndex) % this.columns.length;
-  // }
+  private get columnIndex() {
+    return Math.abs(this.currentColumnIndex) % MainMenu.NUMBER_OF_COLUMNS;
+  }
 
   private get trackIndex() {
-    return Math.abs(this.currentTrackIndex) % TrackList.default.tracks.length;
+    return Math.abs(this.currentTrackIndex) % TrackList.length;
   }
 
 
   constructor(private mainControls: HTMLElement, private onNewGameRequest: () => void) {
-    this.currentColumnIndex = 10000;
-    this.currentTrackIndex = 10000 * TrackList.default.tracks.length;
+    this.currentColumnIndex = 10000 * MainMenu.NUMBER_OF_COLUMNS;
+    this.currentTrackIndex = 10000 * TrackList.length;
     this.render();
   }
 
   public Hide = () => {
-    this.mainControls.style.display = 'none';
+    this.showMenu = false;
+    this.render();
   }
   public Show = () => {
-    this.mainControls.style.display = 'display';
+    this.showMenu = true;
+    this.render();
   }
 
   public HandleCommandFromLeader = (cmd: MenuCommands) => {
@@ -99,67 +114,27 @@ export class MainMenu {
       default:
         console.error('Given invalid command', cmd);
     }
-    // this.renderAll();
+    this.render();
   }
 
   private handleChoose = () => {
-    // console.log('column index', this.columnIndex);
     this.onNewGameRequest();
-    // switch (this.columnIndex) {
-    //   case 2:
-    //     this.onNewGameRequest();
-    //     break;
-    //   default:
-    //     this.handleUpDown(false);
-    //     break;
-    // }
   }
 
   private handleUpDown = (up: boolean) => {
-    // switch (this.columnIndex) {
-    //   case 0:
-    //     // first column is track
-    //     this.currentTrackIndex += up ? 1 : -1;
-    //     break;
-    // }
+    switch (this.columnIndex) {
+      case 0:
+        // first column is track
+        this.currentTrackIndex += up ? 1 : -1;
+        break;
+    }
   }
 
   public HandlePlayerList = (players: Player[]) => {
     this.players = players;
-    // this.renderAll();
+    this.render();
   }
 
-  // private renderAll = () => {
-  //   this.renderSelectedColumn();
-  //   this.renderTrackToMenu();
-  //   this.renderPlayerList();
-  // }
-
-  // private renderSelectedColumn = () => {
-  //   for (var i = 0; i < this.columns.length; i++) {
-  //     if (i == this.columnIndex) {
-  //       this.columns[i].classList.add('selected');
-  //     } else {
-  //       this.columns[i].classList.remove('selected');
-  //     }
-  //   }
-  // }
-  // private renderTrackToMenu = () => {
-  //   this.trackName.innerText = this.currentTrack.name;
-  // }
-  // private renderPlayerList = () => {
-  //   const html = (<any>R.pipe)(
-  //     R.map((p: Player) => {
-  //       return `
-  //       <li style="background: #${p.Color.toString(16)}">
-  //         ${p.DeviceId} - ${p.Nickname}
-  //       </li>`;
-  //     }),
-  //     R.join('')
-  //   )(this.players);
-  //   // console.log('HTML', html);
-  //   this.playerListElement.innerHTML = html;
-  // }
 
 }
 

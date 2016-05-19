@@ -3,6 +3,7 @@ import * as React from 'react';
 
 interface IAppProps {
   pureClass: string;
+  selected: boolean;
   children?: Array<any>;
 }
 
@@ -15,7 +16,7 @@ class ControlBox extends React.Component<IAppProps, IAppState> {
   }
 
   render() {
-    const masterClass = `${this.props.pureClass} control-box`;
+    const masterClass = `${this.props.pureClass} control-box ${this.props.selected ? 'selected' : ''}`;
     return (
       <div className={masterClass}>
         <div className="flex-center">
