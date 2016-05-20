@@ -12,8 +12,12 @@ Tracks support the following objects:
   * spawns - A mesh where every vertex is used as a location to spawn karts. There must be at least 8 vertexes, the vertexes must be more than 12 units (meters) apart from each other, and the vertexs must be above the static meshes by 7 units.
 
 Also, the static mesh below the spawns must be perfectly flat.
+
 Static meshes MUST have rotation and scale applied.
+
 Every triangle in the static mesh is far and away the biggest expense on processing, so limiting these (invisible and approximate to the world geometry) is key.
+
+Path hitboxes must start in front of the start line and be in front of all spawns.
 
 ### **HITBOX**
 
