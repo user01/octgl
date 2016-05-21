@@ -3,3 +3,4 @@ npm-debug.log
 *.blend2
 build/assets/*.log
 .DS_Store
+build/generated/**
