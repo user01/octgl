@@ -136,7 +136,7 @@ export class Game {
   public DEBUG_RequestNewGame = () => {
     this.requestNewGame([
       new Player(0xFF3300, 4, 'Player'),
-      new Player(0x0033FF, 6, 'AI'),
+      new Player(0x0033FF, 65075, 'AI'),
     ]);
   }
 
@@ -151,7 +151,7 @@ export class Game {
       players,
       this.raceElement,
       this.mainMenu.CurrentGamePayload.track.filename,
-      1,
+      3,
       () => {
         console.log('race done');
         this.state = GameState.Lobby;

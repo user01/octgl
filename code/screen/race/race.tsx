@@ -202,7 +202,7 @@ export class Race {
       .then(() => {
         this.presentMilliseconds = +Date.now();
         this.state = RaceState.Green;
-        this.racers.forEach(r => r.State = r.DeviceId == 6 ? RacerState.AI : RacerState.Play);
+        this.racers.forEach(r => r.State = r.DeviceId == 65075 ? RacerState.AI : RacerState.Play);
         this.render();
       })
       .delay(Race.PENDING_MS_PER_STATE)
