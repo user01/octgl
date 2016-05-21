@@ -46,7 +46,11 @@ export class TrackTools {
     const hitboxmat = new BABYLON.StandardMaterial(`hitboxmat`, scene);
     hitboxmat.diffuseColor = BABYLON.Color3.Magenta();
     hitboxmat.wireframe = true;
-    R.forEach(R.forEach((m: BABYLON.AbstractMesh) => m.material = hitboxmat))(this.raceHitObjects);
+    R.forEach(R.forEach((m: BABYLON.AbstractMesh) => {
+      if (m.material) {
+        m.material = hitboxmat;
+      }
+    }))(this.raceHitObjects);
     // R.forEach(R.forEach((m: BABYLON.AbstractMesh) => m.showBoundingBox = true))(this.raceHitObjects);
     R.forEach(R.forEach((m: BABYLON.AbstractMesh) => m.isVisible = false))(this.raceHitObjects);
 
@@ -54,7 +58,10 @@ export class TrackTools {
     groundboxmat.diffuseColor = BABYLON.Color3.Blue();
     // groundboxmat.wireframe = true;
     groundboxmat.alpha = 0.4;
-    R.forEach((m: BABYLON.AbstractMesh) => m.material = groundboxmat)(this.groundHitObjects);
+    R.forEach((m: BABYLON.AbstractMesh) => {
+      if (m.material)
+        m.material = groundboxmat;
+    })(this.groundHitObjects);
     // R.forEach((m: BABYLON.AbstractMesh) => m.showBoundingBox = true)(this.groundHitObjects);
     R.forEach((m: BABYLON.AbstractMesh) => m.isVisible = false)(this.groundHitObjects);
 
