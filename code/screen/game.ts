@@ -116,12 +116,12 @@ export class Game {
           R.map(R.prop('DeviceId')),
           R.contains(device_id)
         )(this.race.Racers);
-        return isRacing ? ControllerState.Main : ControllerState.Waiting;
+        return isRacing ? ControllerState.MainControls : ControllerState.Idle;
       default:
       case GameState.Lobby:
         return (this.playerList.Leader.DeviceId == device_id) ?
-          ControllerState.Leader :
-          ControllerState.Honk;
+          ControllerState.MenuLeader :
+          ControllerState.MenuFollower;
     }
   }
   private getColorFromDeviceId = (device_id: number): number => {

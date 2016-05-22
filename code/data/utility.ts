@@ -24,6 +24,10 @@ export class Utility {
       r = (num & 0xFF0000) >>> 16;
     return { r, g, b };
   }
+
+  public static RandomItem<T>(items: T[]) {
+    return items[Math.floor(Math.random() * items.length)];
+  }
 }
 
 export default Utility;

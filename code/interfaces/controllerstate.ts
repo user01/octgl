@@ -1,10 +1,9 @@
 
 export enum ControllerState {
-  Waiting,
-  Default,
-  Leader,
-  Honk,
-  Main
+  Idle,
+  MenuLeader,
+  MenuFollower,
+  MainControls
 }
 
 export default ControllerState;
