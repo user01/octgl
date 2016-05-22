@@ -34,32 +34,21 @@ export class MainMenu {
 
   private render = () => {
 
-    const rawContents = [
-      (<MapChoice track={this.currentTrack}/>),
-      (<PlayerList players={this.players}/>)
-    ];
-
-    const columns = rawContents.map((elm, idx) => {
-      return (
-        <ControlBox
-          pureClass="pure-u-1-2"
-          key={`column.${idx}`}
-          selected={idx == this.columnIndex}
-          >
-          {elm}
-        </ControlBox>
-      );
-    });
-
     const mainStyle = {
       display: this.showMenu ? 'block' : 'none'
     };
+    const leftControl = (<MapChoice track={this.currentTrack}/>);
 
     ReactDOM.render(
       (
         <div id="main" className="controls" style={mainStyle}>
           <div className="pure-g">
-            {columns}
+            <ControlBox pureClass="pure-u-1-2">
+              {leftControl}
+            </ControlBox>
+            <ControlBox pureClass="pure-u-1-2">
+              <PlayerList players={this.players}/>
+            </ControlBox>
           </div>
         </div>
       ), this.mainControls);

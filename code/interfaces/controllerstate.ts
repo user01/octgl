@@ -3,7 +3,8 @@ export enum ControllerState {
   Idle,
   MenuLeader,
   MenuFollower,
-  MainControls
+  MainControls,
+  Blocked
 }
 
 export default ControllerState;

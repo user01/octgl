@@ -31,7 +31,7 @@ const initController = () => {
   //   // controllerHud.setPlayerIdAndNick(player, nick);
   // };
   airconsole.onMessage = (from: number, data: ToController) => {
-    console.log('CONTROLLER Heard message from ' + from, data);
+    // console.log('CONTROLLER Heard message from ' + from, data);
     if (R.is(Number, data.state)) {
       controllerHud.SwitchTo(data.state);
     }
@@ -40,11 +40,6 @@ const initController = () => {
     }
   }
 
-  setTimeout(() => {
-    //forces this device to learn it's role
-    console.log('Sending request');
-    message(AirConsole.SCREEN, { request: ScreenRequest.UpdateControllerState });
-  }, 250);
 }
 
 window.onload = initController;

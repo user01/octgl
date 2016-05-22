@@ -1,7 +1,7 @@
 
 /// <reference path="../../typings/references.d.ts" />
 
-import ToScreen from '../interfaces/to.screen';
+import {ToScreen, ScreenRequest} from '../interfaces/to.screen';
 import {MenuCommand, MenuCommands} from '../interfaces/menucommand';
 import {RacerCommand} from '../interfaces/racercommand';
 import ControllerState from '../interfaces/controllerstate';
@@ -11,6 +11,7 @@ import MainControls from './main.controls.tsx';
 import MenuFollower from './menu.follower.tsx';
 import MenuLeader from './menu.leader.tsx';
 import Waiting from './waiting.tsx';
+import Blocked from './blocked.tsx';
 
 import * as R from 'ramda';
 import * as React from 'react';
@@ -24,6 +25,11 @@ export class ControllerHUD {
   private colorStr = '#FF00FF';
   private state = ControllerState.Idle;
   private periodicUpdateId: any;
+  private static PERIODIC_UPDATE_MS = 2500;
+
+  private get Playing() {
+    return this.state == ControllerState.MainControls;
+  }
 
   private get currentRacerCommand(): RacerCommand {
     return {
@@ -45,11 +51,14 @@ export class ControllerHUD {
     private rootElement: HTMLElement,
     private handleNewCommand: (msg: ToScreen) => void) {
 
-    this.periodicUpdateId = setInterval(this.perodicUpdate, 2000);
+    this.periodicUpdateId = setInterval(this.perodicUpdate, ControllerHUD.PERIODIC_UPDATE_MS);
     this.SwitchTo(ControllerState.Idle);
   }
 
   private render = () => {
+    if (this.state == ControllerState.Blocked) {
+      console.warn('BLOCKED');
+    }
     // console.log('testing', this.state, 'v', ControllerState.Waiting);
     const style = {
       background: this.colorStr
@@ -57,6 +66,7 @@ export class ControllerHUD {
     const isWaiting =
       ReactDOM.render(
         (<div style={style} className="controls">
+          {this.state == ControllerState.Blocked ? <Blocked /> : ''}
           {this.state == ControllerState.Idle ? <Waiting /> : ''}
           {this.state == ControllerState.MainControls ? <MainControls /> : ''}
           {this.state == ControllerState.MenuFollower ? <MenuFollower /> : ''}
@@ -66,7 +76,13 @@ export class ControllerHUD {
 
   /** Force an update, in case the state gets dropped */
   private perodicUpdate = () => {
-    this.handleNewCommand({ racer: this.currentRacerCommand });
+    if (this.Playing) {
+      // rewrite the state of the racer
+      this.handleNewCommand({ racer: this.currentRacerCommand });
+    } else {
+      // check for the controller state
+      this.handleNewCommand({ request: ScreenRequest.UpdateControllerState });
+    }
   }
 
   // private assignClick = (elm: HTMLElement) => {
@@ -127,7 +143,6 @@ export class ControllerHUD {
   // }
 
   public SwitchTo = (state: ControllerState) => {
-    console.log('switch to ', state);
     this.state = state;
     this.render();
   }

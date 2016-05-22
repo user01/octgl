@@ -47,6 +47,11 @@ export class Game {
       },
       (device_id: number, image_size: number) => {
         return this.airConsole.getProfilePicture(device_id, image_size);
+      },
+      (device_id: number) => {
+        this.message(device_id, {
+          state: ControllerState.Blocked
+        });
       }
     );
     this.state = GameState.Lobby;
@@ -66,7 +71,7 @@ export class Game {
   private onMessage = (device_id: number, data: ToScreen) => {
     // console.log(`SCREEN - Device ${device_id} sent `, data);
     if (R.is(Number, data.request)) {
-      console.log(`Heard request from ${device_id}`, data);
+      // console.log(`Heard request from ${device_id}`, data);
       switch (data.request) {
         case ScreenRequest.UpdateControllerState:
           this.updateDeviceIdControllerState(device_id);
@@ -76,7 +81,7 @@ export class Game {
     }
     switch (this.state) {
       case GameState.Lobby:
-        if (this.playerList.Leader.DeviceId == device_id && data.menu) {
+        if (this.playerList.IsLeader(device_id) && data.menu) {
           this.mainMenu.HandleCommandFromLeader(data.menu.cmd);
         }
         break;
@@ -109,6 +114,10 @@ export class Game {
   }
 
   private getControllerStateFromDeviceId = (device_id: number): ControllerState => {
+    // console.log('Update from ', device_id, 'requested');
+    if (!this.playerList.IsPlayer(device_id)) {
+      return ControllerState.Blocked;
+    }
     switch (this.state) {
       case GameState.Game:
         // console.log('Racers', this.race.Racers);
@@ -119,9 +128,8 @@ export class Game {
         return isRacing ? ControllerState.MainControls : ControllerState.Idle;
       default:
       case GameState.Lobby:
-        return (this.playerList.Leader.DeviceId == device_id) ?
-          ControllerState.MenuLeader :
-          ControllerState.MenuFollower;
+        return this.playerList.IsLeader(device_id) ?
+          ControllerState.MenuLeader : ControllerState.MenuFollower;
     }
   }
   private getColorFromDeviceId = (device_id: number): number => {
