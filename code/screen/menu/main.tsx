@@ -43,12 +43,14 @@ export class MainMenu {
       (
         <div id="main" className="controls" style={mainStyle}>
           <div className="pure-g">
-            <ControlBox pureClass="pure-u-1-2">
+
+            <div className="pure-u-1-2 control-box">
               {leftControl}
-            </ControlBox>
-            <ControlBox pureClass="pure-u-1-2">
+            </div>
+            <div className="pure-u-1-2 control-box">
               <PlayerList players={this.players}/>
-            </ControlBox>
+            </div>
+
           </div>
         </div>
       ), this.mainControls);

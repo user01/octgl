@@ -5,29 +5,50 @@
 @border-small-value: 0.1em solid teal;
 @border-big-value: 1.4em solid teal;
 
-.control-box.selected {
-  .flex-center {
-    border-left: @border-big-value;
-    border-right: @border-big-value;
-    background: #DBA;
-  }
-}
+// .control-box.selected {
+//   .flex-center {
+//   }
+// }
 
 .flex-center {
-  border-left: @border-small-value;
-  border-right: @border-small-value;
   div.flex-container {
     height: 25vw;
     width: 25vw;
     .control-arrows {
       text-align: center;
     }
-    div.image-wrapper {
-      text-align: center;
-      img {
-        width:10em;
-      }
-    }
+  }
+}
+
+.zero-around {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+div.image-wrapper {
+  text-align: center;
+  img {
+    width:16em;
+    border-radius: 0.5em;
+  }
+}
+
+.track-selection {
+  .left {
+    float: left;
+    width: 2em;
+    .zero-around;
+  }
+  .right {
+    float: right;
+    width: 2em;
+    .zero-around;
+  }
+  .center {
+    text-align: center;
+    text-decoration: underline;
+    .zero-around;
   }
 }
 
@@ -44,7 +65,7 @@
   }
 }
 
-#track-name {
+.column-header {
   text-align:  center;
 }
 

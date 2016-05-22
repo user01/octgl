@@ -17,19 +17,29 @@ class MapChoice extends React.Component<IAppProps, IAppState> {
 
   render() {
     return (
-      <div className="flex-container">
-        <p className="control-arrows">
-          <i className="fa fa-chevron-circle-up fa-2x"></i>
-        </p>
+      <div>
 
-        <h3 id="track-name" className="track-name">{this.props.track.name}</h3>
-        <div className="image-wrapper">
-          <img src={this.props.track.image} className="track-img" />
+        <h2 className="column-header">
+          Track Selection
+        </h2>
+
+        <div className="flex-center">
+          <div className="flex-container">
+            <div className="track-selection">
+              <div className="left"><i className="fa fa-chevron-circle-left fa-2x"></i></div>
+              <div className="right"><i className="fa fa-chevron-circle-right fa-2x"></i></div>
+              <div className="center">
+                <h3 id="track-name" className="track-name">{this.props.track.name}</h3>
+              </div>
+            </div>
+
+
+            <div className="image-wrapper">
+              <img src={this.props.track.image} className="track-img" />
+            </div>
+          </div>
         </div>
 
-        <p className="control-arrows">
-          <i className="fa fa-chevron-circle-down fa-2x"></i>
-        </p>
       </div>
     );
   }

@@ -36,8 +36,13 @@ class PlayerList extends React.Component<IAppProps, IAppState> {
     return (
       <div className="player-list">
         <h2 className="game-header">OctGL</h2>
-        <div className="player-list pure-g">
-          {players}
+
+        <div className="flex-center">
+          <div className="flex-container">
+            <div className="player-list pure-g">
+              {players}
+            </div>
+          </div>
         </div>
       </div>
     );
