@@ -22,7 +22,7 @@ class Waiting extends React.Component<IAppProps, IAppState> {
 
   render() {
     return (
-      <div className="controls">
+      <div>
         <h1 className="screen-header">{Utility.RandomItem(messages) }</h1>
       </div>
     );

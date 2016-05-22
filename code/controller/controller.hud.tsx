@@ -51,9 +51,12 @@ export class ControllerHUD {
 
   private render = () => {
     // console.log('testing', this.state, 'v', ControllerState.Waiting);
+    const style = {
+      background: this.colorStr
+    };
     const isWaiting =
       ReactDOM.render(
-        (<div>
+        (<div style={style} className="controls">
           {this.state == ControllerState.Idle ? <Waiting /> : ''}
           {this.state == ControllerState.MainControls ? <MainControls /> : ''}
           {this.state == ControllerState.MenuFollower ? <MenuFollower /> : ''}

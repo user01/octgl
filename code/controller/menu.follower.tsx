@@ -15,7 +15,7 @@ class MenuFollower extends React.Component<IAppProps, IAppState> {
 
   render() {
     return (
-      <div className="controls">
+      <div>
         <h1 className="screen-header">Hang on</h1>
         <h2 className="screen-header">The race will start soon.</h2>
       </div>

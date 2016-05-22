@@ -15,7 +15,7 @@ class MenuLeader extends React.Component<IAppProps, IAppState> {
 
   render() {
     return (
-      <div className="controls">
+      <div>
         <h1 className="screen-header">Menu Leader</h1>
       </div>
     );
