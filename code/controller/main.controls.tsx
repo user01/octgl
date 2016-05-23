@@ -71,7 +71,7 @@ class MainControls extends React.Component<IAppProps, IAppState> {
 
                     <div className="flex-center">
                       <div className="flex-container">
-                        <i className="fa fa-arrow-left fa-5x"></i>
+                        <i className="fa fa-arrow-left fa-5x control-arrow"></i>
                       </div>
                     </div>
 
@@ -94,7 +94,7 @@ class MainControls extends React.Component<IAppProps, IAppState> {
                     >
                     <div className="flex-center">
                       <div className="flex-container">
-                        <i className="fa fa-arrow-right fa-5x"></i>
+                        <i className="fa fa-arrow-right fa-5x control-arrow"></i>
                       </div>
                     </div>
                   </a>

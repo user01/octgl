@@ -24,19 +24,29 @@ div#main {
   width: 100%;
   height: 100vh;
   border: 0.2em black solid;
-  border-radius: 0.25em;
-  // -webkit-box-shadow: inset 0 0 30px #00f, 0 0 30px #00f;
-  // -moz-box-shadow: inset 0 0 30px #00f, 0 0 30px #00f;
-  // box-shadow: inset 0 0 30px #00f, 0 0 30px #00f;
+}
+.control-arrow {
+    color: ghostwhite;
+    text-shadow: rgb(5, 5, 5) 0 0 0.25em;
+}
+.control-text {
+  font-size: 2em;
+  font-weight: bold;
 }
 
-.direction-control-button {
-  width: 50vw;
+.ctl-btn {
   height: 100vh;
   background: rgba(0,0,0,0);
   overflow: hidden;
 }
-
+.direction-control-button {
+  width: 50vw;
+  .ctl-btn;
+}
+.third-control-button {
+  width: 33vw;
+  .ctl-btn;
+}
 
 .btn {
   font-size: 100%;
