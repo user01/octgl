@@ -70,7 +70,9 @@ export class ControllerHUD {
           {this.state == ControllerState.Idle ? <Waiting /> : ''}
           {this.state == ControllerState.MainControls ? <MainControls /> : ''}
           {this.state == ControllerState.MenuFollower ? <MenuFollower /> : ''}
-          {this.state == ControllerState.MenuLeader ? <MenuLeader /> : ''}
+          {this.state == ControllerState.MenuLeader ? <MenuLeader handleCommand={(cmd: MenuCommands) => {
+            this.handleNewCommand({ menu: { cmd } });
+          } } /> : ''}
         </div>), this.rootElement);
   }
 

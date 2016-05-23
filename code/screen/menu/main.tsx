@@ -84,19 +84,19 @@ export class MainMenu {
   }
 
   public HandleCommandFromLeader = (cmd: MenuCommands) => {
-    // console.log('cmd ', cmd, this.currentColumnIndex);
+    console.log('cmd ', cmd, this.currentColumnIndex);
     switch (cmd) {
       case MenuCommands.Left:
-        this.currentColumnIndex--;
-        break;
-      case MenuCommands.Right:
-        this.currentColumnIndex++;
-        break;
-      case MenuCommands.Up:
         this.handleUpDown(true);
         break;
-      case MenuCommands.Down:
+      case MenuCommands.Right:
         this.handleUpDown(false);
+        break;
+      case MenuCommands.Up:
+        this.currentColumnIndex--;
+        break;
+      case MenuCommands.Down:
+        this.currentColumnIndex++;
         break;
       case MenuCommands.Choose:
         // console.log('choose');
