@@ -26,25 +26,15 @@ export class ControllerHUD {
   private state = ControllerState.Idle;
   private periodicUpdateId: any;
   private static PERIODIC_UPDATE_MS = 2500;
+  private currentRacerCommand: RacerCommand = {
+    left: false,
+    right: false,
+    special: false
+  };
 
   private get Playing() {
     return this.state == ControllerState.MainControls;
   }
-
-  private get currentRacerCommand(): RacerCommand {
-    return {
-      left: this.left,
-      right: this.right,
-      special: this.special
-    }
-  };
-  private leftUpper = false;
-  private leftLower = false;
-  private special = false;
-  private rightUpper = false;
-  private rightLower = false;
-  private get left() { return this.leftUpper || this.leftLower; }
-  private get right() { return this.rightUpper || this.rightLower; }
 
 
   constructor(
@@ -68,12 +58,17 @@ export class ControllerHUD {
         (<div style={style} className="controls">
           {this.state == ControllerState.Blocked ? <Blocked /> : ''}
           {this.state == ControllerState.Idle ? <Waiting /> : ''}
-          {this.state == ControllerState.MainControls ? <MainControls /> : ''}
+          {this.state == ControllerState.MainControls ? <MainControls handleUpdatedRacerCommand={this.handleUpdatedRacerCommand}/> : ''}
           {this.state == ControllerState.MenuFollower ? <MenuFollower /> : ''}
           {this.state == ControllerState.MenuLeader ? <MenuLeader handleCommand={(cmd: MenuCommands) => {
             this.handleNewCommand({ menu: { cmd } });
           } } /> : ''}
         </div>), this.rootElement);
+  }
+
+  private handleUpdatedRacerCommand = (racer: RacerCommand) => {
+    this.currentRacerCommand = racer;
+    this.handleNewCommand({ racer: this.currentRacerCommand });
   }
 
   /** Force an update, in case the state gets dropped */
