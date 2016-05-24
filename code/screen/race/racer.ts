@@ -187,12 +187,14 @@ export class Racer extends Player {
     scene: BABYLON.Scene,
     spawn: BABYLON.Vector3,
     kart: BABYLON.AbstractMesh,
+    flareTexture: BABYLON.Texture,
     trackTools: TrackTools
   ) => {
     this.trackTools = trackTools;
 
     const colors = Utility.NumberToColorSet(this.Color);
     const color = BABYLON.Color3.FromInts(colors.r, colors.g, colors.b);
+    const color4 = BABYLON.Color4.FromInts(colors.r, colors.g, colors.b, 1);
     this.baseMesh = new BABYLON.AbstractMesh(`base.${this.DeviceId}`, scene);
     this.kartMesh = kart.clone(`kart.${this.DeviceId}`, this.baseMesh);
     const kartMat = new BABYLON.StandardMaterial(`kartmat.${this.DeviceId}`, scene);
@@ -216,6 +218,21 @@ export class Racer extends Player {
     this.pointerMesh.position = spawn;
     this.pointerMesh.isVisible = false;
 
+
+    const particleSystem = new BABYLON.ParticleSystem(`particles.${this.DeviceId}`, 2000, scene);
+    particleSystem.particleTexture = flareTexture;
+    particleSystem.emitter = this.roller;
+    particleSystem.minEmitBox = new BABYLON.Vector3(0, 0, -0.5); // Starting all from
+    particleSystem.maxEmitBox = new BABYLON.Vector3(0, 0, 0.5); // To...
+    particleSystem.minSize = 0.5;
+    particleSystem.maxSize = 0.8;
+    particleSystem.minLifeTime = 1.75;
+    particleSystem.maxLifeTime = 2.25;
+    particleSystem.emitRate = 150;
+    particleSystem.color1 = color4;
+    particleSystem.color2 = color4;
+    particleSystem.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.0);
+    particleSystem.start();
 
     // this.targetMesh = BABYLON.Mesh.CreateBox(`something.${this.DeviceId}`, 8, scene);
     // this.targetMesh.material = sphereMat;

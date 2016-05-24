@@ -48,6 +48,7 @@ export class Race {
   private scene: BABYLON.Scene;
   private assetsManager: BABYLON.AssetsManager;
   private kart: BABYLON.AbstractMesh;
+  private flareTextures: BABYLON.Texture;
 
   private periodicUpdateId: any;
   private presentMilliseconds = 0;
@@ -155,11 +156,15 @@ export class Race {
 
     this.assetsManager = new BABYLON.AssetsManager(this.scene);
     const kartTask = this.assetsManager.addMeshTask('ship', '', './assets/', 'kart.babylon');
+    const flareTask = this.assetsManager.addTextureTask('flare', './images/flare.png');
     kartTask.onSuccess = (task: any) => {
       // console.log(task);
       const kart = task.loadedMeshes[0];
       this.scene.removeMesh(kart);
       this.kart = kart;
+    }
+    flareTask.onSuccess = (task: any) => {
+      this.flareTextures = task.texture;
     }
     this.assetsManager.onFinish = this.babylonAssetsLoaded;
     this.assetsManager.load();
@@ -173,6 +178,7 @@ export class Race {
         this.scene,
         spawns[idx],
         this.kart,
+        this.flareTextures,
         this.trackTools
       )
     );
