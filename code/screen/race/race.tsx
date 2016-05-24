@@ -50,6 +50,9 @@ export class Race {
   private kart: BABYLON.AbstractMesh;
   private flareTextures: BABYLON.Texture;
 
+  private countDownSound: BABYLON.Sound;
+  private goSound: BABYLON.Sound;
+
   private periodicUpdateId: any;
   private presentMilliseconds = 0;
   private static PERIODIC_UPDATE_MS = 50;
@@ -157,6 +160,8 @@ export class Race {
     this.assetsManager = new BABYLON.AssetsManager(this.scene);
     const kartTask = this.assetsManager.addMeshTask('ship', '', './assets/', 'kart.babylon');
     const flareTask = this.assetsManager.addTextureTask('flare', './images/flare.png');
+    const countDownSoundTask = this.assetsManager.addBinaryFileTask('countdownsound', 'audio/load.wav');
+    const goSoundTask = this.assetsManager.addBinaryFileTask('gosound', 'audio/DM-CGS-18.wav');
     kartTask.onSuccess = (task: any) => {
       // console.log(task);
       const kart = task.loadedMeshes[0];
@@ -165,6 +170,12 @@ export class Race {
     }
     flareTask.onSuccess = (task: any) => {
       this.flareTextures = task.texture;
+    }
+    countDownSoundTask.onSuccess = (task: any) => {
+      this.countDownSound = new BABYLON.Sound('chimesound', task.data, this.scene, null, { autoplay: false, loop: false });
+    }
+    goSoundTask.onSuccess = (task: any) => {
+      this.goSound = new BABYLON.Sound('gosound', task.data, this.scene, null, { autoplay: false, loop: false });
     }
     this.assetsManager.onFinish = this.babylonAssetsLoaded;
     this.assetsManager.load();
@@ -194,6 +205,7 @@ export class Race {
 
     const countDown = () => {
       this.countDownRemaining--;
+      this.countDownSound.play();
       if (this.countDownRemaining > 1) {
         this.state = RaceState.Counting;
         this.render();
@@ -206,6 +218,7 @@ export class Race {
       .then(countDown)
       .delay(Race.PENDING_MS_PER_STATE)
       .then(() => {
+        this.goSound.play();
         this.presentMilliseconds = +Date.now();
         this.state = RaceState.Green;
         this.racers.forEach(r => r.State = r.DeviceId == 65075 ? RacerState.AI : RacerState.Play);
