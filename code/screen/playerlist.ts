@@ -75,6 +75,7 @@ export class PlayerList {
   }
 
   public IsLeader = (device_id: number) => {
+    if (this.players.length < 1) return false;
     return this.Leader.DeviceId == device_id;
   }
   public IsPlayer = (device_id: number) => {
