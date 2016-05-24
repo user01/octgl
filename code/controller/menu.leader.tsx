@@ -81,7 +81,7 @@ class MenuLeader extends React.Component<IAppProps, IAppState> {
                   onClick={() => { this.props.handleCommand(MenuCommands.Choose) } }>
                   <div className="flex-center">
                     <div className="flex-container">
-                      <p className="control-arrow control-text">Race!</p>
+                      <p className="control-arrow control-text">Start</p>
                       <p><i className="fa fa-play-circle fa-4x control-arrow"></i></p>
                     </div>
                   </div>
