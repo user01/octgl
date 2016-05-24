@@ -13,6 +13,7 @@ import TrackTools from './track.tools';
 import PlacementTools from './placement.tools';
 import RacerCommand from '../../interfaces/racercommand';
 import * as WindowFrames from '../../interfaces/window.frame';
+import Utility from '../../data/utility';
 
 import RacerHUDs from './racer.huds.tsx';
 
@@ -31,6 +32,22 @@ export enum RaceState {
   ForcedLeaderboard, // ignore inputs to move past leaderboard (prevents spamming)
   Post // leaderboard
 }
+const availableSoundtracks = [
+  "Trance.A.Metal.Rush.mp3",
+  "Trance.B.Clunk.mp3",
+  "Trance.C.Bright.Blip.mp3",
+  "Trance.D.Base.Dance.mp3",
+  "Trance.E.Frantic.Bomb.mp3",
+  "Trance.F.Trade.Pep.mp3",
+  "Trance.G.Dampen.mp3",
+  "Trance.H.Jumper.mp3",
+  "Trance.I.Pickitah.Motion.mp3",
+  "Trance.J.Sweeper.mp3",
+  "Trance.K.Space.Trance.mp3",
+  "TranceI.L.Pickitah.Motion.mp3",
+];
+
+
 
 /** A Race controller
 */
@@ -52,6 +69,7 @@ export class Race {
 
   private countDownSound: BABYLON.Sound;
   private goSound: BABYLON.Sound;
+  private musicSound: BABYLON.Sound;
 
   private periodicUpdateId: any;
   private presentMilliseconds = 0;
@@ -60,6 +78,7 @@ export class Race {
   private id = Race.id++;
 
   private static PENDING_MS_PER_STATE = 1200;
+  private static MS_STEP_TO_DROP5PER = 50;
   private static MS_TO_ALWAYS_HOLD_LEADERBOARD = 7500;
   private countDownRemaining = 4;
 
@@ -157,11 +176,14 @@ export class Race {
       m.isVisible = false;
     });
 
+    const currentSoundtrack = Utility.RandomItem(availableSoundtracks);
+
     this.assetsManager = new BABYLON.AssetsManager(this.scene);
     const kartTask = this.assetsManager.addMeshTask('ship', '', './assets/', 'kart.babylon');
     const flareTask = this.assetsManager.addTextureTask('flare', './images/flare.png');
     const countDownSoundTask = this.assetsManager.addBinaryFileTask('countdownsound', 'audio/load.wav');
     const goSoundTask = this.assetsManager.addBinaryFileTask('gosound', 'audio/DM-CGS-18.wav');
+    const musicSoundTask = this.assetsManager.addBinaryFileTask('gosound', `audio/${currentSoundtrack}`);
     kartTask.onSuccess = (task: any) => {
       // console.log(task);
       const kart = task.loadedMeshes[0];
@@ -176,6 +198,9 @@ export class Race {
     }
     goSoundTask.onSuccess = (task: any) => {
       this.goSound = new BABYLON.Sound('gosound', task.data, this.scene, null, { autoplay: false, loop: false });
+    }
+    musicSoundTask.onSuccess = (task: any) => {
+      this.musicSound = new BABYLON.Sound('musicsound', task.data, this.scene, null, { autoplay: true, loop: true, volume: 0.65 });
     }
     this.assetsManager.onFinish = this.babylonAssetsLoaded;
     this.assetsManager.load();
@@ -309,6 +334,8 @@ export class Race {
   private closeLevel = () => {
     window.removeEventListener(`resize.${this.id}`, this.babylonEngineResize);
     this.engine.stopRenderLoop();
+    this.musicSound.setVolume(0, 4);
+    this.musicSound.stop(4.1);
     this.onRaceDone();
   }
 
