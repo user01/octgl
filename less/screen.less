@@ -1,6 +1,7 @@
 @import "common.less";
 @import "racer.hud.less";
 @import "animate.custom.min.less";
+@import "mixins.less";
 
 @border-small-value: 0.1em solid teal;
 @border-big-value: 1.4em solid teal;
@@ -75,7 +76,8 @@ div.image-wrapper {
 
 #main {
   z-index: 100;
-  background: white;
+  // .gradient(left,red,teal);
+  .radial(white,#C8E5FF);
 }
 
 #loading-view {
