@@ -78,7 +78,7 @@ export class Race {
   private id = Race.id++;
 
   private static PENDING_MS_PER_STATE = 1200;
-  private static MS_STEP_TO_DROP5PER = 50;
+  private static SECONDS_TO_FADE_OUT_MUSIC = 2.2;
   private static MS_TO_ALWAYS_HOLD_LEADERBOARD = 7500;
   private countDownRemaining = 4;
 
@@ -334,8 +334,8 @@ export class Race {
   private closeLevel = () => {
     window.removeEventListener(`resize.${this.id}`, this.babylonEngineResize);
     this.engine.stopRenderLoop();
-    this.musicSound.setVolume(0, 4);
-    this.musicSound.stop(4.1);
+    this.musicSound.setVolume(0, Race.SECONDS_TO_FADE_OUT_MUSIC);
+    this.musicSound.stop(Race.SECONDS_TO_FADE_OUT_MUSIC + 0.1);
     this.onRaceDone();
   }
 
