@@ -121,6 +121,8 @@ export class Racer extends Player {
   private nextTarget: BABYLON.Vector3 = null;
   private cameraTarget: BABYLON.Vector3;
 
+  private trailerParticleSystem: BABYLON.ParticleSystem;
+
   // private targetMesh: BABYLON.AbstractMesh;
   private tempSphere: BABYLON.AbstractMesh;
   private cameraTargetBox: BABYLON.AbstractMesh;
@@ -219,20 +221,20 @@ export class Racer extends Player {
     this.pointerMesh.isVisible = false;
 
 
-    const particleSystem = new BABYLON.ParticleSystem(`particles.${this.DeviceId}`, 2000, scene);
-    particleSystem.particleTexture = flareTexture;
-    particleSystem.emitter = this.roller;
-    particleSystem.minEmitBox = new BABYLON.Vector3(0, 0, -0.5); // Starting all from
-    particleSystem.maxEmitBox = new BABYLON.Vector3(0, 0, 0.5); // To...
-    particleSystem.minSize = 0.5;
-    particleSystem.maxSize = 0.8;
-    particleSystem.minLifeTime = 1.75;
-    particleSystem.maxLifeTime = 2.25;
-    particleSystem.emitRate = 150;
-    particleSystem.color1 = color4;
-    particleSystem.color2 = color4;
-    particleSystem.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.0);
-    particleSystem.start();
+    this.trailerParticleSystem = new BABYLON.ParticleSystem(`particles.${this.DeviceId}`, 2000, scene);
+    this.trailerParticleSystem.particleTexture = flareTexture;
+    this.trailerParticleSystem.emitter = this.roller;
+    this.trailerParticleSystem.minEmitBox = new BABYLON.Vector3(0, 0, -0.5); // Starting all from
+    this.trailerParticleSystem.maxEmitBox = new BABYLON.Vector3(0, 0, 0.5); // To...
+    this.trailerParticleSystem.minSize = 0.5;
+    this.trailerParticleSystem.maxSize = 0.8;
+    this.trailerParticleSystem.minLifeTime = 1.75;
+    this.trailerParticleSystem.maxLifeTime = 2.25;
+    this.trailerParticleSystem.emitRate = 150;
+    this.trailerParticleSystem.color1 = color4;
+    this.trailerParticleSystem.color2 = color4;
+    this.trailerParticleSystem.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.0);
+    // this.trailerParticleSystem.start();
 
     // this.targetMesh = BABYLON.Mesh.CreateBox(`something.${this.DeviceId}`, 8, scene);
     // this.targetMesh.material = sphereMat;
@@ -276,6 +278,7 @@ export class Racer extends Player {
     this.driveRacer(linearVelocity, fractionOfSecond, impulseScalar);
     this.updateChildObjects(linearVelocity, fractionOfSecond);
     this.updateTargetLocation();
+    this.updateParticleSystems(linearVelocity.length());
 
     this.UpdateRacerPosition();
   }
@@ -601,6 +604,20 @@ export class Racer extends Player {
       default:
         console.error('Bad AI state');
         break;
+    }
+  }
+
+  private updateParticleSystems = (linearVelocity: number) => {
+    // this.DEBUG_feedback = `${linearVelocity}`;
+    if (linearVelocity > Racer.MAX_GROUND_LINEAR_VELOCITY * 0.2) {
+      //fast enought
+      if (!this.trailerParticleSystem.isStarted()) {
+        this.trailerParticleSystem.start();
+      }
+    } else {
+      if (this.trailerParticleSystem.isStarted()) {
+        this.trailerParticleSystem.stop();
+      }
     }
   }
 
