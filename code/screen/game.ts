@@ -145,10 +145,15 @@ export class Game {
     this.requestNewGame([
       new Player(0xFF3300, 4, 'Player'),
       new Player(0x0033FF, 65075, 'AI'),
-    ]);
+    ],
+      'track.b.babylon',
+      1);
   }
 
-  private requestNewGame = (players = this.playerList.Players) => {
+  private requestNewGame = (
+    players = this.playerList.Players,
+    trackFilename: string = this.mainMenu.CurrentGamePayload.track.filename,
+    lapToWin: number = 3) => {
     console.log('Requesting a new game with payload of ', this.mainMenu.CurrentGamePayload);
 
     //Switch the game state
@@ -158,8 +163,8 @@ export class Game {
     this.race = new Race(
       players,
       this.raceElement,
-      this.mainMenu.CurrentGamePayload.track.filename,
-      3,
+      trackFilename,
+      lapToWin,
       () => {
         console.log('race done');
         this.state = GameState.Lobby;
