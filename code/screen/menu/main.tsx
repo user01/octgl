@@ -87,10 +87,10 @@ export class MainMenu {
     console.log('cmd ', cmd, this.currentColumnIndex);
     switch (cmd) {
       case MenuCommands.Left:
-        this.handleUpDown(true);
+        this.handleUpDown(false);
         break;
       case MenuCommands.Right:
-        this.handleUpDown(false);
+        this.handleUpDown(true);
         break;
       case MenuCommands.Up:
         this.currentColumnIndex--;
