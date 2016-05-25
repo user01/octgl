@@ -122,6 +122,7 @@ export class Racer extends Player {
   private cameraTarget: BABYLON.Vector3;
 
   private trailerParticleSystem: BABYLON.ParticleSystem;
+  private groundParticleSystem: BABYLON.ParticleSystem;
 
   // private targetMesh: BABYLON.AbstractMesh;
   private tempSphere: BABYLON.AbstractMesh;
@@ -221,20 +222,40 @@ export class Racer extends Player {
     this.pointerMesh.isVisible = false;
 
 
-    this.trailerParticleSystem = new BABYLON.ParticleSystem(`particles.${this.DeviceId}`, 2000, scene);
+    this.trailerParticleSystem = new BABYLON.ParticleSystem(`trailers.particles.${this.DeviceId}`, 2000, scene);
     this.trailerParticleSystem.particleTexture = flareTexture;
     this.trailerParticleSystem.emitter = this.roller;
     this.trailerParticleSystem.minEmitBox = new BABYLON.Vector3(0, 0, -0.5); // Starting all from
     this.trailerParticleSystem.maxEmitBox = new BABYLON.Vector3(0, 0, 0.5); // To...
     this.trailerParticleSystem.minSize = 0.5;
     this.trailerParticleSystem.maxSize = 0.8;
-    this.trailerParticleSystem.minLifeTime = 1.75;
-    this.trailerParticleSystem.maxLifeTime = 2.25;
+    this.trailerParticleSystem.minLifeTime = 3.75;
+    this.trailerParticleSystem.maxLifeTime = 5.25;
     this.trailerParticleSystem.emitRate = 150;
     this.trailerParticleSystem.color1 = color4;
     this.trailerParticleSystem.color2 = color4;
     this.trailerParticleSystem.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.0);
-    // this.trailerParticleSystem.start();
+    this.trailerParticleSystem.stop();
+
+
+    const tempGroundWidth = 1.4;
+
+    this.groundParticleSystem = new BABYLON.ParticleSystem(`ground.particles.${this.DeviceId}`, 200, scene);
+    this.groundParticleSystem.particleTexture = flareTexture;
+    this.groundParticleSystem.emitter = this.kartMesh;
+    this.groundParticleSystem.minEmitBox = new BABYLON.Vector3(-tempGroundWidth, -1.5, -tempGroundWidth); // Starting all from
+    this.groundParticleSystem.maxEmitBox = new BABYLON.Vector3(tempGroundWidth, -1.5 + tempGroundWidth / 2, tempGroundWidth); // To...
+    this.groundParticleSystem.minSize = 0.8;
+    this.groundParticleSystem.maxSize = 1.4;
+    this.groundParticleSystem.minLifeTime = 0.05;
+    this.groundParticleSystem.maxLifeTime = 0.15;
+    this.groundParticleSystem.emitRate = 1250;
+    this.groundParticleSystem.gravity = new BABYLON.Vector3(0, -2, 0);
+    this.groundParticleSystem.color1 = new BABYLON.Color4(144 / 255, 9 / 255, 0 / 255, 1);
+    this.groundParticleSystem.color2 = new BABYLON.Color4(144 / 255, 9 / 255, 0 / 255, 1);
+    this.groundParticleSystem.colorDead = new BABYLON.Color4(144 / 255, 9 / 255, 0 / 255, 1);
+    this.groundParticleSystem.stop();
+
 
     // this.targetMesh = BABYLON.Mesh.CreateBox(`something.${this.DeviceId}`, 8, scene);
     // this.targetMesh.material = sphereMat;
@@ -518,6 +539,7 @@ export class Racer extends Player {
     this.lap = newLap;
     this.PercentDoneTrack = this.trackTools.DistanceOnTrack(this.roller, this.currentTrackIndex) / this.trackTools.TrackLength;
     this.isGrounded = this.trackTools.IsOnGround(this.roller);
+    this.DEBUG_feedback = `Grounded: ${this.isGrounded}`;
 
     // if a new target has been found, 
     if (computedIndex != this.currentTrackIndex) {
@@ -609,7 +631,7 @@ export class Racer extends Player {
 
   private updateParticleSystems = (linearVelocity: number) => {
     // this.DEBUG_feedback = `${linearVelocity}`;
-    if (linearVelocity > Racer.MAX_GROUND_LINEAR_VELOCITY * 0.2) {
+    if (linearVelocity > Racer.MAX_GROUND_LINEAR_VELOCITY * 0.05) {
       //fast enought
       if (!this.trailerParticleSystem.isStarted()) {
         this.trailerParticleSystem.start();
@@ -617,6 +639,17 @@ export class Racer extends Player {
     } else {
       if (this.trailerParticleSystem.isStarted()) {
         this.trailerParticleSystem.stop();
+      }
+    }
+
+    if (this.isGrounded) {
+      // on turf
+      if (!this.groundParticleSystem.isStarted()) {
+        this.groundParticleSystem.start();
+      }
+    } else {
+      if (this.groundParticleSystem.isStarted()) {
+        this.groundParticleSystem.stop();
       }
     }
   }
@@ -703,18 +736,6 @@ export class Racer extends Player {
     const newScale = newLength / origLength;
     return vector3.scale(newScale);
   }
-
-  // /** Changes the length a certain delta */
-  // private static adjustVectorToMax(vector3: BABYLON.Vector3, maxLength: number) {
-  //   const origLength = vector3.length();
-  //   if (origLength <= maxLength) return vector3;
-
-  //   const overshoot = origLength - maxLength;
-
-  //   const newLength = origLength + delta;
-  //   const newScale = newLength / origLength;
-  //   return vector3.scale(newScale);
-  // }
 
   private static roundPlace(num: number, places = 1) {
     const factor = Math.pow(10, places);

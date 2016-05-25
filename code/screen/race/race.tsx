@@ -180,7 +180,7 @@ export class Race {
 
     this.assetsManager = new BABYLON.AssetsManager(this.scene);
     const kartTask = this.assetsManager.addMeshTask('ship', '', './assets/', 'kart.babylon');
-    const flareTask = this.assetsManager.addTextureTask('flare', './images/flare.png');
+    const flareTask = this.assetsManager.addTextureTask('flare', './images/particle.jpg');
     const countDownSoundTask = this.assetsManager.addBinaryFileTask('countdownsound', 'audio/load.wav');
     const goSoundTask = this.assetsManager.addBinaryFileTask('gosound', 'audio/DM-CGS-18.wav');
     const musicSoundTask = this.assetsManager.addBinaryFileTask('gosound', `audio/${currentSoundtrack}`);
