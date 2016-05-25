@@ -33,8 +33,7 @@ export class TrackTools {
         if (a.name < b.name) return -1;
         return 0;
       }),
-      R.groupBy((mesh: BABYLON.AbstractMesh) => mesh.name),
-      // R.groupBy((mesh: BABYLON.AbstractMesh) => TrackTools.pathRegExp.exec(mesh.name)[0]),
+      R.groupBy((mesh: BABYLON.AbstractMesh) => TrackTools.pathRegExp.exec(mesh.name)[0]),
       R.values,
       R.filter((list: BABYLON.AbstractMesh[]) => list.length > 0)
     )(sceneObjects);
