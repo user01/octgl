@@ -94,14 +94,14 @@ export class TrackTools {
     return currentTrackIndex;
   }
 
+  /** The next target is determined as the FIRST (in alphabetical order)
+   * of the hitboxes in the index
+  */
   public GetNextTrackTarget = (currentTrackIndex: number) => {
     const nextTrackIndex = currentTrackIndex + 1;
     const hitboxes = this.getIndex(nextTrackIndex);
     const targetPosition: BABYLON.Vector3 = (<any>R).pipe(
-      R.length,
-      R.flip(R.divide)(2),
-      Math.floor,
-      R.flip(R.nth)(hitboxes),
+      R.head,
       R.prop('position')
     )(hitboxes);
     return targetPosition;
