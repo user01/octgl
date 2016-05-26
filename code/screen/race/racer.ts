@@ -268,6 +268,7 @@ export class Racer extends Player {
 
     this.camera = new BABYLON.FreeCamera(`camera.${this.DeviceId}`, this.baseMesh.position.add(new BABYLON.Vector3(-20, 8, 0)), scene);
     this.camera.lockedTarget = this.cameraTargetBox;
+    this.camera.maxZ = 200000;
     // this.camera.lockedTarget = this.pointerMesh;
     // this.camera.lockedTarget = this.baseMesh;
 
