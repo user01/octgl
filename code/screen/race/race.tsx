@@ -154,7 +154,7 @@ export class Race {
 
   private babylonSceneLoaded = () => {
     // create a basic light, aiming 0,1,0 - meaning, to the sky
-    var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
+    // var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
     this.scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.CannonJSPlugin(true, 5));
 
     this.trackTools = new TrackTools(this.scene.meshes, this.scene);
