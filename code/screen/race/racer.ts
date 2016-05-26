@@ -539,7 +539,7 @@ export class Racer extends Player {
     this.lap = newLap;
     this.PercentDoneTrack = this.trackTools.DistanceOnTrack(this.roller, this.currentTrackIndex) / this.trackTools.TrackLength;
     this.isGrounded = this.trackTools.IsOnGround(this.roller);
-    this.DEBUG_feedback = `Grounded: ${this.isGrounded}`;
+    // this.DEBUG_feedback = `Grounded: ${this.isGrounded}`;
 
     // if a new target has been found, 
     if (computedIndex != this.currentTrackIndex) {
@@ -630,14 +630,16 @@ export class Racer extends Player {
   }
 
   private updateParticleSystems = (linearVelocity: number) => {
-    // this.DEBUG_feedback = `${linearVelocity}`;
-    if (linearVelocity > Racer.MAX_GROUND_LINEAR_VELOCITY * 0.05) {
+    // this.DEBUG_feedback = `${Racer.roundPlace(Racer.MAX_NORMAL_LINEAR_VELOCITY * 0.0001)} vs ${Racer.roundPlace(linearVelocity, 4)}`;
+    if (linearVelocity > Racer.MAX_NORMAL_LINEAR_VELOCITY * 0.0001) {
       //fast enought
       if (!this.trailerParticleSystem.isStarted()) {
+        // this.DEBUG_feedback = `ON`;
         this.trailerParticleSystem.start();
       }
     } else {
       if (this.trailerParticleSystem.isStarted()) {
+        // this.DEBUG_feedback = `OFF`;
         this.trailerParticleSystem.stop();
       }
     }
