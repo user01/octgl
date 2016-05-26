@@ -243,8 +243,8 @@ export class Racer extends Player {
     this.groundParticleSystem = new BABYLON.ParticleSystem(`ground.particles.${this.DeviceId}`, 200, scene);
     this.groundParticleSystem.particleTexture = flareTexture;
     this.groundParticleSystem.emitter = this.kartMesh;
-    this.groundParticleSystem.minEmitBox = new BABYLON.Vector3(-tempGroundWidth, -1.5, -tempGroundWidth); // Starting all from
-    this.groundParticleSystem.maxEmitBox = new BABYLON.Vector3(tempGroundWidth, -1.5 + tempGroundWidth / 2, tempGroundWidth); // To...
+    this.groundParticleSystem.minEmitBox = new BABYLON.Vector3(-tempGroundWidth + 6, -1.5, -tempGroundWidth); // Starting all from
+    this.groundParticleSystem.maxEmitBox = new BABYLON.Vector3(tempGroundWidth + 6, -1.5 + tempGroundWidth / 2, tempGroundWidth); // To...
     this.groundParticleSystem.minSize = 0.8;
     this.groundParticleSystem.maxSize = 1.4;
     this.groundParticleSystem.minLifeTime = 0.05;
