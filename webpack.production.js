@@ -24,7 +24,16 @@ module.exports = {
     fallback: path.join(__dirname, 'node_modules')
   },
   plugins: [
-    new webpack.DefinePlugin({ "global.GENTLY": false })
+    new webpack.DefinePlugin({ "global.GENTLY": false }),
+    new webpack.DefinePlugin({ "process.env.NODE_ENV": JSON.stringify("production") }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      },
+      mangle: {
+        except: ['BABYLON', 'exports', 'require']
+      }
+    })
   ],
   node: {
     __dirname: true,
