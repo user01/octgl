@@ -12,8 +12,8 @@ const tracks: TrackData[] = [
     image: "images/track.b.png"
   },
   {
-    name: "Faux Track",
-    filename: "track.test.003.babylon",
+    name: "Dresden",
+    filename: "track.d.babylon",
     image: "images/temp.jpg"
   }
 ];

@@ -146,7 +146,7 @@ export class Game {
       new Player(0xFF3300, 4, 'Player'),
       new Player(0x0033FF, 65075, 'AI'),
     ],
-      'track.b.babylon',
+      'track.d.babylon',
       1);
   }
 

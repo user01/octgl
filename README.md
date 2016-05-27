@@ -39,4 +39,6 @@ To do this, [Use Dupliframes](http://blender.stackexchange.com/questions/510/how
 
     Finally, you can now change the orientation of the object by either rotating it (either in Edit mode or Object mode). The arrangement of objects can, of course, be further enhanced by editing the curve. (Shaping it into text etc)
     
+    Additionally, its worth noting that the additional objects are instances and not real objects, this will reduce the load of your scene and also allow you to be more flexible when adding more objects. Alternatively, you can Make Duplicates Real with Ctrl + Shift + A. All objects will now be real objects, but still linked copies. To change this, go to Object → Make Single User → Object & Data and choose All.
+    
 Make sure to remove extra objects and unparent the first object (once isolated) from the curve. Also make sure the results actually line up; most need to be nudged.
