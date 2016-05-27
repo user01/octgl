@@ -1,4 +1,4 @@
-var webpack = require( 'webpack' ); //Comment this out if you want to use the noErrorsPlugin below
+var webpack = require('webpack'); //Comment this out if you want to use the noErrorsPlugin below
 var path = require('path');
 
 module.exports = {
@@ -24,7 +24,13 @@ module.exports = {
     fallback: path.join(__dirname, 'node_modules')
   },
   plugins: [
-    new webpack.DefinePlugin({ "global.GENTLY": false })
+    new webpack.DefinePlugin({ "global.GENTLY": false }),
+    new webpack.DefinePlugin({ "process.env.NODE_ENV": JSON.stringify("production") }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      }
+    })
   ],
   node: {
     __dirname: true,
