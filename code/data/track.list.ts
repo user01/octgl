@@ -9,7 +9,7 @@ const tracks: TrackData[] = [
   {
     name: "Brisbane",
     filename: "track.b.babylon",
-    image: "images/temp.jpg"
+    image: "images/track.b.png"
   },
   {
     name: "Faux Track",
