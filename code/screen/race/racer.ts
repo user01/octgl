@@ -49,6 +49,7 @@ export class Racer extends Player {
   private isGrounded = false;
   private aiState = RacerAiState.Straight;
   public DEBUG_feedback = '';
+  private cameraElevation = 0;
 
   // Message flags
   public get ShowLapTime() { return this.showLapTime; }
@@ -117,6 +118,7 @@ export class Racer extends Player {
   private roller: BABYLON.Mesh;
   private baseMesh: BABYLON.AbstractMesh;
   private pointerMesh: BABYLON.AbstractMesh;
+  private DEBUGMesh: BABYLON.AbstractMesh;
   private kartMesh: BABYLON.AbstractMesh;
   private nextTarget: BABYLON.Vector3 = null;
   private cameraTarget: BABYLON.Vector3;
@@ -162,6 +164,7 @@ export class Racer extends Player {
 
   /** Speed camera can move to reach ideal location */
   private static UNITS_PER_SECOND_CAMERA_SPEED = 0.5;
+  private static UNIT_PER_SECOND_CAMERA_Y = 0.02;
 
   /** Linear speeds */
   private static IMPULSE_PER_SECOND = 32;
@@ -205,6 +208,10 @@ export class Racer extends Player {
     this.kartMesh.material = kartMat;
 
 
+    const DEBUGMat = new BABYLON.StandardMaterial(`DEBUGmat.${this.DeviceId}`, scene);
+    DEBUGMat.diffuseColor = new BABYLON.Color3(0, 1, 0);
+    DEBUGMat.wireframe = true;
+
     const sphereMat = new BABYLON.StandardMaterial(`spheremat.${this.DeviceId}`, scene);
     sphereMat.diffuseColor = color;
     sphereMat.wireframe = true;
@@ -216,10 +223,15 @@ export class Racer extends Player {
       { mass: 5, friction: 8.5, restitution: 0.1 });
     this.roller.isVisible = false;
 
-    this.pointerMesh = BABYLON.Mesh.CreateSphere(`roller.${this.DeviceId}`, 2, 0.5, scene);
+    this.pointerMesh = BABYLON.Mesh.CreateSphere(`pointer.${this.DeviceId}`, 2, 0.5, scene);
     this.pointerMesh.material = sphereMat;
     this.pointerMesh.position = spawn;
     this.pointerMesh.isVisible = false;
+
+    this.DEBUGMesh = BABYLON.Mesh.CreateSphere(`DEBUG.${this.DeviceId}`, 2, 0.9, scene);
+    this.DEBUGMesh.material = DEBUGMat;
+    this.DEBUGMesh.position = spawn;
+    this.DEBUGMesh.isVisible = false;
 
 
     this.trailerParticleSystem = new BABYLON.ParticleSystem(`trailers.particles.${this.DeviceId}`, 2000, scene);
@@ -263,7 +275,7 @@ export class Racer extends Player {
     // this.tempSphere = BABYLON.Mesh.CreateSphere(`tempish.${this.DeviceId}`, 6, 5.5, scene);
     // this.tempSphere.material = sphereMat;
     this.cameraTargetBox = BABYLON.Mesh.CreateBox(`cameraTargetBox.${this.DeviceId}`, 1.4, scene);
-    this.cameraTargetBox.material = sphereMat;
+    this.cameraTargetBox.material = DEBUGMat;
     this.cameraTargetBox.isVisible = false;
 
     this.camera = new BABYLON.FreeCamera(`camera.${this.DeviceId}`, this.baseMesh.position.add(new BABYLON.Vector3(-20, 8, 0)), scene);
@@ -497,18 +509,35 @@ export class Racer extends Player {
       BABYLON.Axis.Y);
     const idealForwardPosition = this.baseMesh.position.add(forwardVector);
 
-    this.cameraTargetBox.position = BABYLON.Vector3.Lerp(idealForwardPosition, this.pointerMesh.position, 0.1);
+    const yDiff = this.nextTarget.y - idealCameraPosition.y;
+    this.DEBUGMesh.position = this.PushFromVector3ToVector3ByDistance(this.DEBUGMesh.position, idealForwardPosition.add(new BABYLON.Vector3(0, yDiff, 0)), Racer.UNITS_PER_SECOND_CAMERA_SPEED * fractionOfSecond);
+    // this.DEBUGMesh.position = idealForwardPosition.add(new BABYLON.Vector3(0,4,0));
+    this.cameraTargetBox.position = idealForwardPosition;
+    this.camera.position = idealCameraPosition;
 
-    const vectorToAddToBeIdeal = idealCameraPosition.subtract(this.camera.position)
-    const vectorToAddToBeIdealLength = vectorToAddToBeIdeal.length();
 
-    const cameraCloseToIdeal = vectorToAddToBeIdealLength < 0.005;
-    this.camera.position = cameraCloseToIdeal ?
-      idealCameraPosition :
-      this.camera.position.add(vectorToAddToBeIdeal.scale(
-        (Racer.UNITS_PER_SECOND_CAMERA_SPEED * fractionOfSecond + vectorToAddToBeIdealLength) / vectorToAddToBeIdealLength
-      ))
-    // BABYLON.Vector3.Lerp(this.camera.position, idealCameraPosition, 1 - 0.2);
+
+
+    // const vectorFromRollerToTarget = this.camera.position.subtract(this.nextTarget);
+    // this.DEBUG_feedback = `yDiff: ${Racer.roundPlace(yDiff, 2)}`;
+    // const desiredCameraElevation = yDiff * 0.8;
+    // // const actualForwardPosition = idealCameraPosition;
+    // const actualForwardPosition = idealCameraPosition.add(new BABYLON.Vector3(0, yDiff * 0.5, 0));
+
+
+    // // this.cameraTargetBox.position = BABYLON.Vector3.Lerp(idealForwardPosition, this.pointerMesh.position, 0.1);
+    // this.cameraTargetBox.position = BABYLON.Vector3.Lerp(actualForwardPosition, this.pointerMesh.position, 0.1);
+
+    // const vectorToAddToBeIdeal = idealCameraPosition.subtract(this.camera.position)
+    // const vectorToAddToBeIdealLength = vectorToAddToBeIdeal.length();
+
+    // const cameraCloseToIdeal = vectorToAddToBeIdealLength < 0.005;
+    // this.camera.position = cameraCloseToIdeal ?
+    //   idealCameraPosition :
+    //   this.camera.position.add(vectorToAddToBeIdeal.scale(
+    //     (Racer.UNITS_PER_SECOND_CAMERA_SPEED * fractionOfSecond + vectorToAddToBeIdealLength) / vectorToAddToBeIdealLength
+    //   ))
+    // // BABYLON.Vector3.Lerp(this.camera.position, idealCameraPosition, 1 - 0.2);
 
     this.baseMesh.position = this.roller.position;
     this.pointerMesh.position = this.baseMesh.position.add(linearVelocity);
@@ -760,6 +789,16 @@ export class Racer extends Player {
 
     str += '.' + fractionalSeconds;
     return str;
+  }
+
+  private PushFromVector3ToVector3ByDistance(vSource: BABYLON.Vector3, vTarget: BABYLON.Vector3, pushAmount: number) {
+    const difference = vTarget.subtract(vSource);
+    const distance = difference.length();
+    // this.DEBUG_feedback = `${Racer.roundPlace(distance, 2)}`;
+    if (distance <= pushAmount) {
+      return vTarget;
+    }
+    return vSource.add(difference.scale((pushAmount + distance) / distance));
   }
 }
 
