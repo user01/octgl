@@ -1,5 +1,6 @@
 
 import * as React from 'react';
+import * as R from 'ramda';
 
 import {RacerCommand} from '../interfaces/racercommand';
 
@@ -22,6 +23,11 @@ class MainControls extends React.Component<IAppProps, IAppState> {
   private left = false;
   private special = false;
   private right = false;
+  private lastSentCommand: RacerCommand = {
+    left: false,
+    right: false,
+    special: false
+  };
 
   constructor(props: IAppProps) {
     super(props);
@@ -30,26 +36,31 @@ class MainControls extends React.Component<IAppProps, IAppState> {
   private leftOn = (e) => {
     e.preventDefault();
     this.left = true;
-    this.sendCurrentCommand();
+    this.requestSendCurrentCommand();
   }
   private leftOff = (e) => {
     e.preventDefault();
     this.left = false;
-    this.sendCurrentCommand();
+    this.requestSendCurrentCommand();
   }
 
   private rightOn = (e) => {
     e.preventDefault();
     this.right = true;
-    this.sendCurrentCommand();
+    this.requestSendCurrentCommand();
   }
   private rightOff = (e) => {
     e.preventDefault();
     this.right = false;
-    this.sendCurrentCommand();
+    this.requestSendCurrentCommand();
   }
 
+  private requestSendCurrentCommand = () => {
+    if (R.equals(this.lastSentCommand, this.currentRacerCommand)) return;
+    this.sendCurrentCommand();
+  }
   private sendCurrentCommand = () => {
+    this.lastSentCommand = this.currentRacerCommand;
     this.props.handleUpdatedRacerCommand(this.currentRacerCommand);
   }
 
