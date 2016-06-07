@@ -8,6 +8,7 @@
 ## Minor
 
  * Better ship model
+ * Better chase camera
  * Better loading screen
  * Fix Brisbane's geometry issues
  * Add ramps to Dresden to spice things up
