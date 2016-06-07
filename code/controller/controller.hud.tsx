@@ -82,62 +82,6 @@ export class ControllerHUD {
     }
   }
 
-  // private assignClick = (elm: HTMLElement) => {
-  //   const clickableBtns = elm.getElementsByClassName('btn');
-  //   for (var i = 0; i < clickableBtns.length; i++) {
-  //     let id = clickableBtns[i].id;
-  //     let handlerOn = (evt) => {
-  //       evt.preventDefault();
-  //       // console.log('heard a click start from ', id);
-  //       this.handleClickOn(id);
-  //     };
-  //     clickableBtns[i].addEventListener('touchstart', handlerOn, true);
-  //     clickableBtns[i].addEventListener('mousedown', handlerOn, true);
-  //     let handlerOff = (evt) => {
-  //       evt.preventDefault();
-  //       // console.log('heard a click end from ', id);
-  //       this.handleClickOff(id);
-  //     };
-  //     clickableBtns[i].addEventListener('touchend', handlerOff, true);
-  //     clickableBtns[i].addEventListener('mouseup', handlerOff, true);
-  //   }
-  // }
-  // private handleClickOn = (id: string) => {
-  //   // console.log(ControllerHUD.IDS_TO_CMDS[id], id, ControllerHUD.IDS_TO_CMDS);
-  //   if (R.is(Number, ControllerHUD.IDS_TO_CMDS[id])) {
-  //     this.handleNewCommand({ menu: { cmd: ControllerHUD.IDS_TO_CMDS[id] } });
-  //     return;
-  //   } else {
-  //     this.toggleRacerId(id, true);
-  //   }
-  // }
-  // private handleClickOff = (id: string) => {
-  //   if (!R.is(Number, ControllerHUD.IDS_TO_CMDS[id])) {
-  //     this.toggleRacerId(id, false);
-  //   }
-  // }
-  // private toggleRacerId = (id: string, state: boolean) => {
-  //   switch (id) {
-  //     case 'button-upper-left':
-  //       this.leftUpper = state;
-  //       break;
-  //     case 'button-lower-left':
-  //       this.leftLower = state;
-  //       break;
-  //     case 'button-upper-right':
-  //       this.rightUpper = state;
-  //       break;
-  //     case 'button-lower-right':
-  //       this.rightLower = state;
-  //       break;
-  //     case 'button-special':
-  //       this.special = state;
-  //       break;
-  //     default:
-  //       console.error('bad id of ', id);
-  //   }
-  //   this.handleNewCommand({ racer: this.currentRacerCommand });
-  // }
 
   public SwitchTo = (state: ControllerState) => {
     this.state = state;
